@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neptune Reads</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+    }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="bg-zinc-50 text-zinc-900 dark:bg-zinc-950 dark:text-zinc-100 min-h-screen flex flex-col transition-colors duration-150">
+
+  <!-- Top Navigation -->
+  <header class="sticky top-0 z-40 bg-white/95 dark:bg-zinc-950/95 backdrop-blur border-b border-zinc-200 dark:border-zinc-800">
+    <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
+      <!-- Brand + Mobile Menu Button -->
+      <div class="flex items-center gap-2.5">
+        <button id="mobile-menu-btn" aria-label="Open menu" class="md:hidden p-2 -ml-2 rounded-lg text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+        </button>
+        <a href="#home" onclick="navigate('home'); return false;" class="flex items-center gap-2 font-bold text-lg tracking-tight">
+          <span class="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block"></span>
+          <span>Neptune Reads</span>
+        </a>
+      </div>
+
+      <!-- Desktop Nav Links -->
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-zinc-600 dark:text-zinc-400">
+        <button onclick="navigate('home')" data-nav="home" class="nav-link hover:text-zinc-900 dark:hover:text-white transition">Browse</button>
+        <button onclick="navigate('library')" data-nav="library" class="nav-link hover:text-zinc-900 dark:hover:text-white transition">Library</button>
+        <button onclick="navigate('publish')" data-nav="publish" class="nav-link hover:text-zinc-900 dark:hover:text-white transition">Publish</button>
+      </nav>
+
+      <!-- Right Actions: Search, Theme, Auth -->
+      <div class="flex items-center gap-2">
+        <button onclick="toggleTheme()" aria-label="Toggle dark mode" class="p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition">
+          <svg id="icon-sun" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+          </svg>
+          <svg id="icon-moon" class="w-4 h-4 block dark:hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+          </svg>
+        </button>
+
+        <button id="auth-header-btn" onclick="openAuthModal()" class="px-3.5 py-1.5 rounded-lg text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white transition">
+          Sign In
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Mobile Tucked Drawer -->
+  <div id="mobile-drawer" class="fixed inset-0 z-50 hidden">
+    <div onclick="closeMobileDrawer()" class="fixed inset-0 bg-black/60"></div>
+    <aside class="relative w-64 max-w-[80vw] h-full bg-white dark:bg-zinc-950 border-r border-zinc-200 dark:border-zinc-800 p-4 flex flex-col justify-between">
+      <div>
+        <div class="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
+          <span class="font-bold text-base">Neptune Reads</span>
+          <button onclick="closeMobileDrawer()" class="p-1.5 rounded-lg text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-900">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <div id="drawer-user-box" class="mt-4 p-3 rounded-lg bg-zinc-100 dark:bg-zinc-900 text-xs">
+          <p class="font-medium text-zinc-800 dark:text-zinc-200">Guest Reader</p>
+          <p class="text-zinc-500 dark:text-zinc-400 mt-0.5">Sign in to sync library & publish.</p>
+        </div>
+
+        <nav class="mt-4 flex flex-col gap-1 text-sm font-medium">
+          <button onclick="navigate('home'); closeMobileDrawer();" class="text-left px-3 py-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-900">Browse Novels</button>
+          <button onclick="navigate('library'); closeMobileDrawer();" class="text-left px-3 py-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-900">My Library</button>
+          <button onclick="navigate('publish'); closeMobileDrawer();" class="text-left px-3 py-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-900">Author Studio</button>
+        </nav>
+      </div>
+
+      <div id="drawer-footer-action" class="pt-4 border-t border-zinc-200 dark:border-zinc-800">
+        <button onclick="closeMobileDrawer(); openAuthModal();" class="w-full py-2 rounded-lg bg-blue-600 text-white text-sm font-medium">Sign In / Register</button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Main Content -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-6">
+
+    <!-- VIEW: HOME / BROWSE -->
+    <section id="view-home" class="space-y-6">
+      <!-- Search & Genre Filter Bar -->
+      <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+        <div class="relative flex-1 max-w-md">
+          <input id="search-input" type="text" oninput="renderNovels()" placeholder="Search title or author..." class="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
+          <svg class="w-4 h-4 text-zinc-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+          </svg>
+        </div>
+
+        <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
+          <button onclick="setGenreFilter('All')" data-genre="All" class="genre-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-600 text-white whitespace-nowrap">All</button>
+          <button onclick="setGenreFilter('Fantasy')" data-genre="Fantasy" class="genre-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-200/70 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 whitespace-nowrap">Fantasy</button>
+          <button onclick="setGenreFilter('Romance')" data-genre="Romance" class="genre-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-200/70 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 whitespace-nowrap">Romance</button>
+          <button onclick="setGenreFilter('Action')" data-genre="Action" class="genre-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-200/70 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 whitespace-nowrap">Action</button>
+          <button onclick="setGenreFilter('Sci-Fi')" data-genre="Sci-Fi" class="genre-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-200/70 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 whitespace-nowrap">Sci-Fi</button>
+          <button onclick="setGenreFilter('System')" data-genre="System" class="genre-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-200/70 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 whitespace-nowrap">System</button>
+        </div>
+      </div>
+
+      <!-- Catalog Grid -->
+      <div>
+        <div class="flex items-center justify-between mb-3">
+          <h2 class="text-base font-semibold tracking-tight">Catalog</h2>
+          <span id="catalog-count" class="text-xs text-zinc-500">0 novels</span>
+        </div>
+
+        <div id="novels-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+
+        <div id="empty-catalog" class="hidden border border-dashed border-zinc-300 dark:border-zinc-800 rounded-xl p-10 text-center">
+          <p class="text-sm font-medium text-zinc-700 dark:text-zinc-300">No novels published yet.</p>
+          <p class="text-xs text-zinc-500 mt-1">Sign in with a verified email to add your first authorized story.</p>
+          <button onclick="navigate('publish')" class="mt-4 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium">Open Author Studio</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- VIEW: NOVEL DETAILS -->
+    <section id="view-novel" class="hidden space-y-6">
+      <button onclick="navigate('home')" class="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-white">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+        Back to Catalog
+      </button>
+
+      <div id="novel-detail-container" class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5"></div>
+
+      <div class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="text-sm font-semibold">Chapters</h3>
+          <span id="chapter-count-label" class="text-xs text-zinc-500">0 chapters</span>
+        </div>
+        <div id="novel-chapters-list" class="divide-y divide-zinc-200 dark:divide-zinc-800"></div>
+      </div>
+    </section>
+
+    <!-- VIEW: CHAPTER READER -->
+    <section id="view-reader" class="hidden max-w-2xl mx-auto space-y-5">
+      <div class="flex items-center justify-between gap-2 pb-3 border-b border-zinc-200 dark:border-zinc-800">
+        <button id="reader-back-btn" class="text-xs font-medium text-zinc-500 hover:text-zinc-900 dark:hover:text-white">← Novel Info</button>
+        <div class="flex items-center gap-2">
+          <button onclick="changeFontSize(-1)" class="px-2.5 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-800">A-</button>
+          <button onclick="changeFontSize(1)" class="px-2.5 py-1 text-xs rounded border border-zinc-200 dark:border-zinc-800">A+</button>
+        </div>
+      </div>
+
+      <article>
+        <p id="reader-novel-title" class="text-xs font-medium text-blue-600 uppercase tracking-wider"></p>
+        <h1 id="reader-chapter-title" class="text-xl sm:text-2xl font-bold mt-1"></h1>
+        <div id="reader-content" class="mt-6 space-y-4 leading-relaxed text-zinc-800 dark:text-zinc-200 whitespace-pre-line" style="font-size: 17px;"></div>
+      </article>
+
+      <div class="pt-6 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between gap-3">
+        <button id="prev-chapter-btn" class="px-4 py-2 rounded-lg text-xs font-medium border border-zinc-200 dark:border-zinc-800 disabled:opacity-40">Previous Chapter</button>
+        <button id="next-chapter-btn" class="px-4 py-2 rounded-lg text-xs font-medium bg-blue-600 text-white disabled:opacity-40">Next Chapter</button>
+      </div>
+    </section>
+
+    <!-- VIEW: LIBRARY -->
+    <section id="view-library" class="hidden space-y-4">
+      <h2 class="text-base font-semibold">My Library</h2>
+      <div id="library-guest-notice" class="hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl p-6 text-center">
+        <p class="text-sm font-medium">Sign in to view your bookmarked novels</p>
+        <p class="text-xs text-zinc-500 mt-1">Reading chapters is open to everyone, while library sync requires a verified account.</p>
+        <button onclick="openAuthModal()" class="mt-4 px-4 py-2 rounded-lg bg-blue-600 text-white text-xs font-medium">Sign In</button>
+      </div>
+      <div id="library-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
+    </section>
+
+    <!-- VIEW: PUBLISH / AUTHOR STUDIO -->
+    <section id="view-publish" class="hidden max-w-2xl mx-auto space-y-6">
+      <div>
+        <h2 class="text-base font-semibold">Author Studio</h2>
+        <p class="text-xs text-zinc-500 mt-0.5">Upload authorized novels and chapters directly to your Supabase database.</p>
+      </div>
+
+      <div id="publish-auth-gate" class="hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl p-6 text-center">
+        <p class="text-sm font-medium">Verified Account Required</p>
+        <p class="text-xs text-zinc-500 mt-1">Sign in with your verified email address to create novels or add chapters.</p>
+        <button onclick="openAuthModal()" class="mt-4 px-4 py-2 rounded-lg bg-blue-600 text-white text-xs font-medium">Sign In to Publish</button>
+      </div>
+
+      <div id="publish-forms" class="hidden space-y-6">
+        <!-- Create Novel Form -->
+        <form id="create-novel-form" onsubmit="handleCreateNovel(event)" class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 space-y-4">
+          <h3 class="text-sm font-semibold">1. Create New Novel</h3>
+
+          <div class="grid sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-zinc-500 mb-1">Novel Title *</label>
+              <input name="title" required placeholder="e.g. Chronicles of Edo" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800" />
+            </div>
+            <div>
+              <label class="block text-xs text-zinc-500 mb-1">Author Name *</label>
+              <input name="author_name" required placeholder="Original author name" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800" />
+            </div>
+          </div>
+
+          <div class="grid sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs text-zinc-500 mb-1">Genre</label>
+              <select name="genre" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
+                <option value="Fantasy">Fantasy</option>
+                <option value="Romance">Romance</option>
+                <option value="Action">Action</option>
+                <option value="Sci-Fi">Sci-Fi</option>
+                <option value="System">System</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs text-zinc-500 mb-1">Cover Image URL (Optional)</label>
+              <input name="cover_url" type="url" placeholder="https://..." class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs text-zinc-500 mb-1">Synopsis *</label>
+            <textarea name="synopsis" required rows="3" placeholder="Brief summary of the novel..." class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800"></textarea>
+          </div>
+
+          <label class="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-300">
+            <input type="checkbox" name="is_mature" class="rounded border-zinc-300 dark:border-zinc-700" />
+            <span>Mature Content (18+)</span>
+          </label>
+
+          <button type="submit" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium">Save Novel</button>
+        </form>
+
+        <!-- Add Chapter Form -->
+        <form id="add-chapter-form" onsubmit="handleAddChapter(event)" class="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 space-y-4">
+          <h3 class="text-sm font-semibold">2. Add Chapter to Existing Novel</h3>
+
+          <div>
+            <label class="block text-xs text-zinc-500 mb-1">Select Novel *</label>
+            <select id="publish-novel-select" name="novel_id" required class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
+              <option value="">-- Choose a novel --</option>
+            </select>
+          </div>
+
+          <div class="grid sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs text-zinc-500 mb-1">Chapter # *</label>
+              <input name="chapter_number" type="number" min="1" value="1" required class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800" />
+            </div>
+            <div class="sm:col-span-2">
+              <label class="block text-xs text-zinc-500 mb-1">Chapter Title *</label>
+              <input name="chapter_title" required placeholder="e.g. Awakening" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800" />
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs text-zinc-500 mb-1">Chapter Content *</label>
+            <textarea name="content" required rows="8" placeholder="Paste or write chapter text..." class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800"></textarea>
+          </div>
+
+          <button type="submit" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium">Publish Chapter</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- AUTH MODAL (Real Supabase Email OTP + Password Verification) -->
+  <div id="auth-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div onclick="closeAuthModal()" class="fixed inset-0 bg-black/65"></div>
+    <div class="relative w-full max-w-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-semibold">Account Verification</h3>
+        <button onclick="closeAuthModal()" class="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">✕</button>
+      </div>
+
+      <!-- Mode Switcher -->
+      <div class="grid grid-cols-2 p-1 rounded-lg bg-zinc-100 dark:bg-zinc-950 text-xs font-medium">
+        <button id="tab-otp" onclick="switchAuthTab('otp')" class="py-1.5 rounded-md bg-white dark:bg-zinc-800 shadow-sm">6-Digit Email OTP</button>
+        <button id="tab-password" onclick="switchAuthTab('password')" class="py-1.5 rounded-md text-zinc-500">Password + Link</button>
+      </div>
+
+      <div id="auth-feedback" class="hidden text-xs p-2.5 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"></div>
+
+      <!-- Panel A: 6-Digit OTP -->
+      <div id="panel-otp" class="space-y-3">
+        <div id="otp-step-1" class="space-y-3">
+          <div>
+            <label class="block text-xs text-zinc-500 mb-1">Email Address</label>
+            <input id="otp-email" type="email" placeholder="you@example.com" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800" />
+          </div>
+          <button onclick="sendEmailOtp()" class="w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium">Send 6-Digit Code</button>
+        </div>
+
+        <div id="otp-step-2" class="hidden space-y-3">
+          <div>
+            <label class="block text-xs text-zinc-500 mb-1">Enter 6-Digit Code from Email</label>
+            <input id="otp-code" type="text" maxlength="6" inputmode="numeric" placeholder="123456" class="w-full px-3 py-2 text-center tracking-[0.35em] font-mono text-base rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800" />
+          </div>
+          <button onclick="verifyEmailOtp()" class="w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium">Verify & Sign In</button>
+          <button onclick="resetOtpStep()" class="w-full text-xs text-zinc-500 hover:underline">Change email</button>
+        </div>
+      </div>
+
+      <!-- Panel B: Email & Password + Verification Link -->
+      <div id="panel-password" class="hidden space-y-3">
+        <div>
+          <label class="block text-xs text-zinc-500 mb-1">Email Address</label>
+          <input id="pw-email" type="email" placeholder="you@example.com" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800" />
+        </div>
+        <div>
+          <label class="block text-xs text-zinc-500 mb-1">Password (min 6 chars)</label>
+          <input id="pw-pass" type="password" placeholder="••••••••" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800" />
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="handlePasswordSignIn()" class="py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium">Sign In</button>
+          <button onclick="handlePasswordSignUp()" class="py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 text-xs font-medium">Create Account</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 18+ Age Gate Modal -->
+  <div id="mature-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div class="fixed inset-0 bg-black/75"></div>
+    <div class="relative w-full max-w-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 space-y-4">
+      <span class="inline-block px-2 py-0.5 text-[11px] font-semibold rounded bg-red-500/15 text-red-500">18+ MATURE CONTENT</span>
+      <h3 class="text-base font-semibold">Age Confirmation</h3>
+      <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">This novel contains mature themes intended for adult readers aged 18 and above. Confirm your age to continue.</p>
+      <div class="grid grid-cols-2 gap-2">
+        <button onclick="cancelMatureGate()" class="py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 text-xs font-medium">Go Back</button>
+        <button id="confirm-mature-btn" class="py-2 rounded-lg bg-blue-600 text-white text-xs font-medium">I am 18+</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Your live Supabase credentials
+    const SUPABASE_URL = 'https://wswhddksvlcodtwilxaf.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_iFkRGRCD_Ki7czkC292-fg_hbqInZlO';
+    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const state = {
+      user: null,
+      novels: [],
+      chapters: [],
+      bookmarks: [],
+      genre: 'All',
+      currentNovelId: null,
+      currentChapterId: null,
+      fontSize: 17,
+      matureVerified: sessionStorage.getItem('nr_18_ok') === '1'
+    };
+
+    // Theme handling
+    function toggleTheme() {
+      const html = document.documentElement;
+      const isDark = html.classList.toggle('dark');
+      localStorage.setItem('nr_theme', isDark ? 'dark' : 'light');
+    }
+    if (localStorage.getItem('nr_theme') === 'light') {
+      document.documentElement.classList.remove('dark');
+    }
+
+    // Mobile Drawer
+    document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+      document.getElementById('mobile-drawer').classList.remove('hidden');
+    });
+    function closeMobileDrawer() {
+      document.getElementById('mobile-drawer').classList.add('hidden');
+    }
+
+    // Navigation
+    function navigate(view) {
+      ['home', 'novel', 'reader', 'library', 'publish'].forEach(v => {
+        document.getElementById('view-' + v).classList.add('hidden');
+      });
+      document.getElementById('view-' + view).classList.remove('hidden');
+
+      if (view === 'home') renderNovels();
+      if (view === 'library') renderLibrary();
+      if (view === 'publish') renderPublishView();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Auth State Sync
+    async function initAuth() {
+      const { data: { session } } = await sb.auth.getSession();
+      setCurrentUser(session?.user || null);
+
+      sb.auth.onAuthStateChange((_event, session) => {
+        setCurrentUser(session?.user || null);
+      });
+    }
+
+    function setCurrentUser(user) {
+      // Only treat user as verified if email_confirmed_at exists
+      const verifiedUser = user && user.email_confirmed_at ? user : null;
+      state.user = verifiedUser;
+
+      const headerBtn = document.getElementById('auth-header-btn');
+      const drawerBox = document.getElementById('drawer-user-box');
+      const drawerFooter = document.getElementById('drawer-footer-action');
+
+      if (verifiedUser) {
+        headerBtn.textContent = 'Sign Out';
+        headerBtn.onclick = signOutUser;
+        drawerBox.innerHTML = `<p class="font-medium text-zinc-900 dark:text-white truncate">${verifiedUser.email}</p><p class="text-emerald-500 mt-0.5">Verified Account</p>`;
+        drawerFooter.innerHTML = `<button onclick="closeMobileDrawer(); signOutUser();" class="w-full py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 text-xs font-medium">Sign Out</button>`;
+        loadUserBookmarks();
+      } else {
+        headerBtn.textContent = 'Sign In';
+        headerBtn.onclick = openAuthModal;
+        drawerBox.innerHTML = `<p class="font-medium text-zinc-800 dark:text-zinc-200">Guest Reader</p><p class="text-zinc-500 mt-0.5">Sign in to sync library & publish.</p>`;
+        drawerFooter.innerHTML = `<button onclick="closeMobileDrawer(); openAuthModal();" class="w-full py-2 rounded-lg bg-blue-600 text-white text-xs font-medium">Sign In / Register</button>`;
+        state.bookmarks = [];
+      }
+      renderPublishView();
+    }
+
+    async function signOutUser() {
+      await sb.auth.signOut();
+      navigate('home');
+    }
+
+    // Auth Modal Controls
+    function openAuthModal() {
+      document.getElementById('auth-modal').classList.remove('hidden');
+      document.getElementById('auth-modal').classList.add('flex');
+      showAuthFeedback('');
+    }
+    function closeAuthModal() {
+      document.getElementById('auth-modal').classList.add('hidden');
+      document.getElementById('auth-modal').classList.remove('flex');
+    }
+    function showAuthFeedback(msg) {
+      const box = document.getElementById('auth-feedback');
+      if (!msg) {
+        box.classList.add('hidden');
+        return;
+      }
+      box.textContent = msg;
+      box.classList.remove('hidden');
+    }
+    function switchAuthTab(tab) {
+      const isOtp = tab === 'otp';
+      document.getElementById('panel-otp').classList.toggle('hidden', !isOtp);
+      document.getElementById('panel-password').classList.toggle('hidden', isOtp);
+      document.getElementById('tab-otp').className = isOtp ? 'py-1.5 rounded-md bg-white dark:bg-zinc-800 shadow-sm' : 'py-1.5 rounded-md text-zinc-500';
+      document.getElementById('tab-password').className = !isOtp ? 'py-1.5 rounded-md bg-white dark:bg-zinc-800 shadow-sm' : 'py-1.5 rounded-md text-zinc-500';
+      showAuthFeedback('');
+    }
+
+    // 6-Digit Email OTP
+    async function sendEmailOtp() {
+      const email = document.getElementById('otp-email').value.trim();
+      if (!email) return showAuthFeedback('Enter your email address.');
+      showAuthFeedback('Sending verification code...');
+      const { error } = await sb.auth.signInWithOtp({ email });
+      if (error) return showAuthFeedback(error.message);
+      document.getElementById('otp-step-1').classList.add('hidden');
+      document.getElementById('otp-step-2').classList.remove('hidden');
+      showAuthFeedback('Verification code sent! Check your email inbox.');
+    }
+
+    async function verifyEmailOtp() {
+      const email = document.getElementById('otp-email').value.trim();
+      const token = document.getElementById('otp-code').value.trim();
+      if (token.length < 6) return showAuthFeedback('Enter the 6-digit code from your email.');
+      showAuthFeedback('Verifying code...');
+      const { data, error } = await sb.auth.verifyOtp({ email, token, type: 'email' });
+      if (error) return showAuthFeedback(error.message);
+      if (data.user) {
+        closeAuthModal();
+      }
+    }
+
+    function resetOtpStep() {
+      document.getElementById('otp-step-1').classList.remove('hidden');
+      document.getElementById('otp-step-2').classList.add('hidden');
+      showAuthFeedback('');
+    }
+
+    // Email & Password + Verification Link
+    async function handlePasswordSignUp() {
+      const email = document.getElementById('pw-email').value.trim();
+      const password = document.getElementById('pw-pass').value;
+      if (!email || password.length < 6) return showAuthFeedback('Enter a valid email and at least 6 characters.');
+      showAuthFeedback('Creating account...');
+      const { error } = await sb.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: window.location.origin }
+      });
+      if (error) return showAuthFeedback(error.message);
+      showAuthFeedback('Verification link sent to your email! Click the link in your inbox, then sign in.');
+    }
+
+    async function handlePasswordSignIn() {
+      const email = document.getElementById('pw-email').value.trim();
+      const password = document.getElementById('pw-pass').value;
+      if (!email || !password) return showAuthFeedback('Enter your email and password.');
+      showAuthFeedback('Signing in...');
+      const { data, error } = await sb.auth.signInWithPassword({ email, password });
+      if (error) return showAuthFeedback(error.message);
+      if (!data.user?.email_confirmed_at) {
+        await sb.auth.signOut();
+        return showAuthFeedback('Your email is not verified yet. Check your inbox and click the verification link first.');
+      }
+      closeAuthModal();
+    }
+
+    // Database Operations
+    async function loadCatalog() {
+      const { data, error } = await sb
+        .from('novels')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (!error && data) {
+        state.novels = data;
+      }
+      renderNovels();
+    }
+
+    async function loadUserBookmarks() {
+      if (!state.user) return;
+      const { data } = await sb
+        .from('bookmarks')
+        .select('novel_id')
+        .eq('user_id', state.user.id);
+      state.bookmarks = (data || []).map(b => b.novel_id);
+    }
+
+    function setGenreFilter(genre) {
+      state.genre = genre;
+      document.querySelectorAll('.genre-pill').forEach(btn => {
+        const active = btn.dataset.genre === genre;
+        btn.className = active
+          ? 'genre-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-600 text-white whitespace-nowrap'
+          : 'genre-pill px-3 py-1.5 rounded-lg text-xs font-medium bg-zinc-200/70 dark:bg-zinc-900 text-zinc-700 dark:text-zinc-300 whitespace-nowrap';
+      });
+      renderNovels();
+    }
+
+    function renderNovels() {
+      const query = document.getElementById('search-input').value.trim().toLowerCase();
+      const filtered = state.novels.filter(n => {
+        const matchesGenre = state.genre === 'All' || n.genre === state.genre;
+        const matchesQuery = !query || n.title.toLowerCase().includes(query) || n.author_name.toLowerCase().includes(query);
+        return matchesGenre && matchesQuery;
+      });
+
+      document.getElementById('catalog-count').textContent = `${filtered.length} novel${filtered.length === 1 ? '' : 's'}`;
+      const grid = document.getElementById('novels-grid');
+      const empty = document.getElementById('empty-catalog');
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        empty.classList.remove('hidden');
+        return;
+      }
+
+      empty.classList.add('hidden');
+      grid.innerHTML = filtered.map(novel => novelCardHTML(novel)).join('');
+    }
+
+    function novelCardHTML(novel) {
+      const cover = novel.cover_url
+        ? `<img src="${escapeHtml(novel.cover_url)}" alt="${escapeHtml(novel.title)}" class="w-full h-full object-cover" />`
+        : `<div class="w-full h-full flex items-center justify-center p-3 text-center bg-zinc-200 dark:bg-zinc-800 text-xs font-semibold text-zinc-600 dark:text-zinc-300">${escapeHtml(novel.title)}</div>`;
+
+      return `
+        <div onclick="openNovel('${novel.id}')" class="cursor-pointer group space-y-2">
+          <div class="relative aspect-[2/3] rounded-lg overflow-hidden bg-zinc-200 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
+            ${cover}
+            ${novel.is_mature ? '<span class="absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-bold rounded bg-red-600 text-white">18+</span>' : ''}
+          </div>
+          <div>
+            <h3 class="text-sm font-medium leading-snug line-clamp-1 group-hover:text-blue-600 transition">${escapeHtml(novel.title)}</h3>
+            <p class="text-xs text-zinc-500 line-clamp-1">${escapeHtml(novel.author_name)} · ${escapeHtml(novel.genre)}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    async function openNovel(novelId) {
+      const novel = state.novels.find(n => n.id === novelId);
+      if (!novel) return;
+
+      if (novel.is_mature && !state.matureVerified) {
+        const modal = document.getElementById('mature-modal');
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+        document.getElementById('confirm-mature-btn').onclick = () => {
+          state.matureVerified = true;
+          sessionStorage.setItem('nr_18_ok', '1');
+          modal.classList.add('hidden');
+          modal.classList.remove('flex');
+          openNovel(novelId);
+        };
+        return;
+      }
+
+      state.currentNovelId = novelId;
+      navigate('novel');
+
+      const isBookmarked = state.bookmarks.includes(novelId);
+      const cover = novel.cover_url
+        ? `<img src="${escapeHtml(novel.cover_url)}" alt="" class="w-28 sm:w-36 aspect-[2/3] object-cover rounded-lg border border-zinc-200 dark:border-zinc-800 shrink-0" />`
+        : `<div class="w-28 sm:w-36 aspect-[2/3] rounded-lg bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center p-3 text-center text-xs font-semibold shrink-0">${escapeHtml(novel.title)}</div>`;
+
+      document.getElementById('novel-detail-container').innerHTML = `
+        <div class="flex flex-col sm:flex-row gap-5">
+          ${cover}
+          <div class="space-y-3 flex-1">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="px-2 py-0.5 text-xs rounded bg-blue-600/10 text-blue-600 dark:text-blue-400 font-medium">${escapeHtml(novel.genre)}</span>
+              <span class="px-2 py-0.5 text-xs rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">${escapeHtml(novel.status)}</span>
+              ${novel.is_mature ? '<span class="px-2 py-0.5 text-xs rounded bg-red-500/15 text-red-500 font-medium">18+</span>' : ''}
+            </div>
+            <h1 class="text-xl font-bold">${escapeHtml(novel.title)}</h1>
+            <p class="text-xs text-zinc-500">By <span class="text-zinc-800 dark:text-zinc-200 font-medium">${escapeHtml(novel.author_name)}</span></p>
+            <p class="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">${escapeHtml(novel.synopsis)}</p>
+            <div class="pt-2 flex flex-wrap gap-2">
+              <button id="read-first-btn" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium">Start Reading</button>
+              <button onclick="toggleBookmark('${novel.id}')" class="px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 text-xs font-medium">
+                ${isBookmarked ? '✓ In Library' : '+ Add to Library'}
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const { data: chapters } = await sb
+        .from('chapters')
+        .select('*')
+        .eq('novel_id', novelId)
+        .order('chapter_number', { ascending: true });
+
+      state.chapters = chapters || [];
+      document.getElementById('chapter-count-label').textContent = `${state.chapters.length} chapter${state.chapters.length === 1 ? '' : 's'}`;
+
+      const list = document.getElementById('novel-chapters-list');
+      if (state.chapters.length === 0) {
+        list.innerHTML = `<p class="py-4 text-xs text-zinc-500">No chapters uploaded yet.</p>`;
+        document.getElementById('read-first-btn').disabled = true;
+        document.getElementById('read-first-btn').classList.add('opacity-40');
+      } else {
+        document.getElementById('read-first-btn').onclick = () => openChapter(state.chapters[0].id);
+        list.innerHTML = state.chapters.map(ch => `
+          <button onclick="openChapter('${ch.id}')" class="w-full py-3 flex items-center justify-between text-left hover:text-blue-600 transition">
+            <span class="text-sm">Chapter ${ch.chapter_number}: ${escapeHtml(ch.chapter_title)}</span>
+            <span class="text-xs text-zinc-400">Read →</span>
+          </button>
+        `).join('');
+      }
+    }
+
+    function cancelMatureGate() {
+      const modal = document.getElementById('mature-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function openChapter(chapterId) {
+      const idx = state.chapters.findIndex(c => c.id === chapterId);
+      if (idx === -1) return;
+      const chapter = state.chapters[idx];
+      const novel = state.novels.find(n => n.id === chapter.novel_id);
+
+      state.currentChapterId = chapterId;
+      navigate('reader');
+
+      document.getElementById('reader-back-btn').onclick = () => openNovel(chapter.novel_id);
+      document.getElementById('reader-novel-title').textContent = novel ? novel.title : '';
+      document.getElementById('reader-chapter-title').textContent = `Chapter ${chapter.chapter_number}: ${chapter.chapter_title}`;
+      document.getElementById('reader-content').textContent = chapter.content;
+
+      const prevBtn = document.getElementById('prev-chapter-btn');
+      const nextBtn = document.getElementById('next-chapter-btn');
+      prevBtn.disabled = idx === 0;
+      nextBtn.disabled = idx === state.chapters.length - 1;
+      prevBtn.onclick = () => openChapter(state.chapters[idx - 1].id);
+      nextBtn.onclick = () => openChapter(state.chapters[idx + 1].id);
+    }
+
+    function changeFontSize(delta) {
+      state.fontSize = Math.min(24, Math.max(14, state.fontSize + delta));
+      document.getElementById('reader-content').style.fontSize = state.fontSize + 'px';
+    }
+
+    async function toggleBookmark(novelId) {
+      if (!state.user) return openAuthModal();
+      const exists = state.bookmarks.includes(novelId);
+      if (exists) {
+        await sb.from('bookmarks').delete().eq('user_id', state.user.id).eq('novel_id', novelId);
+        state.bookmarks = state.bookmarks.filter(id => id !== novelId);
+      } else {
+        await sb.from('bookmarks').insert({ user_id: state.user.id, novel_id: novelId });
+        state.bookmarks.push(novelId);
+      }
+      openNovel(novelId);
+    }
+
+    function renderLibrary() {
+      const guestBox = document.getElementById('library-guest-notice');
+      const grid = document.getElementById('library-grid');
+      if (!state.user) {
+        guestBox.classList.remove('hidden');
+        grid.innerHTML = '';
+        return;
+      }
+      guestBox.classList.add('hidden');
+      const saved = state.novels.filter(n => state.bookmarks.includes(n.id));
+      grid.innerHTML = saved.length
+        ? saved.map(n => novelCardHTML(n)).join('')
+        : `<p class="col-span-full text-xs text-zinc-500">Your library is empty. Open any novel and tap "+ Add to Library".</p>`;
+    }
+
+    function renderPublishView() {
+      const gate = document.getElementById('publish-auth-gate');
+      const forms = document.getElementById('publish-forms');
+      if (!state.user) {
+        gate.classList.remove('hidden');
+        forms.classList.add('hidden');
+        return;
+      }
+      gate.classList.add('hidden');
+      forms.classList.remove('hidden');
+
+      const myNovels = state.novels.filter(n => n.author_id === state.user.id);
+      const select = document.getElementById('publish-novel-select');
+      select.innerHTML = `<option value="">-- Choose your novel --</option>` +
+        myNovels.map(n => `<option value="${n.id}">${escapeHtml(n.title)}</option>`).join('');
+    }
+
+    async function handleCreateNovel(e) {
+      e.preventDefault();
+      if (!state.user) return openAuthModal();
+      const fd = new FormData(e.target);
+      const payload = {
+        author_id: state.user.id,
+        title: fd.get('title').trim(),
+        author_name: fd.get('author_name').trim(),
+        genre: fd.get('genre'),
+        cover_url: fd.get('cover_url').trim() || null,
+        synopsis: fd.get('synopsis').trim(),
+        is_mature: fd.get('is_mature') === 'on'
+      };
+
+      const { error } = await sb.from('novels').insert(payload);
+      if (error) return alert(error.message);
+
+      e.target.reset();
+      await loadCatalog();
+      renderPublishView();
+      alert('Novel created successfully!');
+    }
+
+    async function handleAddChapter(e) {
+      e.preventDefault();
+      if (!state.user) return openAuthModal();
+      const fd = new FormData(e.target);
+      const payload = {
+        novel_id: fd.get('novel_id'),
+        chapter_number: Number(fd.get('chapter_number')),
+        chapter_title: fd.get('chapter_title').trim(),
+        content: fd.get('content').trim()
+      };
+
+      const { error } = await sb.from('chapters').insert(payload);
+      if (error) return alert(error.message);
+
+      e.target.reset();
+      alert('Chapter published!');
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    // Boot
+    initAuth();
+    loadCatalog();
+  </script>
+</body>
+</html>
