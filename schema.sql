@@ -67,3 +67,4 @@ CREATE POLICY "Authors delete chapters" ON public.chapters FOR DELETE TO authent
 DROP POLICY IF EXISTS "Users manage own bookmarks" ON public.bookmarks;
 CREATE POLICY "Users manage own bookmarks" ON public.bookmarks FOR ALL TO authenticated
   USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+
