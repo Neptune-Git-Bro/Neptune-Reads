@@ -1377,7 +1377,7 @@
                 </div>
                 <div class="flex items-center gap-2 shrink-0">
                   <button onclick="acceptReaderRequest('${req.id}')" class="px-3.5 py-1.5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black text-xs font-bold">Accept</button>
-                  <button onclick="cancelOrDeclineRequest('${req.id}')" class="px-3 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-xs font-semibold text-zinc-500">Decline</button>
+                  <button onclick="cancelOrDeclineRequest('${req.id}')" class="px-3.5 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-xs font-semibold text-zinc-500">Decline</button>
                 </div>
               </div>
             `;
@@ -1475,6 +1475,11 @@
 
     async function openChatThread(peerId) {
       if (!state.user) return;
+      const conn = getConnectionBetween(peerId);
+      if (!conn || conn.status !== 'accepted') {
+        return showToast('Accept the reader request first before messaging.', true);
+      }
+
       state.activeChatPeerId = peerId;
       const peer = state.readers.find(r => r.id === peerId) || { full_name: 'Reader', username: 'reader' };
 
@@ -2340,4 +2345,3 @@
   </script>
 </body>
 </html>
-
