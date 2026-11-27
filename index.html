@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Neptune Reads</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style type="text/tailwindcss">
+    @custom-variant dark (&:where(.dark, .dark *));
+  </style>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -34,17 +37,17 @@
 
   <!-- Top Navigation -->
   <header class="sticky top-0 z-40 bg-white/95 dark:bg-zinc-950/95 backdrop-blur border-b border-zinc-200 dark:border-zinc-800">
-    <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-3">
+    <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-2">
       <!-- Brand + Mobile Menu Button -->
-      <div class="flex items-center gap-2.5">
-        <button id="mobile-menu-btn" aria-label="Open menu" class="md:hidden p-2 -ml-2 rounded-lg text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900">
+      <div class="flex items-center gap-2 min-w-0">
+        <button id="mobile-menu-btn" aria-label="Open menu" class="md:hidden p-2 -ml-2 rounded-lg text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900 shrink-0">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/>
           </svg>
         </button>
-        <a href="#home" onclick="navigate('home'); return false;" class="flex items-center gap-2 font-bold text-lg tracking-tight">
-          <span class="w-2.5 h-2.5 rounded-full bg-blue-600 inline-block"></span>
-          <span>Neptune Reads</span>
+        <a href="#home" onclick="navigate('home'); return false;" class="flex items-center gap-2 font-bold text-base sm:text-lg tracking-tight truncate">
+          <span class="w-2.5 h-2.5 rounded-full bg-blue-600 shrink-0"></span>
+          <span class="truncate">Neptune Reads</span>
         </a>
       </div>
 
@@ -52,11 +55,11 @@
       <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-zinc-600 dark:text-zinc-400">
         <button onclick="navigate('home')" data-nav="home" class="nav-link hover:text-zinc-900 dark:hover:text-white transition">Browse</button>
         <button onclick="navigate('library')" data-nav="library" class="nav-link hover:text-zinc-900 dark:hover:text-white transition">Library</button>
-        <button onclick="navigate('publish')" data-nav="publish" class="nav-link hover:text-zinc-900 dark:hover:text-white transition">Publish</button>
+        <button onclick="navigate('publish')" data-nav="publish" class="nav-link hover:text-zinc-900 dark:hover:text-white transition">Author Studio</button>
       </nav>
 
-      <!-- Right Actions: Search, Theme, Auth -->
-      <div class="flex items-center gap-2">
+      <!-- Right Actions: Theme + Compact Auth/Profile -->
+      <div class="flex items-center gap-2 shrink-0">
         <button onclick="toggleTheme()" aria-label="Toggle dark mode" class="p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition">
           <svg id="icon-sun" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
             <circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
@@ -66,20 +69,33 @@
           </svg>
         </button>
 
-        <button id="auth-header-btn" onclick="openAuthModal()" class="px-3.5 py-1.5 rounded-lg text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white transition">
+        <!-- Guest Sign In Button -->
+        <button id="auth-header-btn" onclick="openAuthModal()" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white whitespace-nowrap transition">
           Sign In
+        </button>
+
+        <!-- Compact Signed-In Profile Chip -->
+        <button id="profile-header-btn" onclick="openProfileModal()" class="hidden items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-100/70 dark:bg-zinc-900 hover:bg-zinc-200/70 dark:hover:bg-zinc-800 text-xs font-medium whitespace-nowrap transition">
+          <span id="header-avatar-initial" class="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[11px] font-bold">U</span>
+          <span id="header-display-name" class="max-w-[90px] truncate">Profile</span>
         </button>
       </div>
     </div>
   </header>
 
+  <!-- Toast Banner for Feedback -->
+  <div id="toast-banner" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 hidden max-w-sm w-[92vw] px-4 py-3 rounded-xl shadow-lg border text-xs font-medium text-center transition-all"></div>
+
   <!-- Mobile Tucked Drawer -->
   <div id="mobile-drawer" class="fixed inset-0 z-50 hidden">
-    <div onclick="closeMobileDrawer()" class="fixed inset-0 bg-black/60"></div>
-    <aside class="relative w-64 max-w-[80vw] h-full bg-white dark:bg-zinc-950 border-r border-zinc-200 dark:border-zinc-800 p-4 flex flex-col justify-between">
+    <div onclick="closeMobileDrawer()" class="fixed inset-0 bg-black/65 backdrop-blur-xs"></div>
+    <aside class="relative w-68 max-w-[82vw] h-full bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-100 border-r border-zinc-200 dark:border-zinc-800 p-4 flex flex-col justify-between">
       <div>
         <div class="flex items-center justify-between pb-4 border-b border-zinc-200 dark:border-zinc-800">
-          <span class="font-bold text-base">Neptune Reads</span>
+          <div class="flex items-center gap-2 font-bold text-base">
+            <span class="w-2 h-2 rounded-full bg-blue-600"></span>
+            <span>Neptune Reads</span>
+          </div>
           <button onclick="closeMobileDrawer()" class="p-1.5 rounded-lg text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-900">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
@@ -87,20 +103,21 @@
           </button>
         </div>
 
-        <div id="drawer-user-box" class="mt-4 p-3 rounded-lg bg-zinc-100 dark:bg-zinc-900 text-xs">
-          <p class="font-medium text-zinc-800 dark:text-zinc-200">Guest Reader</p>
+        <div id="drawer-user-box" class="mt-4 p-3 rounded-xl bg-zinc-100 dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 text-xs">
+          <p class="font-semibold text-zinc-900 dark:text-zinc-100">Guest Reader</p>
           <p class="text-zinc-500 dark:text-zinc-400 mt-0.5">Sign in to sync library & publish.</p>
         </div>
 
         <nav class="mt-4 flex flex-col gap-1 text-sm font-medium">
-          <button onclick="navigate('home'); closeMobileDrawer();" class="text-left px-3 py-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-900">Browse Novels</button>
-          <button onclick="navigate('library'); closeMobileDrawer();" class="text-left px-3 py-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-900">My Library</button>
-          <button onclick="navigate('publish'); closeMobileDrawer();" class="text-left px-3 py-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-900">Author Studio</button>
+          <button onclick="navigate('home'); closeMobileDrawer();" class="text-left px-3 py-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-900 transition">Browse Novels</button>
+          <button onclick="navigate('library'); closeMobileDrawer();" class="text-left px-3 py-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-900 transition">My Library</button>
+          <button onclick="navigate('publish'); closeMobileDrawer();" class="text-left px-3 py-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-900 transition">Author Studio</button>
+          <button id="drawer-edit-profile-btn" onclick="closeMobileDrawer(); openProfileModal();" class="hidden text-left px-3 py-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-900 text-blue-600 dark:text-blue-400 transition">Edit Profile</button>
         </nav>
       </div>
 
       <div id="drawer-footer-action" class="pt-4 border-t border-zinc-200 dark:border-zinc-800">
-        <button onclick="closeMobileDrawer(); openAuthModal();" class="w-full py-2 rounded-lg bg-blue-600 text-white text-sm font-medium">Sign In / Register</button>
+        <button onclick="closeMobileDrawer(); openAuthModal();" class="w-full py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium">Sign In / Register</button>
       </div>
     </aside>
   </div>
@@ -110,7 +127,6 @@
 
     <!-- VIEW: HOME / BROWSE -->
     <section id="view-home" class="space-y-6">
-      <!-- Search & Genre Filter Bar -->
       <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
         <div class="relative flex-1 max-w-md">
           <input id="search-input" type="text" oninput="renderNovels()" placeholder="Search title or author..." class="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
@@ -129,7 +145,6 @@
         </div>
       </div>
 
-      <!-- Catalog Grid -->
       <div>
         <div class="flex items-center justify-between mb-3">
           <h2 class="text-base font-semibold tracking-tight">Catalog</h2>
@@ -140,7 +155,7 @@
 
         <div id="empty-catalog" class="hidden border border-dashed border-zinc-300 dark:border-zinc-800 rounded-xl p-10 text-center">
           <p class="text-sm font-medium text-zinc-700 dark:text-zinc-300">No novels published yet.</p>
-          <p class="text-xs text-zinc-500 mt-1">Sign in with a verified email to add your first authorized story.</p>
+          <p class="text-xs text-zinc-500 mt-1">Sign in with your verified email to add your first story.</p>
           <button onclick="navigate('publish')" class="mt-4 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium">Open Author Studio</button>
         </div>
       </div>
@@ -208,9 +223,12 @@
 
     <!-- VIEW: PUBLISH / AUTHOR STUDIO -->
     <section id="view-publish" class="hidden max-w-2xl mx-auto space-y-6">
-      <div>
-        <h2 class="text-base font-semibold">Author Studio</h2>
-        <p class="text-xs text-zinc-500 mt-0.5">Upload authorized novels and chapters directly to your Supabase database.</p>
+      <div class="flex items-center justify-between gap-2">
+        <div>
+          <h2 class="text-base font-semibold">Author Studio</h2>
+          <p class="text-xs text-zinc-500 mt-0.5">Publish novels and chapters directly to your database.</p>
+        </div>
+        <button onclick="openProfileModal()" class="px-3 py-1.5 rounded-lg border border-zinc-200 dark:border-zinc-800 text-xs font-medium hover:bg-zinc-100 dark:hover:bg-zinc-900">Edit Pen Name</button>
       </div>
 
       <div id="publish-auth-gate" class="hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl p-6 text-center">
@@ -227,18 +245,18 @@
           <div class="grid sm:grid-cols-2 gap-3">
             <div>
               <label class="block text-xs text-zinc-500 mb-1">Novel Title *</label>
-              <input name="title" required placeholder="e.g. Chronicles of Edo" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800" />
+              <input name="title" required placeholder="e.g. Chronicles of Edo" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
             </div>
             <div>
               <label class="block text-xs text-zinc-500 mb-1">Author Name *</label>
-              <input name="author_name" required placeholder="Original author name" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800" />
+              <input id="studio-author-name" name="author_name" required placeholder="Your pen name" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
             </div>
           </div>
 
           <div class="grid sm:grid-cols-2 gap-3">
             <div>
               <label class="block text-xs text-zinc-500 mb-1">Genre</label>
-              <select name="genre" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
+              <select name="genre" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600">
                 <option value="Fantasy">Fantasy</option>
                 <option value="Romance">Romance</option>
                 <option value="Action">Action</option>
@@ -248,13 +266,13 @@
             </div>
             <div>
               <label class="block text-xs text-zinc-500 mb-1">Cover Image URL (Optional)</label>
-              <input name="cover_url" type="url" placeholder="https://..." class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800" />
+              <input name="cover_url" type="url" placeholder="https://..." class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
             </div>
           </div>
 
           <div>
             <label class="block text-xs text-zinc-500 mb-1">Synopsis *</label>
-            <textarea name="synopsis" required rows="3" placeholder="Brief summary of the novel..." class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800"></textarea>
+            <textarea name="synopsis" required rows="3" placeholder="Brief summary of the novel..." class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600"></textarea>
           </div>
 
           <label class="flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-300">
@@ -262,7 +280,7 @@
             <span>Mature Content (18+)</span>
           </label>
 
-          <button type="submit" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium">Save Novel</button>
+          <button id="save-novel-btn" type="submit" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium">Save Novel</button>
         </form>
 
         <!-- Add Chapter Form -->
@@ -271,85 +289,106 @@
 
           <div>
             <label class="block text-xs text-zinc-500 mb-1">Select Novel *</label>
-            <select id="publish-novel-select" name="novel_id" required class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
-              <option value="">-- Choose a novel --</option>
+            <select id="publish-novel-select" name="novel_id" required class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600">
+              <option value="">-- Choose your novel --</option>
             </select>
           </div>
 
           <div class="grid sm:grid-cols-3 gap-3">
             <div>
               <label class="block text-xs text-zinc-500 mb-1">Chapter # *</label>
-              <input name="chapter_number" type="number" min="1" value="1" required class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800" />
+              <input name="chapter_number" type="number" min="1" value="1" required class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
             </div>
             <div class="sm:col-span-2">
               <label class="block text-xs text-zinc-500 mb-1">Chapter Title *</label>
-              <input name="chapter_title" required placeholder="e.g. Awakening" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800" />
+              <input name="chapter_title" required placeholder="e.g. Awakening" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
             </div>
           </div>
 
           <div>
             <label class="block text-xs text-zinc-500 mb-1">Chapter Content *</label>
-            <textarea name="content" required rows="8" placeholder="Paste or write chapter text..." class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800"></textarea>
+            <textarea name="content" required rows="8" placeholder="Paste or write chapter text..." class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600"></textarea>
           </div>
 
-          <button type="submit" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium">Publish Chapter</button>
+          <button id="save-chapter-btn" type="submit" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium">Publish Chapter</button>
         </form>
       </div>
     </section>
   </main>
 
-  <!-- AUTH MODAL (Real Supabase Email OTP + Password Verification) -->
+  <!-- AUTH MODAL (Password + Magic Link Verification) -->
   <div id="auth-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
-    <div onclick="closeAuthModal()" class="fixed inset-0 bg-black/65"></div>
+    <div onclick="closeAuthModal()" class="fixed inset-0 bg-black/70"></div>
     <div class="relative w-full max-w-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xl space-y-4">
       <div class="flex items-center justify-between">
-        <h3 class="text-base font-semibold">Account Verification</h3>
+        <h3 class="text-base font-semibold">Sign In to Neptune Reads</h3>
         <button onclick="closeAuthModal()" class="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">✕</button>
       </div>
 
       <!-- Mode Switcher -->
       <div class="grid grid-cols-2 p-1 rounded-lg bg-zinc-100 dark:bg-zinc-950 text-xs font-medium">
-        <button id="tab-otp" onclick="switchAuthTab('otp')" class="py-1.5 rounded-md bg-white dark:bg-zinc-800 shadow-sm">6-Digit Email OTP</button>
-        <button id="tab-password" onclick="switchAuthTab('password')" class="py-1.5 rounded-md text-zinc-500">Password + Link</button>
+        <button id="tab-password" onclick="switchAuthTab('password')" class="py-1.5 rounded-md bg-white dark:bg-zinc-800 shadow-sm">Email & Password</button>
+        <button id="tab-magic" onclick="switchAuthTab('magic')" class="py-1.5 rounded-md text-zinc-500">Magic Link</button>
       </div>
 
-      <div id="auth-feedback" class="hidden text-xs p-2.5 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20"></div>
+      <div id="auth-feedback" class="hidden text-xs p-2.5 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 leading-relaxed"></div>
 
-      <!-- Panel A: 6-Digit OTP -->
-      <div id="panel-otp" class="space-y-3">
-        <div id="otp-step-1" class="space-y-3">
-          <div>
-            <label class="block text-xs text-zinc-500 mb-1">Email Address</label>
-            <input id="otp-email" type="email" placeholder="you@example.com" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800" />
-          </div>
-          <button onclick="sendEmailOtp()" class="w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium">Send 6-Digit Code</button>
-        </div>
-
-        <div id="otp-step-2" class="hidden space-y-3">
-          <div>
-            <label class="block text-xs text-zinc-500 mb-1">Enter 6-Digit Code from Email</label>
-            <input id="otp-code" type="text" maxlength="6" inputmode="numeric" placeholder="123456" class="w-full px-3 py-2 text-center tracking-[0.35em] font-mono text-base rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800" />
-          </div>
-          <button onclick="verifyEmailOtp()" class="w-full py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium">Verify & Sign In</button>
-          <button onclick="resetOtpStep()" class="w-full text-xs text-zinc-500 hover:underline">Change email</button>
-        </div>
-      </div>
-
-      <!-- Panel B: Email & Password + Verification Link -->
-      <div id="panel-password" class="hidden space-y-3">
+      <!-- Panel A: Email & Password (Default) -->
+      <div id="panel-password" class="space-y-3">
         <div>
           <label class="block text-xs text-zinc-500 mb-1">Email Address</label>
-          <input id="pw-email" type="email" placeholder="you@example.com" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800" />
+          <input id="pw-email" type="email" placeholder="you@example.com" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
         </div>
         <div>
           <label class="block text-xs text-zinc-500 mb-1">Password (min 6 chars)</label>
-          <input id="pw-pass" type="password" placeholder="••••••••" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800" />
+          <input id="pw-pass" type="password" placeholder="••••••••" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
         </div>
-        <div class="grid grid-cols-2 gap-2">
-          <button onclick="handlePasswordSignIn()" class="py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium">Sign In</button>
-          <button onclick="handlePasswordSignUp()" class="py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 text-xs font-medium">Create Account</button>
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button onclick="handlePasswordSignIn()" class="py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium">Sign In</button>
+          <button onclick="handlePasswordSignUp()" class="py-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-xs font-medium">Create Account</button>
         </div>
       </div>
+
+      <!-- Panel B: Passwordless Magic Link -->
+      <div id="panel-magic" class="hidden space-y-3">
+        <div>
+          <label class="block text-xs text-zinc-500 mb-1">Email Address</label>
+          <input id="magic-email" type="email" placeholder="you@example.com" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
+        </div>
+        <button onclick="sendMagicLink()" class="w-full py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium">Send Sign-In Link</button>
+        <p class="text-[11px] text-zinc-500 leading-relaxed">We will send a one-click sign-in link to your email. Tap the link in your inbox to return here signed in.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROFILE SETTINGS MODAL (Self-Service Pen Name & Bio) -->
+  <div id="profile-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div onclick="closeProfileModal()" class="fixed inset-0 bg-black/70"></div>
+    <div class="relative w-full max-w-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 shadow-xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-semibold">Edit Profile</h3>
+        <button onclick="closeProfileModal()" class="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">✕</button>
+      </div>
+
+      <form onsubmit="handleSaveProfile(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs text-zinc-500 mb-1">Account Email</label>
+          <input id="profile-email-display" type="text" disabled class="w-full px-3 py-2 text-xs rounded-lg bg-zinc-100 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-zinc-500" />
+        </div>
+        <div>
+          <label class="block text-xs text-zinc-500 mb-1">Pen Name / Display Name *</label>
+          <input id="profile-pen-name" type="text" required placeholder="e.g. Neptune" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
+        </div>
+        <div>
+          <label class="block text-xs text-zinc-500 mb-1">Author Bio (Optional)</label>
+          <textarea id="profile-bio" rows="3" placeholder="Tell readers a little about yourself..." class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600"></textarea>
+        </div>
+
+        <div class="pt-1 flex items-center justify-between gap-2">
+          <button type="button" onclick="closeProfileModal(); signOutUser();" class="px-3 py-2 rounded-lg border border-red-500/30 text-red-500 hover:bg-red-500/10 text-xs font-medium">Sign Out</button>
+          <button type="submit" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium">Save Profile</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -368,7 +407,6 @@
   </div>
 
   <script>
-    // Your live Supabase credentials
     const SUPABASE_URL = 'https://wswhddksvlcodtwilxaf.supabase.co';
     const SUPABASE_KEY = 'sb_publishable_iFkRGRCD_Ki7czkC292-fg_hbqInZlO';
     const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -384,6 +422,19 @@
       fontSize: 17,
       matureVerified: sessionStorage.getItem('nr_18_ok') === '1'
     };
+
+    // Toast notification helper
+    let toastTimer = null;
+    function showToast(msg, isError = false) {
+      const el = document.getElementById('toast-banner');
+      el.textContent = msg;
+      el.className = isError
+        ? 'fixed bottom-5 left-1/2 -translate-x-1/2 z-50 max-w-sm w-[92vw] px-4 py-3 rounded-xl shadow-lg border border-red-500/30 bg-zinc-900 text-red-400 text-xs font-medium text-center'
+        : 'fixed bottom-5 left-1/2 -translate-x-1/2 z-50 max-w-sm w-[92vw] px-4 py-3 rounded-xl shadow-lg border border-emerald-500/30 bg-zinc-900 text-emerald-400 text-xs font-medium text-center';
+      el.classList.remove('hidden');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => el.classList.add('hidden'), 4500);
+    }
 
     // Theme handling
     function toggleTheme() {
@@ -428,13 +479,33 @@
       slot.appendChild(script);
     }
 
-    // Auth State Sync
+    // Helper to get user's display name
+    function getDisplayName(user) {
+      if (!user) return 'Guest';
+      return user.user_metadata?.pen_name || user.email.split('@')[0];
+    }
+
+    // Auth State Sync (Handles Email Link Redirects Automatically)
     async function initAuth() {
+      const hadAuthCallback = window.location.hash.includes('access_token') || window.location.search.includes('code=');
       const { data: { session } } = await sb.auth.getSession();
       setCurrentUser(session?.user || null);
 
-      sb.auth.onAuthStateChange((_event, session) => {
+      if (hadAuthCallback && session?.user) {
+        window.history.replaceState({}, document.title, window.location.pathname);
+        closeAuthModal();
+        showToast('Email verified! Welcome to Neptune Reads.');
+      }
+
+      sb.auth.onAuthStateChange((event, session) => {
         setCurrentUser(session?.user || null);
+        if (event === 'SIGNED_IN' && session?.user?.email_confirmed_at) {
+          closeAuthModal();
+          if (window.location.hash.includes('access_token')) {
+            window.history.replaceState({}, document.title, window.location.pathname);
+            showToast('Email verified! Welcome to Neptune Reads.');
+          }
+        }
       });
     }
 
@@ -442,21 +513,36 @@
       const verifiedUser = user && user.email_confirmed_at ? user : null;
       state.user = verifiedUser;
 
-      const headerBtn = document.getElementById('auth-header-btn');
+      const signInBtn = document.getElementById('auth-header-btn');
+      const profileBtn = document.getElementById('profile-header-btn');
       const drawerBox = document.getElementById('drawer-user-box');
       const drawerFooter = document.getElementById('drawer-footer-action');
+      const drawerEditBtn = document.getElementById('drawer-edit-profile-btn');
 
       if (verifiedUser) {
-        headerBtn.textContent = 'Sign Out';
-        headerBtn.onclick = signOutUser;
-        drawerBox.innerHTML = `<p class="font-medium text-zinc-900 dark:text-white truncate">${verifiedUser.email}</p><p class="text-emerald-500 mt-0.5">Verified Account</p>`;
-        drawerFooter.innerHTML = `<button onclick="closeMobileDrawer(); signOutUser();" class="w-full py-2 rounded-lg border border-zinc-300 dark:border-zinc-700 text-xs font-medium">Sign Out</button>`;
+        const displayName = getDisplayName(verifiedUser);
+        signInBtn.classList.add('hidden');
+        profileBtn.classList.remove('hidden');
+        profileBtn.classList.add('flex');
+        document.getElementById('header-avatar-initial').textContent = displayName.charAt(0).toUpperCase();
+        document.getElementById('header-display-name').textContent = displayName;
+
+        drawerBox.innerHTML = `
+          <p class="font-semibold text-zinc-900 dark:text-white truncate">${escapeHtml(displayName)}</p>
+          <p class="text-zinc-500 dark:text-zinc-400 truncate mt-0.5">${escapeHtml(verifiedUser.email)}</p>
+          <p class="text-emerald-500 mt-1 font-medium">✓ Verified Account</p>
+        `;
+        drawerEditBtn.classList.remove('hidden');
+        drawerFooter.innerHTML = `<button onclick="closeMobileDrawer(); signOutUser();" class="w-full py-2.5 rounded-lg border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-xs font-medium">Sign Out</button>`;
         loadUserBookmarks();
       } else {
-        headerBtn.textContent = 'Sign In';
-        headerBtn.onclick = openAuthModal;
-        drawerBox.innerHTML = `<p class="font-medium text-zinc-800 dark:text-zinc-200">Guest Reader</p><p class="text-zinc-500 mt-0.5">Sign in to sync library & publish.</p>`;
-        drawerFooter.innerHTML = `<button onclick="closeMobileDrawer(); openAuthModal();" class="w-full py-2 rounded-lg bg-blue-600 text-white text-xs font-medium">Sign In / Register</button>`;
+        signInBtn.classList.remove('hidden');
+        profileBtn.classList.add('hidden');
+        profileBtn.classList.remove('flex');
+        drawerEditBtn.classList.add('hidden');
+
+        drawerBox.innerHTML = `<p class="font-semibold text-zinc-800 dark:text-zinc-200">Guest Reader</p><p class="text-zinc-500 dark:text-zinc-400 mt-0.5">Sign in to sync library & publish.</p>`;
+        drawerFooter.innerHTML = `<button onclick="closeMobileDrawer(); openAuthModal();" class="w-full py-2.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium">Sign In / Register</button>`;
         state.bookmarks = [];
       }
       renderPublishView();
@@ -464,7 +550,39 @@
 
     async function signOutUser() {
       await sb.auth.signOut();
+      showToast('Signed out.');
       navigate('home');
+    }
+
+    // Profile Modal Controls
+    function openProfileModal() {
+      if (!state.user) return openAuthModal();
+      document.getElementById('profile-email-display').value = state.user.email;
+      document.getElementById('profile-pen-name').value = getDisplayName(state.user);
+      document.getElementById('profile-bio').value = state.user.user_metadata?.bio || '';
+      document.getElementById('profile-modal').classList.remove('hidden');
+      document.getElementById('profile-modal').classList.add('flex');
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profile-modal').classList.add('hidden');
+      document.getElementById('profile-modal').classList.remove('flex');
+    }
+
+    async function handleSaveProfile(e) {
+      e.preventDefault();
+      if (!state.user) return;
+      const penName = document.getElementById('profile-pen-name').value.trim();
+      const bio = document.getElementById('profile-bio').value.trim();
+
+      const { data, error } = await sb.auth.updateUser({
+        data: { pen_name: penName, bio }
+      });
+
+      if (error) return showToast(error.message, true);
+      setCurrentUser(data.user);
+      closeProfileModal();
+      showToast('Profile updated!');
     }
 
     // Auth Modal Controls
@@ -487,57 +605,32 @@
       box.classList.remove('hidden');
     }
     function switchAuthTab(tab) {
-      const isOtp = tab === 'otp';
-      document.getElementById('panel-otp').classList.toggle('hidden', !isOtp);
-      document.getElementById('panel-password').classList.toggle('hidden', isOtp);
-      document.getElementById('tab-otp').className = isOtp ? 'py-1.5 rounded-md bg-white dark:bg-zinc-800 shadow-sm' : 'py-1.5 rounded-md text-zinc-500';
-      document.getElementById('tab-password').className = !isOtp ? 'py-1.5 rounded-md bg-white dark:bg-zinc-800 shadow-sm' : 'py-1.5 rounded-md text-zinc-500';
+      const isPassword = tab === 'password';
+      document.getElementById('panel-password').classList.toggle('hidden', !isPassword);
+      document.getElementById('panel-magic').classList.toggle('hidden', isPassword);
+      document.getElementById('tab-password').className = isPassword ? 'py-1.5 rounded-md bg-white dark:bg-zinc-800 shadow-sm' : 'py-1.5 rounded-md text-zinc-500';
+      document.getElementById('tab-magic').className = !isPassword ? 'py-1.5 rounded-md bg-white dark:bg-zinc-800 shadow-sm' : 'py-1.5 rounded-md text-zinc-500';
       showAuthFeedback('');
     }
 
-    // 6-Digit Email OTP
-    async function sendEmailOtp() {
-      const email = document.getElementById('otp-email').value.trim();
-      if (!email) return showAuthFeedback('Enter your email address.');
-      showAuthFeedback('Sending verification code...');
-      const { error } = await sb.auth.signInWithOtp({ email });
-      if (error) return showAuthFeedback(error.message);
-      document.getElementById('otp-step-1').classList.add('hidden');
-      document.getElementById('otp-step-2').classList.remove('hidden');
-      showAuthFeedback('Verification code sent! Check your email inbox.');
-    }
-
-    async function verifyEmailOtp() {
-      const email = document.getElementById('otp-email').value.trim();
-      const token = document.getElementById('otp-code').value.trim();
-      if (token.length < 6) return showAuthFeedback('Enter the 6-digit code from your email.');
-      showAuthFeedback('Verifying code...');
-      const { data, error } = await sb.auth.verifyOtp({ email, token, type: 'email' });
-      if (error) return showAuthFeedback(error.message);
-      if (data.user) {
-        closeAuthModal();
-      }
-    }
-
-    function resetOtpStep() {
-      document.getElementById('otp-step-1').classList.remove('hidden');
-      document.getElementById('otp-step-2').classList.add('hidden');
-      showAuthFeedback('');
-    }
-
-    // Email & Password + Verification Link
+    // Email & Password Sign Up / Sign In
     async function handlePasswordSignUp() {
       const email = document.getElementById('pw-email').value.trim();
       const password = document.getElementById('pw-pass').value;
-      if (!email || password.length < 6) return showAuthFeedback('Enter a valid email and at least 6 characters.');
+      if (!email || password.length < 6) return showAuthFeedback('Enter a valid email and a password of at least 6 characters.');
       showAuthFeedback('Creating account...');
-      const { error } = await sb.auth.signUp({
+      const { data, error } = await sb.auth.signUp({
         email,
         password,
         options: { emailRedirectTo: window.location.origin }
       });
       if (error) return showAuthFeedback(error.message);
-      showAuthFeedback('Verification link sent to your email! Click the link in your inbox, then sign in.');
+      if (data.session) {
+        closeAuthModal();
+        showToast('Account created and signed in!');
+      } else {
+        showAuthFeedback('Verification link sent to your email! Open your inbox and tap the link to activate your account.');
+      }
     }
 
     async function handlePasswordSignIn() {
@@ -549,9 +642,26 @@
       if (error) return showAuthFeedback(error.message);
       if (!data.user?.email_confirmed_at) {
         await sb.auth.signOut();
-        return showAuthFeedback('Your email is not verified yet. Check your inbox and click the verification link first.');
+        return showAuthFeedback('Your email is not verified yet. Open your inbox and tap the verification link first.');
       }
       closeAuthModal();
+      showToast('Welcome back!');
+    }
+
+    // Passwordless Magic Link
+    async function sendMagicLink() {
+      const email = document.getElementById('magic-email').value.trim();
+      if (!email) return showAuthFeedback('Enter your email address.');
+      showAuthFeedback('Sending sign-in link...');
+      const { error } = await sb.auth.signInWithOtp({
+        email,
+        options: {
+          shouldCreateUser: true,
+          emailRedirectTo: window.location.origin
+        }
+      });
+      if (error) return showAuthFeedback(error.message);
+      showAuthFeedback('Sign-in link sent! Check your email inbox (and spam folder) and tap "Sign in".');
     }
 
     // Database Operations
@@ -561,7 +671,9 @@
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (!error && data) {
+      if (error) {
+        console.error('Catalog load error:', error.message);
+      } else if (data) {
         state.novels = data;
       }
       renderNovels();
@@ -660,7 +772,7 @@
           <div class="space-y-3 flex-1">
             <div class="flex flex-wrap items-center gap-2">
               <span class="px-2 py-0.5 text-xs rounded bg-blue-600/10 text-blue-600 dark:text-blue-400 font-medium">${escapeHtml(novel.genre)}</span>
-              <span class="px-2 py-0.5 text-xs rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">${escapeHtml(novel.status)}</span>
+              <span class="px-2 py-0.5 text-xs rounded bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300">${escapeHtml(novel.status || 'Ongoing')}</span>
               ${novel.is_mature ? '<span class="px-2 py-0.5 text-xs rounded bg-red-500/15 text-red-500 font-medium">18+</span>' : ''}
             </div>
             <h1 class="text-xl font-bold">${escapeHtml(novel.title)}</h1>
@@ -742,9 +854,11 @@
       if (exists) {
         await sb.from('bookmarks').delete().eq('user_id', state.user.id).eq('novel_id', novelId);
         state.bookmarks = state.bookmarks.filter(id => id !== novelId);
+        showToast('Removed from Library');
       } else {
         await sb.from('bookmarks').insert({ user_id: state.user.id, novel_id: novelId });
         state.bookmarks.push(novelId);
+        showToast('Added to Library');
       }
       openNovel(novelId);
     }
@@ -775,6 +889,12 @@
       gate.classList.add('hidden');
       forms.classList.remove('hidden');
 
+      // Pre-fill author name with user's Pen Name
+      const authorInput = document.getElementById('studio-author-name');
+      if (authorInput && !authorInput.value) {
+        authorInput.value = getDisplayName(state.user);
+      }
+
       const myNovels = state.novels.filter(n => n.author_id === state.user.id);
       const select = document.getElementById('publish-novel-select');
       select.innerHTML = `<option value="">-- Choose your novel --</option>` +
@@ -784,6 +904,10 @@
     async function handleCreateNovel(e) {
       e.preventDefault();
       if (!state.user) return openAuthModal();
+      const btn = document.getElementById('save-novel-btn');
+      btn.disabled = true;
+      btn.textContent = 'Saving...';
+
       const fd = new FormData(e.target);
       const payload = {
         author_id: state.user.id,
@@ -796,17 +920,24 @@
       };
 
       const { error } = await sb.from('novels').insert(payload);
-      if (error) return alert(error.message);
+      btn.disabled = false;
+      btn.textContent = 'Save Novel';
+
+      if (error) return showToast(error.message, true);
 
       e.target.reset();
       await loadCatalog();
       renderPublishView();
-      alert('Novel created successfully!');
+      showToast('Novel created! You can now add chapters below.');
     }
 
     async function handleAddChapter(e) {
       e.preventDefault();
       if (!state.user) return openAuthModal();
+      const btn = document.getElementById('save-chapter-btn');
+      btn.disabled = true;
+      btn.textContent = 'Publishing...';
+
       const fd = new FormData(e.target);
       const payload = {
         novel_id: fd.get('novel_id'),
@@ -816,10 +947,13 @@
       };
 
       const { error } = await sb.from('chapters').insert(payload);
-      if (error) return alert(error.message);
+      btn.disabled = false;
+      btn.textContent = 'Publish Chapter';
+
+      if (error) return showToast(error.message, true);
 
       e.target.reset();
-      alert('Chapter published!');
+      showToast('Chapter published!');
     }
 
     function escapeHtml(str) {
