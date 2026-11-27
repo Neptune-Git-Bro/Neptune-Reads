@@ -112,14 +112,12 @@
     <div onclick="closeMobileDrawer()" class="fixed inset-0 bg-zinc-900/60 dark:bg-zinc-900/75 backdrop-blur-xs"></div>
     <aside class="relative w-72 max-w-[82vw] h-full bg-white dark:bg-black text-zinc-900 dark:text-white border-r border-zinc-200 dark:border-zinc-800/80 px-5 py-5 flex flex-col justify-between overflow-y-auto">
       <div>
-        <!-- Top Profile Identity Block -->
         <div id="drawer-user-box" class="pb-5 border-b border-zinc-200 dark:border-zinc-800/80">
           <div class="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center font-bold text-sm">G</div>
           <p class="font-bold text-[15px] mt-3">Guest Reader</p>
           <p class="text-xs text-zinc-500 mt-0.5">@guest</p>
         </div>
 
-        <!-- Clean Icon + Bold Label Navigation List -->
         <nav class="mt-3 flex flex-col">
           <button onclick="navigate('home'); closeMobileDrawer();" class="flex items-center gap-4 py-3 text-left text-[17px] font-bold hover:opacity-75 transition">
             <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24">
@@ -176,7 +174,6 @@
         </nav>
       </div>
 
-      <!-- Bottom Sign In / Log Out -->
       <div id="drawer-footer-action" class="pt-3 border-t border-zinc-200 dark:border-zinc-800/80">
         <button onclick="closeMobileDrawer(); openAuthModal('signin');" class="flex items-center gap-4 py-2.5 text-left text-[17px] font-bold hover:opacity-75 transition">
           <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" stroke-width="1.9" viewBox="0 0 24 24">
@@ -294,7 +291,6 @@
 
       <!-- Signed-in Social Hub -->
       <div id="messages-main-hub" class="hidden space-y-4">
-        <!-- X-Style Clean Top Tabs -->
         <div class="flex border-b border-zinc-200 dark:border-zinc-800 text-xs font-bold">
           <button onclick="switchMsgTab('chats')" id="msg-tab-chats" class="flex-1 py-3 text-center border-b-2 border-blue-500 text-zinc-900 dark:text-white">
             Chats
@@ -310,10 +306,8 @@
 
         <!-- PANEL 1: ACCEPTED CHATS + ACTIVE CONVERSATION -->
         <div id="msg-panel-chats" class="space-y-4">
-          <!-- Friends / Conversations List -->
           <div id="chat-friends-list" class="divide-y divide-zinc-200 dark:divide-zinc-800/80 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 overflow-hidden"></div>
 
-          <!-- Active Chat Thread Box -->
           <div id="active-chat-box" class="hidden border border-zinc-200 dark:border-zinc-800 rounded-2xl bg-white dark:bg-zinc-950 overflow-hidden flex flex-col">
             <div class="px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between gap-2">
               <div class="flex items-center gap-2.5 min-w-0">
@@ -350,14 +344,17 @@
           </div>
         </div>
 
-        <!-- PANEL 3: DISCOVER / SEARCH READERS -->
+        <!-- PANEL 3: X-STYLE LIVE PEOPLE SEARCH -->
         <div id="msg-panel-discover" class="hidden space-y-3">
           <div class="relative">
-            <input id="reader-search-input" type="text" oninput="renderDiscoverReaders()" placeholder="Search readers by name or @username..." class="w-full pl-9 pr-3 py-2.5 text-sm rounded-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
-            <svg class="w-4 h-4 text-zinc-400 absolute left-3 top-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <input id="reader-search-input" type="text" autocomplete="off" oninput="handleLiveReaderSearch(this.value)" placeholder="Search people by name or @username..." class="w-full pl-10 pr-9 py-2.5 text-sm rounded-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-500" />
+            <svg class="w-4 h-4 text-zinc-400 absolute left-3.5 top-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
               <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
             </svg>
+            <button id="clear-reader-search" type="button" onclick="clearReaderSearch()" class="hidden absolute right-3 top-2.5 w-5 h-5 rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 text-xs items-center justify-center">✕</button>
           </div>
+
+          <p id="discover-section-label" class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 px-1">Suggested readers</p>
           <div id="discover-readers-list" class="divide-y divide-zinc-200 dark:divide-zinc-800/80 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 overflow-hidden"></div>
         </div>
       </div>
@@ -391,7 +388,6 @@
       </div>
 
       <div id="publish-forms" class="hidden space-y-6">
-        <!-- Create Novel Form -->
         <form id="create-novel-form" novalidate onsubmit="handleCreateNovel(event)" class="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 space-y-4">
           <h3 class="text-sm font-bold">1. Create New Novel</h3>
 
@@ -448,7 +444,6 @@
           <button id="save-novel-btn" type="submit" class="px-5 py-2.5 rounded-full bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white text-xs font-semibold transition">Save Novel</button>
         </form>
 
-        <!-- Add Chapter Form -->
         <form id="add-chapter-form" novalidate onsubmit="handleAddChapter(event)" class="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl p-5 space-y-4">
           <h3 class="text-sm font-bold">2. Add Chapter to Existing Novel</h3>
 
@@ -759,6 +754,8 @@
       chapters: [],
       bookmarks: [],
       readers: [],
+      searchResults: [],
+      isSearchingReaders: false,
       requests: [],
       messages: [],
       activeChatPeerId: null,
@@ -882,7 +879,10 @@
       if (view === 'home') renderNovels();
       if (view === 'library') renderLibrary();
       if (view === 'publish') renderPublishView();
-      if (view === 'messages') renderMessagesView();
+      if (view === 'messages') {
+        loadSocialData();
+        renderMessagesView();
+      }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
@@ -907,7 +907,6 @@
       return (user.user_metadata?.username || user.user_metadata?.pen_name || user.email.split('@')[0]).replace(/^@/, '');
     }
 
-    // Sync signed-in user to public reader_profiles directory
     async function syncPublicReaderProfile(user) {
       if (!user) return;
       const fullName = getDisplayName(user);
@@ -924,7 +923,6 @@
         updated_at: new Date().toISOString()
       }, { onConflict: 'id' });
 
-      // Fallback if username collision occurs
       if (error && error.message?.includes('username')) {
         await sb.from('reader_profiles').upsert({
           id: user.id,
@@ -1029,7 +1027,7 @@
 
         await syncPublicReaderProfile(state.user);
         loadUserBookmarks();
-        loadSocialData();
+        await loadSocialData();
         setupSocialRealtime();
       } else {
         signInBtn.classList.remove('hidden');
@@ -1074,12 +1072,65 @@
     }
 
     // ==========================================
-    // READER REQUESTS & REAL-TIME CHAT LOGIC
+    // X-STYLE LIVE READER SEARCH, REQUESTS & CHAT
     // ==========================================
+    let readerSearchTimer = null;
+
+    function clearReaderSearch() {
+      const input = document.getElementById('reader-search-input');
+      if (input) input.value = '';
+      handleLiveReaderSearch('');
+    }
+
+    function handleLiveReaderSearch(rawVal) {
+      const clearBtn = document.getElementById('clear-reader-search');
+      const label = document.getElementById('discover-section-label');
+      const clean = (rawVal || '').trim().replace(/^@+/, '');
+
+      if (clearBtn) {
+        clearBtn.classList.toggle('hidden', clean.length === 0);
+        clearBtn.classList.toggle('flex', clean.length > 0);
+      }
+
+      clearTimeout(readerSearchTimer);
+
+      if (!clean) {
+        state.isSearchingReaders = false;
+        state.searchResults = [];
+        if (label) label.textContent = 'Suggested readers';
+        renderDiscoverReaders();
+        return;
+      }
+
+      if (label) label.textContent = `People matching "${clean}"`;
+      state.isSearchingReaders = true;
+      renderDiscoverReaders();
+
+      readerSearchTimer = setTimeout(async () => {
+        const safe = clean.replace(/[%_,()]/g, '');
+        const { data } = await sb
+          .from('reader_profiles')
+          .select('*')
+          .neq('id', state.user.id)
+          .or(`full_name.ilike.%${safe}%,username.ilike.%${safe}%,bio.ilike.%${safe}%`)
+          .limit(25);
+
+        state.searchResults = data || [];
+        // Merge any newly found profiles into state.readers cache
+        for (const r of state.searchResults) {
+          if (!state.readers.some(existing => existing.id === r.id)) {
+            state.readers.push(r);
+          }
+        }
+        state.isSearchingReaders = false;
+        renderDiscoverReaders();
+      }, 180);
+    }
+
     async function loadSocialData() {
       if (!state.user) return;
       const [{ data: readers }, { data: reqs }] = await Promise.all([
-        sb.from('reader_profiles').select('*').order('updated_at', { ascending: false }),
+        sb.from('reader_profiles').select('*').order('updated_at', { ascending: false }).limit(50),
         sb.from('friend_requests').select('*').or(`sender_id.eq.${state.user.id},receiver_id.eq.${state.user.id}`)
       ]);
 
@@ -1157,7 +1208,12 @@
         btn.classList.toggle('border-transparent', !active);
         btn.classList.toggle('text-zinc-500', !active);
       });
-      renderMessagesView();
+      if (tab === 'discover') {
+        loadSocialData();
+        setTimeout(() => document.getElementById('reader-search-input')?.focus(), 50);
+      } else {
+        renderMessagesView();
+      }
     }
 
     function getConnectionBetween(otherId) {
@@ -1316,40 +1372,66 @@
       const listEl = document.getElementById('discover-readers-list');
       if (!listEl || !state.user) return;
 
-      const q = (document.getElementById('reader-search-input')?.value || '').trim().toLowerCase();
-      const others = state.readers.filter(r => {
-        if (r.id === state.user.id) return false;
-        if (!q) return true;
-        return r.full_name.toLowerCase().includes(q) || r.username.toLowerCase().includes(q);
-      });
+      const raw = (document.getElementById('reader-search-input')?.value || '').trim();
+      const q = raw.replace(/^@+/, '').toLowerCase();
 
-      if (others.length === 0) {
-        listEl.innerHTML = `<p class="p-5 text-center text-xs text-zinc-500">No other readers found yet.</p>`;
+      if (state.isSearchingReaders) {
+        listEl.innerHTML = `<p class="p-5 text-center text-xs text-zinc-500">Searching people...</p>`;
         return;
       }
 
-      listEl.innerHTML = others.map(reader => {
+      // Combine live Supabase results + local instant prefix/substring filter
+      let matches = [];
+      if (q) {
+        const localMatches = state.readers.filter(r =>
+          r.id !== state.user.id &&
+          (r.full_name.toLowerCase().includes(q) ||
+            r.username.toLowerCase().includes(q) ||
+            (r.bio || '').toLowerCase().includes(q))
+        );
+        const merged = [...state.searchResults];
+        for (const item of localMatches) {
+          if (!merged.some(m => m.id === item.id)) merged.push(item);
+        }
+        // Rank exact / prefix matches first just like X
+        matches = merged.sort((a, b) => {
+          const aStarts = a.full_name.toLowerCase().startsWith(q) || a.username.toLowerCase().startsWith(q) ? 0 : 1;
+          const bStarts = b.full_name.toLowerCase().startsWith(q) || b.username.toLowerCase().startsWith(q) ? 0 : 1;
+          return aStarts - bStarts;
+        });
+      } else {
+        matches = state.readers.filter(r => r.id !== state.user.id);
+      }
+
+      if (matches.length === 0) {
+        listEl.innerHTML = q
+          ? `<p class="p-5 text-center text-xs text-zinc-500">No results for "${escapeHtml(raw)}"</p>`
+          : `<p class="p-5 text-center text-xs text-zinc-500">No other readers found yet.</p>`;
+        return;
+      }
+
+      listEl.innerHTML = matches.map(reader => {
         const conn = getConnectionBetween(reader.id);
-        let actionBtn = `<button onclick="sendReaderRequest('${reader.id}')" class="px-3.5 py-1.5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black text-xs font-bold shrink-0">Add</button>`;
+        let actionBtn = `<button onclick="sendReaderRequest('${reader.id}')" class="px-4 py-1.5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black text-xs font-bold hover:opacity-90 shrink-0">Add</button>`;
 
         if (conn) {
           if (conn.status === 'accepted') {
-            actionBtn = `<button onclick="switchMsgTab('chats'); openChatThread('${reader.id}');" class="px-3.5 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-xs font-bold shrink-0">Message</button>`;
+            actionBtn = `<button onclick="switchMsgTab('chats'); openChatThread('${reader.id}');" class="px-3.5 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-xs font-bold hover:bg-zinc-100 dark:hover:bg-zinc-900 shrink-0">Message</button>`;
           } else if (conn.sender_id === state.user.id) {
-            actionBtn = `<span class="px-3 py-1 rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-500 text-xs font-semibold shrink-0">Requested</span>`;
+            actionBtn = `<button onclick="cancelOrDeclineRequest('${conn.id}')" class="px-3.5 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-zinc-500 text-xs font-semibold shrink-0">Requested</button>`;
           } else {
-            actionBtn = `<button onclick="acceptReaderRequest('${conn.id}')" class="px-3.5 py-1.5 rounded-full bg-blue-600 text-white text-xs font-bold shrink-0">Accept</button>`;
+            actionBtn = `<button onclick="acceptReaderRequest('${conn.id}')" class="px-4 py-1.5 rounded-full bg-blue-600 text-white text-xs font-bold shrink-0">Accept</button>`;
           }
         }
 
         return `
-          <div class="px-4 py-3 flex items-center justify-between gap-3">
+          <div class="px-4 py-3 flex items-center justify-between gap-3 hover:bg-zinc-50 dark:hover:bg-zinc-900/60 transition">
             <div class="flex items-center gap-3 min-w-0">
-              ${avatarMarkup(reader)}
+              ${avatarMarkup(reader, 'w-11 h-11 text-sm')}
               <div class="min-w-0">
-                <p class="text-sm font-bold truncate">${escapeHtml(reader.full_name)}</p>
+                <p class="text-sm font-bold text-zinc-900 dark:text-white truncate">${escapeHtml(reader.full_name)}</p>
                 <p class="text-xs text-zinc-500 truncate">@${escapeHtml(reader.username)}</p>
-                ${reader.bio ? `<p class="text-xs text-zinc-500 line-clamp-1 mt-0.5">${escapeHtml(reader.bio)}</p>` : ''}
+                ${reader.bio ? `<p class="text-xs text-zinc-600 dark:text-zinc-300 line-clamp-1 mt-0.5">${escapeHtml(reader.bio)}</p>` : ''}
               </div>
             </div>
             ${actionBtn}
