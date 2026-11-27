@@ -72,7 +72,7 @@
         <button onclick="navigate('home')" data-nav="home" class="nav-link hover:text-zinc-900 dark:hover:text-white transition">Browse</button>
         <button onclick="navigate('library')" data-nav="library" class="nav-link hover:text-zinc-900 dark:hover:text-white transition">Library</button>
         <button onclick="navigate('publish')" data-nav="publish" class="nav-link hover:text-zinc-900 dark:hover:text-white transition">Author Studio</button>
-        <button onclick="openSupportModal()" class="hover:text-zinc-900 dark:hover:text-white transition">Support</button>
+        <button onclick="openContactModal()" class="hover:text-zinc-900 dark:hover:text-white transition">Contact Us</button>
       </nav>
 
       <!-- Right Actions: Theme + Compact User Info Chip -->
@@ -139,14 +139,14 @@
           <button id="drawer-edit-profile-btn" onclick="closeMobileDrawer(); openProfileModal('view');" class="hidden text-left px-3 py-2.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-900 text-blue-600 dark:text-blue-400 transition">User Info & Privacy</button>
         </nav>
 
-        <!-- Direct Support Box inside Drawer -->
+        <!-- Contact Us Buttons inside Drawer (No Plain Numbers/Emails) -->
         <div class="mt-5 p-3 rounded-xl bg-zinc-100/80 dark:bg-zinc-900/90 border border-zinc-200/70 dark:border-zinc-800 space-y-2">
-          <p class="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">Help & Support</p>
-          <a href="https://wa.me/2347050304562?text=Hello%20Neptune%20Reads%20Support" target="_blank" rel="noopener" class="flex items-center gap-2 text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:underline">
-            <span>WhatsApp: 07050304562</span>
+          <p class="text-[11px] font-semibold uppercase tracking-wider text-zinc-500">Contact Us</p>
+          <a href="https://wa.me/2347050304562?text=Hello%20Neptune%20Reads%20Support" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 w-full py-2 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition">
+            <span>Chat on WhatsApp</span>
           </a>
-          <a href="mailto:rulemoni8@gmail.com?subject=Neptune%20Reads%20Support" class="flex items-center gap-2 text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline truncate">
-            <span>Email: rulemoni8@gmail.com</span>
+          <a href="mailto:rulemoni8@gmail.com?subject=Neptune%20Reads%20Support" class="flex items-center justify-center gap-2 w-full py-2 px-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition">
+            <span>Email Us</span>
           </a>
         </div>
       </div>
@@ -190,7 +190,7 @@
 
         <div id="empty-catalog" class="hidden border border-dashed border-zinc-300 dark:border-zinc-800 rounded-xl p-10 text-center">
           <p class="text-sm font-medium text-zinc-700 dark:text-zinc-300">No novels published yet.</p>
-          <p class="text-xs text-zinc-500 mt-1">Sign in with your verified email to add your first story.</p>
+          <p class="text-xs text-zinc-500 mt-1">Sign in to add your first story.</p>
           <button onclick="navigate('publish')" class="mt-4 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-medium">Open Author Studio</button>
         </div>
       </div>
@@ -250,7 +250,7 @@
       <h2 class="text-base font-semibold">My Library</h2>
       <div id="library-guest-notice" class="hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl p-6 text-center">
         <p class="text-sm font-medium">Sign in to view your bookmarked novels</p>
-        <p class="text-xs text-zinc-500 mt-1">Reading chapters is open to everyone, while library sync requires a verified account.</p>
+        <p class="text-xs text-zinc-500 mt-1">Reading chapters is open to everyone, while library sync requires an account.</p>
         <button onclick="openAuthModal('signin')" class="mt-4 px-4 py-2 rounded-lg bg-blue-600 text-white text-xs font-medium">Sign In</button>
       </div>
       <div id="library-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
@@ -267,8 +267,8 @@
       </div>
 
       <div id="publish-auth-gate" class="hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 rounded-xl p-6 text-center">
-        <p class="text-sm font-medium">Verified Account Required</p>
-        <p class="text-xs text-zinc-500 mt-1">Sign in with your verified email address to create novels or add chapters.</p>
+        <p class="text-sm font-medium">Account Required</p>
+        <p class="text-xs text-zinc-500 mt-1">Sign in to create novels or add chapters.</p>
         <button onclick="openAuthModal('signin')" class="mt-4 px-4 py-2 rounded-lg bg-blue-600 text-white text-xs font-medium">Sign In to Publish</button>
       </div>
 
@@ -366,13 +366,13 @@
     </section>
   </main>
 
-  <!-- Minimal Footer with Support Contacts -->
+  <!-- Minimal Footer with Contact Us Buttons -->
   <footer class="border-t border-zinc-200 dark:border-zinc-800/80 py-5 px-4 mt-10">
-    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-zinc-500">
+    <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-zinc-500">
       <span>Neptune Reads — Open Web Fiction Platform</span>
-      <div class="flex items-center gap-4">
-        <a href="https://wa.me/2347050304562?text=Hello%20Neptune%20Reads%20Support" target="_blank" rel="noopener" class="hover:text-emerald-500 transition">WhatsApp Support: 07050304562</a>
-        <a href="mailto:rulemoni8@gmail.com?subject=Neptune%20Reads%20Support" class="hover:text-blue-500 transition">rulemoni8@gmail.com</a>
+      <div class="flex items-center gap-2.5">
+        <a href="https://wa.me/2347050304562?text=Hello%20Neptune%20Reads%20Support" target="_blank" rel="noopener" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition">WhatsApp</a>
+        <a href="mailto:rulemoni8@gmail.com?subject=Neptune%20Reads%20Support" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition">Email Us</a>
       </div>
     </div>
   </footer>
@@ -466,11 +466,12 @@
 
         <div id="view-social-links" class="flex flex-wrap gap-2"></div>
 
+        <!-- Contact Us Buttons inside User Info -->
         <div class="p-3 rounded-xl bg-blue-500/5 border border-blue-500/20 flex items-center justify-between gap-2 text-xs">
-          <span class="text-zinc-600 dark:text-zinc-300 font-medium">Need help?</span>
-          <div class="flex items-center gap-3">
-            <a href="https://wa.me/2347050304562?text=Hello%20Neptune%20Reads%20Support" target="_blank" rel="noopener" class="text-emerald-600 dark:text-emerald-400 font-semibold hover:underline">WhatsApp</a>
-            <a href="mailto:rulemoni8@gmail.com?subject=Neptune%20Reads%20Support" class="text-blue-600 dark:text-blue-400 font-semibold hover:underline">Email</a>
+          <span class="text-zinc-600 dark:text-zinc-300 font-medium">Contact Us</span>
+          <div class="flex items-center gap-2">
+            <a href="https://wa.me/2347050304562?text=Hello%20Neptune%20Reads%20Support" target="_blank" rel="noopener" class="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition">WhatsApp</a>
+            <a href="mailto:rulemoni8@gmail.com?subject=Neptune%20Reads%20Support" class="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold transition">Email</a>
           </div>
         </div>
 
@@ -510,7 +511,7 @@
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs text-zinc-500 mb-1">Phone Number</label>
-            <input id="profile-phone" type="tel" placeholder="e.g. 07050304562" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
+            <input id="profile-phone" type="tel" placeholder="Your phone number" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
           </div>
           <div>
             <label class="block text-xs text-zinc-500 mb-1">Favorite Genre</label>
@@ -599,23 +600,21 @@
     </div>
   </div>
 
-  <!-- SUPPORT MODAL -->
-  <div id="support-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
-    <div onclick="closeSupportModal()" class="fixed inset-0 bg-black/70"></div>
+  <!-- CONTACT US MODAL (Buttons Only - No Plain Number or Email Exposed) -->
+  <div id="contact-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div onclick="closeContactModal()" class="fixed inset-0 bg-black/70"></div>
     <div class="relative w-full max-w-sm bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-xl space-y-4">
       <div class="flex items-center justify-between">
-        <h3 class="text-base font-bold">Neptune Reads Support</h3>
-        <button onclick="closeSupportModal()" class="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">✕</button>
+        <h3 class="text-base font-bold">Contact Us</h3>
+        <button onclick="closeContactModal()" class="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200">✕</button>
       </div>
-      <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">Need help with your account, publishing a story, or reporting an issue? Reach out directly:</p>
+      <p class="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed">Need help with your account, publishing a story, or reporting an issue? Tap a button below to reach us directly:</p>
       <div class="space-y-2.5">
-        <a href="https://wa.me/2347050304562?text=Hello%20Neptune%20Reads%20Support" target="_blank" rel="noopener" class="flex items-center justify-between p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/25 text-emerald-600 dark:text-emerald-400 text-xs font-semibold hover:bg-emerald-500/15 transition">
+        <a href="https://wa.me/2347050304562?text=Hello%20Neptune%20Reads%20Support" target="_blank" rel="noopener" class="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition">
           <span>Chat on WhatsApp</span>
-          <span>07050304562 →</span>
         </a>
-        <a href="mailto:rulemoni8@gmail.com?subject=Neptune%20Reads%20Support" class="flex items-center justify-between p-3 rounded-xl bg-blue-500/10 border border-blue-500/25 text-blue-600 dark:text-blue-400 text-xs font-semibold hover:bg-blue-500/15 transition">
+        <a href="mailto:rulemoni8@gmail.com?subject=Neptune%20Reads%20Support" class="flex items-center justify-center gap-2 w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold transition">
           <span>Send an Email</span>
-          <span>rulemoni8@gmail.com →</span>
         </a>
       </div>
     </div>
@@ -653,7 +652,6 @@
       matureVerified: sessionStorage.getItem('nr_18_ok') === '1'
     };
 
-    // Toast notification helper
     let toastTimer = null;
     function showToast(msg, isError = false) {
       const el = document.getElementById('toast-banner');
@@ -680,7 +678,6 @@
       el.classList.remove('hidden');
     }
 
-    // Client-side Image Compression & Upload Helper
     async function compressImage(file, maxWidth = 800, quality = 0.82) {
       return new Promise((resolve) => {
         const reader = new FileReader();
@@ -731,7 +728,6 @@
       return `https://${clean}`;
     }
 
-    // Theme handling
     function toggleTheme() {
       const html = document.documentElement;
       const isDark = html.classList.toggle('dark');
@@ -741,7 +737,6 @@
       document.documentElement.classList.remove('dark');
     }
 
-    // Mobile Drawer
     document.getElementById('mobile-menu-btn').addEventListener('click', () => {
       document.getElementById('mobile-drawer').classList.remove('hidden');
     });
@@ -749,17 +744,15 @@
       document.getElementById('mobile-drawer').classList.add('hidden');
     }
 
-    // Support Modal
-    function openSupportModal() {
-      document.getElementById('support-modal').classList.remove('hidden');
-      document.getElementById('support-modal').classList.add('flex');
+    function openContactModal() {
+      document.getElementById('contact-modal').classList.remove('hidden');
+      document.getElementById('contact-modal').classList.add('flex');
     }
-    function closeSupportModal() {
-      document.getElementById('support-modal').classList.add('hidden');
-      document.getElementById('support-modal').classList.remove('flex');
+    function closeContactModal() {
+      document.getElementById('contact-modal').classList.add('hidden');
+      document.getElementById('contact-modal').classList.remove('flex');
     }
 
-    // Navigation
     function navigate(view) {
       ['home', 'novel', 'reader', 'library', 'publish'].forEach(v => {
         document.getElementById('view-' + v).classList.add('hidden');
@@ -793,7 +786,6 @@
       return (user.user_metadata?.username || user.user_metadata?.pen_name || user.email.split('@')[0]).replace(/^@/, '');
     }
 
-    // Auth State Sync (Handles Email Link & Password Recovery Redirects)
     async function initAuth() {
       const isRecovery = window.location.hash.includes('type=recovery');
       const hadAuthCallback = window.location.hash.includes('access_token') || window.location.search.includes('code=');
@@ -807,7 +799,7 @@
           openProfileModal('privacy');
           showToast('Set your new password below.');
         } else {
-          showToast('Signed in! Set a password in Privacy tab for faster logins.');
+          showToast('Signed in! Set a password in Privacy tab for instant logins.');
         }
       }
 
@@ -817,19 +809,18 @@
           closeAuthModal();
           openProfileModal('privacy');
           showToast('Enter your new password below.');
-        } else if (event === 'SIGNED_IN' && session?.user?.email_confirmed_at) {
+        } else if (event === 'SIGNED_IN' && session?.user) {
           closeAuthModal();
           if (window.location.hash.includes('access_token')) {
             window.history.replaceState({}, document.title, window.location.pathname);
-            showToast('Email verified! Welcome to Neptune Reads.');
+            showToast('Welcome to Neptune Reads.');
           }
         }
       });
     }
 
     function setCurrentUser(user) {
-      const verifiedUser = user && user.email_confirmed_at ? user : null;
-      state.user = verifiedUser;
+      state.user = user || null;
 
       const signInBtn = document.getElementById('auth-header-btn');
       const profileBtn = document.getElementById('profile-header-btn');
@@ -837,11 +828,11 @@
       const drawerFooter = document.getElementById('drawer-footer-action');
       const drawerEditBtn = document.getElementById('drawer-edit-profile-btn');
 
-      if (verifiedUser) {
-        const displayName = getDisplayName(verifiedUser);
-        const username = getUsername(verifiedUser);
-        const avatarUrl = verifiedUser.user_metadata?.avatar_url;
-        const bio = verifiedUser.user_metadata?.bio;
+      if (state.user) {
+        const displayName = getDisplayName(state.user);
+        const username = getUsername(state.user);
+        const avatarUrl = state.user.user_metadata?.avatar_url;
+        const bio = state.user.user_metadata?.bio;
 
         signInBtn.classList.add('hidden');
         profileBtn.classList.remove('hidden');
@@ -897,7 +888,6 @@
       navigate('home');
     }
 
-    // User Info, Profile Editor & Privacy Modal Controls
     function switchProfileMode(mode) {
       const panels = {
         view: document.getElementById('profile-view-panel'),
@@ -926,7 +916,6 @@
       const displayName = getDisplayName(state.user);
       const username = getUsername(state.user);
 
-      // Populate Overview Card
       document.getElementById('view-full-name').textContent = displayName;
       document.getElementById('view-username').textContent = `@${username}`;
       document.getElementById('view-email').textContent = state.user.email;
@@ -947,7 +936,6 @@
         vFallback.textContent = displayName.charAt(0).toUpperCase();
       }
 
-      // Render Social Badges
       const linksContainer = document.getElementById('view-social-links');
       const badges = [];
       if (meta.x_handle) {
@@ -966,7 +954,6 @@
         ? badges.join('')
         : `<p class="text-[11px] text-zinc-400">No social links added yet.</p>`;
 
-      // Populate Edit Form Fields
       document.getElementById('profile-full-name').value = displayName;
       document.getElementById('profile-username').value = username;
       document.getElementById('profile-phone').value = meta.phone || '';
@@ -1055,7 +1042,6 @@
       }
     }
 
-    // Privacy Tab Actions: Set/Change Password & Change Email
     async function handleUpdatePassword(e) {
       e.preventDefault();
       if (!state.user) return;
@@ -1089,7 +1075,7 @@
       const { error } = await sb.auth.resetPasswordForEmail(state.user.email, {
         redirectTo: window.location.origin
       });
-      if (error) return setFormStatus('privacy-status', error.message, true);
+      if (error) return setFormStatus('privacy-status', formatAuthError(error.message), true);
       setFormStatus('privacy-status', `Password reset link sent to ${state.user.email}.`);
     }
 
@@ -1115,14 +1101,24 @@
         setFormStatus('privacy-status', `Confirmation link sent to ${newEmail}. Open your inbox and tap the link to complete the email change.`);
         showToast('Check your new email inbox!');
       } catch (err) {
-        setFormStatus('privacy-status', err.message || 'Could not update email.', true);
+        setFormStatus('privacy-status', formatAuthError(err.message), true);
       } finally {
         btn.disabled = false;
         btn.textContent = 'Change Email';
       }
     }
 
-    // Clean Single-Focus Auth Modal
+    function formatAuthError(msg) {
+      const lower = (msg || '').toLowerCase();
+      if (lower.includes('rate limit')) {
+        return 'Hourly email limit reached on our mail server. Please wait 60 minutes before requesting another email link, or sign in with your password.';
+      }
+      if (lower.includes('invalid login')) {
+        return 'Incorrect email or password. If you signed up with an email link and never set a password, tap "Forgot password?" to set one.';
+      }
+      return msg || 'Authentication failed.';
+    }
+
     function openAuthModal(mode = 'signin') {
       setAuthMode(mode);
       document.getElementById('auth-modal').classList.remove('hidden');
@@ -1203,16 +1199,7 @@
           if (!password) return showAuthFeedback('Please enter your password.');
           showAuthFeedback('Signing in...');
           const { data, error } = await sb.auth.signInWithPassword({ email, password });
-          if (error) {
-            if (error.message.toLowerCase().includes('invalid login')) {
-              return showAuthFeedback('Incorrect email or password. If you created your account with an email link, tap "Forgot password?" to set a password.');
-            }
-            return showAuthFeedback(error.message);
-          }
-          if (!data.user?.email_confirmed_at) {
-            await sb.auth.signOut();
-            return showAuthFeedback('Your email is not verified yet. Open your inbox and tap the verification link first.');
-          }
+          if (error) return showAuthFeedback(formatAuthError(error.message));
           closeAuthModal();
           showToast('Welcome back!');
         } else if (state.authMode === 'signup') {
@@ -1223,7 +1210,7 @@
             password,
             options: { emailRedirectTo: window.location.origin }
           });
-          if (error) return showAuthFeedback(error.message);
+          if (error) return showAuthFeedback(formatAuthError(error.message));
           if (data.session) {
             closeAuthModal();
             showToast('Account created!');
@@ -1236,14 +1223,14 @@
             email,
             options: { shouldCreateUser: true, emailRedirectTo: window.location.origin }
           });
-          if (error) return showAuthFeedback(error.message);
+          if (error) return showAuthFeedback(formatAuthError(error.message));
           showAuthFeedback('Sign-in link sent! Check your email inbox and tap "Sign in".');
         } else if (state.authMode === 'reset') {
           showAuthFeedback('Sending password reset link...');
           const { error } = await sb.auth.resetPasswordForEmail(email, {
             redirectTo: window.location.origin
           });
-          if (error) return showAuthFeedback(error.message);
+          if (error) return showAuthFeedback(formatAuthError(error.message));
           showAuthFeedback('Password reset link sent! Open your email inbox and tap the link to set a new password.');
         }
       } finally {
@@ -1251,7 +1238,6 @@
       }
     }
 
-    // Cover File Preview
     function previewNovelCover(e) {
       const file = e.target.files?.[0];
       const thumb = document.getElementById('cover-preview-thumb');
@@ -1266,7 +1252,6 @@
       label.textContent = file.name;
     }
 
-    // Database Operations
     async function loadCatalog() {
       const { data, error } = await sb
         .from('novels')
