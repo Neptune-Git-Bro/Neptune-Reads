@@ -7,17 +7,15 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      --bg-app: #000000;
-      --bg-elevated: #0b0e12;
-      --bg-card: #11161d;
-      --bg-input: #161b22;
-      --bg-incoming: #2f3336;
+      --bg: #000000;
+      --surface: #0b0e12;
+      --card: #12161c;
+      --incoming: #2f3336;
       --accent: #1d9bf0;
       --accent-hover: #1a8cd8;
-      --text-primary: #e7e9ea;
-      --text-muted: #71767b;
-      --border: #2f3336;
-      --border-soft: #222831;
+      --text: #e7e9ea;
+      --muted: #71767b;
+      --line: #242a32;
     }
 
     * {
@@ -26,55 +24,54 @@
       padding: 0;
     }
 
-    html, body {
-      background: var(--bg-app);
-      color: var(--text-primary);
+    body {
+      background: var(--bg);
+      color: var(--text);
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       min-height: 100dvh;
       -webkit-tap-highlight-color: transparent;
     }
 
-    .nr-app {
-      max-width: 680px;
+    .nr-shell {
+      max-width: 700px;
       margin: 0 auto;
       min-height: 100dvh;
       display: flex;
       flex-direction: column;
-      background: var(--bg-app);
-      border-left: 1px solid var(--border-soft);
-      border-right: 1px solid var(--border-soft);
+      border-left: 1px solid var(--line);
+      border-right: 1px solid var(--line);
     }
 
-    /* Top Bar + 5 Nav Icons at Top */
-    .nr-top-bar {
+    /* Sticky Top Bar with 5 Navigation Icons at the Top */
+    .nr-header {
       position: sticky;
       top: 0;
-      z-index: 50;
+      z-index: 40;
       background: rgba(11, 14, 18, 0.96);
       backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border-soft);
+      border-bottom: 1px solid var(--line);
     }
 
-    .nr-top-brand-row {
+    .nr-header-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
       padding: 10px 14px 6px;
     }
 
-    .nr-brand-left {
+    .nr-brand-group {
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
-    .nr-menu-btn {
+    .nr-drawer-btn {
       width: 34px;
       height: 34px;
       border-radius: 8px;
-      border: 1px solid var(--border-soft);
-      background: var(--bg-input);
-      color: var(--text-primary);
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--text);
       font-size: 1rem;
       cursor: pointer;
     }
@@ -83,262 +80,221 @@
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      color: var(--text-primary);
-      text-decoration: none;
       font-weight: 800;
-      letter-spacing: 0.04em;
       font-size: 0.92rem;
+      letter-spacing: 0.04em;
+      color: var(--text);
+      text-decoration: none;
     }
 
-    .nr-brand-mark {
-      display: inline-grid;
-      place-items: center;
-      width: 28px;
-      height: 28px;
-      border-radius: 8px;
+    .nr-brand-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 7px;
       background: var(--accent);
       color: #ffffff;
-      font-size: 0.78rem;
+      display: inline-grid;
+      place-items: center;
+      font-size: 0.76rem;
       font-weight: 800;
     }
 
-    .nr-user-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
+    .nr-account-pill {
+      font-size: 0.8rem;
+      color: var(--text);
       padding: 4px 11px;
+      border: 1px solid var(--line);
       border-radius: 999px;
-      background: var(--bg-input);
-      border: 1px solid var(--border-soft);
-      color: var(--text-primary);
-      font-size: 0.82rem;
+      background: var(--card);
       font-weight: 600;
     }
 
-    .nr-user-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #22c55e;
-    }
-
-    .nr-top-nav {
+    .nr-nav-row {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      align-items: center;
     }
 
     .nr-nav-btn {
       position: relative;
+      height: 45px;
+      background: transparent;
+      border: 0;
+      color: var(--muted);
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 46px;
-      background: transparent;
-      border: 0;
-      color: var(--text-muted);
       cursor: pointer;
-      transition: color 0.15s ease, background 0.15s ease;
-    }
-
-    .nr-nav-btn:hover {
-      background: rgba(255, 255, 255, 0.04);
     }
 
     .nr-nav-btn.is-active {
-      color: var(--text-primary);
+      color: var(--text);
     }
 
     .nr-nav-btn.is-active::after {
       content: "";
       position: absolute;
       bottom: 0;
-      width: 44px;
+      width: 42px;
       height: 3px;
       border-radius: 999px 999px 0 0;
       background: var(--accent);
     }
 
-    .nr-badge {
+    .nr-nav-badge {
       position: absolute;
-      top: 7px;
-      right: calc(50% - 18px);
-      min-width: 17px;
-      height: 17px;
+      top: 6px;
+      right: calc(50% - 17px);
+      min-width: 16px;
+      height: 16px;
       padding: 0 4px;
       border-radius: 999px;
       background: var(--accent);
       color: #ffffff;
       font-size: 0.68rem;
       font-weight: 700;
-      line-height: 17px;
+      line-height: 16px;
       text-align: center;
     }
 
-    /* Drawer Menu */
-    .nr-drawer-backdrop {
+    /* Mobile Drawer */
+    .nr-backdrop {
       display: none;
       position: fixed;
       inset: 0;
       z-index: 60;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.72);
     }
 
-    .nr-drawer-backdrop.is-open {
+    .nr-backdrop.is-open {
       display: block;
     }
 
     .nr-drawer {
-      width: 270px;
+      width: 260px;
       height: 100%;
-      background: var(--bg-elevated);
-      border-right: 1px solid var(--border);
+      background: var(--surface);
+      border-right: 1px solid var(--line);
       padding: 18px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
     }
 
-    .nr-drawer-title {
-      font-size: 1rem;
+    .nr-drawer-head {
       font-weight: 800;
+      font-size: 0.98rem;
       padding-bottom: 10px;
-      border-bottom: 1px solid var(--border-soft);
+      margin-bottom: 6px;
+      border-bottom: 1px solid var(--line);
     }
 
-    .nr-drawer-link {
+    .nr-drawer-item {
       text-align: left;
       padding: 10px 12px;
       border-radius: 10px;
       border: 0;
       background: transparent;
-      color: var(--text-primary);
+      color: var(--text);
       font-size: 0.92rem;
       cursor: pointer;
     }
 
-    .nr-drawer-link:hover {
-      background: var(--bg-input);
+    .nr-drawer-item:hover {
+      background: var(--card);
     }
 
-    /* Main Content & Views */
+    /* Main Pages */
     .nr-main {
       flex: 1;
       display: flex;
       flex-direction: column;
     }
 
-    .nr-view {
+    .nr-page {
       display: none;
       padding: 16px 14px 28px;
     }
 
-    .nr-view.is-active {
+    .nr-page.is-active {
       display: block;
     }
 
-    .nr-view.is-chat-active {
+    .nr-page.is-dm {
       display: flex;
       flex-direction: column;
-      padding: 0;
       flex: 1;
+      padding: 0;
     }
 
-    .nr-section-heading {
+    .nr-title {
       font-size: 1.15rem;
       font-weight: 800;
-      margin-bottom: 14px;
-    }
-
-    .nr-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border-soft);
-      border-radius: 14px;
-      padding: 14px;
       margin-bottom: 12px;
     }
 
-    .nr-card-title {
-      font-size: 0.98rem;
-      font-weight: 700;
-      margin-bottom: 4px;
+    .nr-subtabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 14px;
     }
 
-    .nr-card-sub {
-      font-size: 0.84rem;
-      color: var(--text-muted);
-      line-height: 1.45;
-    }
-
-    .nr-row-between {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-
-    .nr-btn-primary {
-      padding: 8px 14px;
-      border-radius: 999px;
-      border: 0;
-      background: var(--accent);
-      color: #ffffff;
-      font-weight: 700;
-      font-size: 0.84rem;
-      cursor: pointer;
-    }
-
-    .nr-btn-primary:hover {
-      background: var(--accent-hover);
-    }
-
-    .nr-btn-outline {
-      padding: 7px 14px;
-      border-radius: 999px;
-      border: 1px solid #536471;
+    .nr-subtab {
+      padding: 10px 6px;
       background: transparent;
-      color: var(--text-primary);
+      border: 0;
+      color: var(--muted);
       font-weight: 700;
-      font-size: 0.82rem;
+      font-size: 0.86rem;
       cursor: pointer;
+      position: relative;
     }
 
-    .nr-btn-outline.is-following {
-      background: #eff3f4;
-      color: #0f1419;
-      border-color: #eff3f4;
+    .nr-subtab.is-active {
+      color: var(--text);
     }
 
-    .nr-search-input {
+    .nr-subtab.is-active::after {
+      content: "";
+      position: absolute;
+      left: 16%;
+      right: 16%;
+      bottom: 0;
+      height: 3px;
+      border-radius: 999px 999px 0 0;
+      background: var(--accent);
+    }
+
+    .nr-search {
       width: 100%;
       height: 42px;
-      padding: 0 14px;
+      padding: 0 15px;
       border-radius: 999px;
-      border: 1px solid var(--border);
-      background: var(--bg-input);
-      color: var(--text-primary);
+      border: 1px solid var(--line);
+      background: var(--card);
+      color: var(--text);
       font-size: 0.92rem;
       margin-bottom: 14px;
       outline: none;
     }
 
-    .nr-search-input:focus {
+    .nr-search:focus {
       border-color: var(--accent);
     }
 
-    .nr-reader-item {
+    .nr-user-card {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
       padding: 12px;
       border-radius: 14px;
-      border: 1px solid var(--border-soft);
-      background: var(--bg-card);
+      border: 1px solid var(--line);
+      background: var(--card);
       margin-bottom: 10px;
     }
 
-    .nr-reader-left {
+    .nr-user-left {
       display: flex;
       align-items: center;
       gap: 11px;
@@ -348,90 +304,119 @@
     }
 
     .nr-avatar {
-      width: 42px;
-      height: 42px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      object-fit: cover;
-      background: var(--bg-input);
+      background: #1b222c;
+      color: var(--text);
       display: grid;
       place-items: center;
-      font-weight: 700;
-      font-size: 0.9rem;
-      color: var(--text-primary);
+      font-weight: 800;
+      font-size: 0.92rem;
       flex-shrink: 0;
+      object-fit: cover;
     }
 
-    .nr-reader-meta {
+    .nr-user-meta {
       min-width: 0;
     }
 
-    .nr-reader-name {
+    .nr-user-name {
       font-weight: 700;
-      font-size: 0.94rem;
+      font-size: 0.95rem;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .nr-reader-handle {
+    .nr-user-handle {
       font-size: 0.8rem;
-      color: var(--text-muted);
+      color: var(--muted);
     }
 
-    .nr-reader-followers {
+    .nr-user-followers {
       font-size: 0.78rem;
-      color: #9ca3af;
+      color: #a8b0b8;
       margin-top: 2px;
     }
 
-    .nr-reader-actions {
+    .nr-actions {
       display: flex;
       align-items: center;
       gap: 6px;
       flex-shrink: 0;
     }
 
-    /* X-Style DM Conversation Screen */
-    .nr-dm-screen {
+    .nr-btn {
+      padding: 7px 13px;
+      border-radius: 999px;
+      border: 1px solid #536471;
+      background: transparent;
+      color: var(--text);
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .nr-btn.is-following {
+      background: #eff3f4;
+      color: #0f1419;
+      border-color: #eff3f4;
+    }
+
+    .nr-btn-blue {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #ffffff;
+    }
+
+    .nr-btn-blue:hover {
+      background: var(--accent-hover);
+    }
+
+    /* Mature X-Style DM Thread */
+    .nr-dm {
       display: flex;
       flex-direction: column;
       flex: 1;
       min-height: calc(100dvh - 88px);
-      background: var(--bg-app);
     }
 
-    .nr-dm-topbar {
+    .nr-dm-top {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 8px;
       padding: 10px 12px;
-      border-bottom: 1px solid var(--border);
-      background: var(--bg-app);
+      border-bottom: 1px solid var(--line);
     }
 
-    .nr-dm-peer {
+    .nr-dm-peer-wrap {
       display: flex;
       align-items: center;
       gap: 10px;
-      flex: 1;
       min-width: 0;
+      flex: 1;
     }
 
-    .nr-dm-avatar {
+    .nr-back-btn {
       width: 34px;
       height: 34px;
       border-radius: 50%;
-      object-fit: cover;
-      background: var(--bg-input);
+      background: transparent;
+      border: 0;
+      color: var(--text);
+      font-size: 1.15rem;
+      cursor: pointer;
       display: grid;
       place-items: center;
-      font-weight: 700;
-      font-size: 0.82rem;
-      flex-shrink: 0;
     }
 
-    .nr-dm-name {
+    .nr-back-btn:hover {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .nr-dm-peer-name {
       font-weight: 700;
       font-size: 0.98rem;
       white-space: nowrap;
@@ -439,127 +424,106 @@
       text-overflow: ellipsis;
     }
 
-    .nr-icon-btn {
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      border: 0;
-      background: transparent;
-      color: var(--text-primary);
-      font-size: 1.15rem;
-      cursor: pointer;
-      display: grid;
-      place-items: center;
-    }
-
-    .nr-icon-btn:hover {
-      background: rgba(255, 255, 255, 0.06);
-    }
-
-    .nr-dm-scroll {
+    .nr-dm-body {
       flex: 1;
       overflow-y: auto;
-      padding: 20px 14px 16px;
+      padding: 18px 14px;
     }
 
-    .nr-dm-meta-card {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    .nr-dm-profile-summary {
       text-align: center;
-      padding: 10px 16px 22px;
-      border-bottom: 1px solid #181b1e;
+      padding-bottom: 20px;
       margin-bottom: 14px;
+      border-bottom: 1px solid #181c20;
     }
 
     .nr-dm-joined {
-      color: var(--text-muted);
-      font-size: 0.85rem;
+      font-size: 0.84rem;
+      color: var(--muted);
       margin-bottom: 4px;
     }
 
     .nr-dm-followers {
-      color: var(--text-primary);
-      font-weight: 700;
       font-size: 0.92rem;
-      margin-bottom: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
     }
 
-    .nr-dm-messages {
+    .nr-dm-list {
       display: flex;
       flex-direction: column;
-      gap: 7px;
+      gap: 8px;
     }
 
-    .nr-dm-time-divider {
+    .nr-dm-time {
       text-align: center;
-      color: var(--text-muted);
-      font-size: 0.78rem;
-      margin: 12px 0 6px;
+      font-size: 0.76rem;
+      color: var(--muted);
+      margin: 10px 0 4px;
     }
 
-    .nr-dm-row {
+    .nr-msg-row {
       display: flex;
       flex-direction: column;
     }
 
-    .nr-dm-row.is-incoming {
+    .nr-msg-row.in {
       align-items: flex-start;
     }
 
-    .nr-dm-row.is-outgoing {
+    .nr-msg-row.out {
       align-items: flex-end;
     }
 
-    .nr-dm-bubble {
+    .nr-link-preview {
+      display: inline-block;
+      margin-bottom: 4px;
+      padding: 9px 13px;
+      border-radius: 14px;
+      background: #16181c;
+      border: 1px solid var(--line);
+      color: var(--text);
+      text-decoration: none;
+      font-size: 0.85rem;
       max-width: 78%;
-      padding: 11px 15px;
+      word-break: break-all;
+    }
+
+    .nr-bubble {
+      max-width: 78%;
+      padding: 10px 15px;
       border-radius: 20px;
-      font-size: 0.95rem;
+      font-size: 0.94rem;
       line-height: 1.4;
       word-break: break-word;
     }
 
-    .nr-dm-row.is-incoming .nr-dm-bubble {
-      background: var(--bg-incoming);
-      color: var(--text-primary);
+    .nr-msg-row.in .nr-bubble {
+      background: var(--incoming);
+      color: var(--text);
       border-bottom-left-radius: 5px;
     }
 
-    .nr-dm-row.is-outgoing .nr-dm-bubble {
+    .nr-msg-row.out .nr-bubble {
       background: var(--accent);
       color: #ffffff;
       border-bottom-right-radius: 5px;
     }
 
-    .nr-dm-link-card {
-      display: inline-block;
-      margin-top: 4px;
-      padding: 10px 14px;
-      border-radius: 16px;
-      background: #16181c;
-      border: 1px solid var(--border);
-      color: var(--text-primary);
-      text-decoration: none;
-      font-size: 0.88rem;
-      max-width: 78%;
-      word-break: break-all;
-    }
-
-    .nr-dm-status {
-      font-size: 0.74rem;
-      color: var(--text-muted);
+    .nr-status {
+      font-size: 0.72rem;
+      color: var(--muted);
       margin-top: 3px;
       padding-right: 4px;
     }
 
-    .nr-dm-composer {
+    .nr-dm-form {
       display: flex;
       align-items: center;
       gap: 8px;
       padding: 10px 12px;
-      border-top: 1px solid var(--border);
-      background: var(--bg-app);
+      border-top: 1px solid var(--line);
+      background: var(--bg);
     }
 
     .nr-dm-input {
@@ -567,10 +531,10 @@
       height: 40px;
       padding: 0 14px;
       border-radius: 999px;
-      border: 1px solid var(--border);
-      background: var(--bg-app);
-      color: var(--text-primary);
-      font-size: 0.94rem;
+      border: 1px solid var(--line);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.92rem;
       outline: none;
     }
 
@@ -578,28 +542,21 @@
       border-color: var(--accent);
     }
 
-    .nr-send-btn {
-      height: 36px;
-      padding: 0 15px;
-      border-radius: 999px;
-      border: 0;
-      background: var(--accent);
-      color: #ffffff;
-      font-weight: 700;
-      font-size: 0.85rem;
-      cursor: pointer;
+    .nr-empty {
+      color: var(--muted);
+      font-size: 0.88rem;
+      padding: 12px 0;
     }
 
-    /* Toast */
     .nr-toast {
       position: fixed;
       left: 50%;
       bottom: 20px;
-      transform: translateX(-50%) translateY(20px);
+      transform: translateX(-50%) translateY(16px);
       z-index: 80;
       background: #161b22;
-      color: var(--text-primary);
-      border: 1px solid var(--border);
+      color: var(--text);
+      border: 1px solid var(--line);
       padding: 9px 16px;
       border-radius: 999px;
       font-size: 0.84rem;
@@ -617,145 +574,133 @@
   </style>
 </head>
 <body>
-  <div class="nr-app" id="nrApp">
-    <header class="nr-top-bar" aria-label="Primary navigation">
-      <div class="nr-top-brand-row">
-        <div class="nr-brand-left">
-          <button type="button" class="nr-menu-btn" id="nrMenuBtn" aria-label="Open menu">&#9776;</button>
-          <a href="#home" class="nr-brand" id="nrBrandHome">
-            <span class="nr-brand-mark">NR</span>
+  <div class="nr-shell">
+    <header class="nr-header">
+      <div class="nr-header-top">
+        <div class="nr-brand-group">
+          <button type="button" class="nr-drawer-btn" id="nrMenuBtn" aria-label="Menu">&#9776;</button>
+          <a href="#home" class="nr-brand" id="nrHomeBrand">
+            <span class="nr-brand-icon">NR</span>
             <span>NEPTUNE READS</span>
           </a>
         </div>
-        <div class="nr-user-pill" id="nrUserPill">
-          <span class="nr-user-dot"></span>
-          <span id="nrCurrentHandle">buddypurple0</span>
-        </div>
+        <span class="nr-account-pill" id="nrAccountTag">Not signed in</span>
       </div>
 
-      <nav class="nr-top-nav" aria-label="Main sections">
-        <button type="button" class="nr-nav-btn is-active" data-nav="home" aria-label="Home">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true">
+      <nav class="nr-nav-row" aria-label="Primary top navigation">
+        <button type="button" class="nr-nav-btn is-active" data-tab="home" aria-label="Home">
+          <svg viewBox="0 0 24 24" width="21" height="21" fill="currentColor" aria-hidden="true">
             <path d="M12 3.1 2.5 11h2.2v9.5h5.6v-6h3.4v6h5.6V11h2.2L12 3.1z"/>
           </svg>
         </button>
 
-        <button type="button" class="nr-nav-btn" data-nav="search" aria-label="Find Readers">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+        <button type="button" class="nr-nav-btn" data-tab="search" aria-label="Find Readers">
+          <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
             <circle cx="11" cy="11" r="7"/>
             <path d="m20 20-3.5-3.5"/>
           </svg>
         </button>
 
-        <button type="button" class="nr-nav-btn" data-nav="feed" aria-label="Readers Feed">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+        <button type="button" class="nr-nav-btn" data-tab="following" aria-label="Following">
+          <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
             <path d="M4 6h16M4 12h11M4 18h16"/>
           </svg>
         </button>
 
-        <button type="button" class="nr-nav-btn" data-nav="notifications" aria-label="Notifications">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+        <button type="button" class="nr-nav-btn" data-tab="notifications" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
             <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
             <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
           </svg>
-          <span class="nr-badge" id="nrNotifBadge">2</span>
+          <span class="nr-nav-badge" id="nrNotifBadge" style="display: none;">0</span>
         </button>
 
-        <button type="button" class="nr-nav-btn" data-nav="messages" aria-label="Messages">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+        <button type="button" class="nr-nav-btn" data-tab="messages" aria-label="Messages">
+          <svg viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
         </button>
       </nav>
     </header>
 
-    <div class="nr-drawer-backdrop" id="nrDrawerBackdrop">
-      <aside class="nr-drawer" aria-label="Navigation drawer">
-        <div class="nr-drawer-title">Neptune Reads</div>
-        <button type="button" class="nr-drawer-link" data-drawer-nav="home">Home</button>
-        <button type="button" class="nr-drawer-link" data-drawer-nav="search">Find Readers</button>
-        <button type="button" class="nr-drawer-link" data-drawer-nav="feed">Following &amp; Readers</button>
-        <button type="button" class="nr-drawer-link" data-drawer-nav="notifications">Notifications</button>
-        <button type="button" class="nr-drawer-link" data-drawer-nav="messages">Messages</button>
+    <div class="nr-backdrop" id="nrBackdrop">
+      <aside class="nr-drawer" aria-label="Navigation menu">
+        <div class="nr-drawer-head">NEPTUNE READS</div>
+        <button type="button" class="nr-drawer-item" data-drawer-tab="home">Home</button>
+        <button type="button" class="nr-drawer-item" data-drawer-tab="search">Find Readers</button>
+        <button type="button" class="nr-drawer-item" data-drawer-tab="following">Following</button>
+        <button type="button" class="nr-drawer-item" data-drawer-tab="notifications">Notifications</button>
+        <button type="button" class="nr-drawer-item" data-drawer-tab="messages">Messages</button>
       </aside>
     </div>
 
     <main class="nr-main">
-      <!-- HOME VIEW -->
-      <section class="nr-view is-active" id="view-home" aria-label="Home">
-        <h1 class="nr-section-heading">Neptune Reads</h1>
-        <div class="nr-card">
-          <div class="nr-row-between">
-            <div>
-              <div class="nr-card-title">Continue Reading</div>
-              <div class="nr-card-sub">Open your latest chapters or connect with other readers in Messages.</div>
-            </div>
-            <button type="button" class="nr-btn-primary" id="nrGoMessagesBtn">Messages</button>
-          </div>
-        </div>
-        <div id="nrHomeReaderList"></div>
+      <!-- HOME -->
+      <section class="nr-page is-active" id="tab-home">
+        <h1 class="nr-title">Neptune Reads</h1>
+        <p class="nr-empty" id="nrHomeStatus">Loading real readers from Supabase...</p>
+        <div id="nrHomeReaders"></div>
       </section>
 
-      <!-- SEARCH / FIND READERS VIEW -->
-      <section class="nr-view" id="view-search" aria-label="Find Readers">
-        <h1 class="nr-section-heading">Find Readers</h1>
+      <!-- SEARCH / FIND READERS -->
+      <section class="nr-page" id="tab-search">
+        <h1 class="nr-title">Find Readers</h1>
         <input
           type="search"
-          class="nr-search-input"
-          id="nrReaderSearchInput"
+          class="nr-search"
+          id="nrSearchInput"
           placeholder="Search people by name or @username..."
           autocomplete="off"
         />
         <div id="nrSearchResults"></div>
       </section>
 
-      <!-- FEED / FOLLOWERS DIRECTORY VIEW -->
-      <section class="nr-view" id="view-feed" aria-label="Readers and Followers">
-        <h1 class="nr-section-heading">Readers &amp; Followers</h1>
-        <div id="nrFeedList"></div>
+      <!-- FOLLOWING -->
+      <section class="nr-page" id="tab-following">
+        <h1 class="nr-title">Following</h1>
+        <div id="nrFollowingList"></div>
       </section>
 
-      <!-- NOTIFICATIONS VIEW -->
-      <section class="nr-view" id="view-notifications" aria-label="Notifications">
-        <h1 class="nr-section-heading">Notifications</h1>
-        <div class="nr-card">
-          <div class="nr-card-title">Follower &amp; Message Activity</div>
-          <div class="nr-card-sub">New followers and direct messages appear here as readers interact with your profile.</div>
+      <!-- NOTIFICATIONS -->
+      <section class="nr-page" id="tab-notifications">
+        <h1 class="nr-title">Notifications</h1>
+        <div id="nrNotifList">
+          <p class="nr-empty">No incoming requests right now.</p>
         </div>
       </section>
 
-      <!-- MESSAGES VIEW (INBOX + X-STYLE THREAD) -->
-      <section class="nr-view" id="view-messages" aria-label="Messages">
-        <div id="nrInboxPane">
-          <div class="nr-row-between" style="margin-bottom: 14px;">
-            <h1 class="nr-section-heading" style="margin-bottom: 0;">Messages</h1>
-            <button type="button" class="nr-btn-primary" id="nrNewChatBtn">+ Find Readers</button>
+      <!-- MESSAGES (CHATS / REQUESTS / FIND READERS + X-STYLE DM THREAD) -->
+      <section class="nr-page" id="tab-messages">
+        <div id="nrChatDirectory">
+          <h1 class="nr-title">Messages</h1>
+          <div class="nr-subtabs">
+            <button type="button" class="nr-subtab is-active" data-msg-sub="chats">Chats</button>
+            <button type="button" class="nr-subtab" data-msg-sub="requests">Requests</button>
+            <button type="button" class="nr-subtab" data-msg-sub="find">Find Readers</button>
           </div>
-          <div id="nrInboxList"></div>
+          <div id="nrMsgSubContent"></div>
         </div>
 
-        <div class="nr-dm-screen" id="nrDmScreen" style="display: none;">
-          <div class="nr-dm-topbar">
-            <button type="button" class="nr-icon-btn" id="nrDmBackBtn" aria-label="Back to messages">&#8592;</button>
-            <div class="nr-dm-peer">
-              <div class="nr-dm-avatar" id="nrDmAvatar">M</div>
-              <span class="nr-dm-name" id="nrDmName">moon</span>
+        <div class="nr-dm" id="nrDmView" style="display: none;">
+          <div class="nr-dm-top">
+            <div class="nr-dm-peer-wrap">
+              <button type="button" class="nr-back-btn" id="nrDmBack" aria-label="Back">&#8592;</button>
+              <span class="nr-dm-peer-name" id="nrDmPeerName">Reader</span>
             </div>
-            <button type="button" class="nr-btn-outline" id="nrFollowToggleBtn">Follow</button>
+            <button type="button" class="nr-btn" id="nrDmFollowBtn">Follow</button>
           </div>
 
-          <div class="nr-dm-scroll" id="nrDmScroll">
-            <div class="nr-dm-meta-card">
-              <div class="nr-dm-joined" id="nrDmJoined">Joined December 2022</div>
+          <div class="nr-dm-body" id="nrDmBody">
+            <div class="nr-dm-profile-summary">
+              <div class="nr-dm-joined" id="nrDmJoined"></div>
               <div class="nr-dm-followers" id="nrDmFollowers">0 Followers</div>
-              <button type="button" class="nr-btn-outline" id="nrViewProfileBtn">View Profile</button>
+              <button type="button" class="nr-btn" id="nrDmProfileBtn">View Profile</button>
             </div>
-
-            <div class="nr-dm-messages" id="nrDmMessages"></div>
+            <div class="nr-dm-list" id="nrDmMessages"></div>
           </div>
 
-          <form class="nr-dm-composer" id="nrDmForm">
-            <button type="button" class="nr-icon-btn" id="nrAttachLinkBtn" aria-label="Insert link">+</button>
+          <form class="nr-dm-form" id="nrDmForm">
+            <button type="button" class="nr-back-btn" id="nrAddLinkBtn" aria-label="Insert link">+</button>
             <input
               type="text"
               class="nr-dm-input"
@@ -764,7 +709,7 @@
               autocomplete="off"
               required
             />
-            <button type="submit" class="nr-send-btn" id="nrDmSendBtn">Send</button>
+            <button type="submit" class="nr-btn nr-btn-blue">Send</button>
           </form>
         </div>
       </section>
@@ -776,367 +721,440 @@
   <script>
     (function () {
       const SUPABASE_URL = "https://wswhddksvlcodtwilxaf.supabase.co";
-      const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+      const SUPABASE_ANON_KEY = "Sb_publishable_iFkRGRCD_Ki7czkC292-fg_hbqInZlO";
 
-      const hasSupabaseConfig =
-        SUPABASE_URL.startsWith("http") &&
-        SUPABASE_ANON_KEY.length > 20 &&
-        typeof window.supabase !== "undefined";
-
-      const sb = hasSupabaseConfig
-        ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-        : null;
-
-      const DEMO_READERS = [
-        {
-          id: "demo-moon",
-          full_name: "moon",
-          username: "moon",
-          bio: "Night reader on Neptune Reads.",
-          created_at: "2022-12-01T00:00:00Z",
-          followers_count: 24700
-        },
-        {
-          id: "demo-buddypurple0",
-          full_name: "buddypurple0",
-          username: "buddypurple0",
-          bio: "Reading fantasy and action web novels.",
-          created_at: "2025-02-14T00:00:00Z",
-          followers_count: 148
-        }
-      ];
+      const sb =
+        SUPABASE_ANON_KEY && typeof window.supabase !== "undefined"
+          ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+          : null;
 
       const state = {
-        currentUserId: null,
-        currentHandle: "buddypurple0",
-        readers: [...DEMO_READERS],
-        followingIds: new Set(),
-        activePeerId: null,
-        messagesByPeer: {
-          "demo-moon": [
-            {
-              id: "m1",
-              sender_id: "demo-moon",
-              body: "Welcome to Neptune Reads.",
-              created_at: "Today 19:50",
-              outgoing: false
-            }
-          ]
-        }
+        userId: null,
+        profiles: [],
+        followingSet: new Set(),
+        requests: [],
+        msgSubTab: "chats",
+        activePeerId: null
       };
 
       const toastEl = document.getElementById("nrToast");
       let toastTimer = null;
-
-      function showToast(msg) {
-        toastEl.textContent = msg;
+      function showToast(text) {
+        toastEl.textContent = text;
         toastEl.classList.add("is-visible");
         clearTimeout(toastTimer);
         toastTimer = setTimeout(() => toastEl.classList.remove("is-visible"), 2600);
       }
 
-      function formatFollowerCount(count) {
+      function formatFollowers(count) {
         const n = Number(count) || 0;
-        if (n >= 1000000) {
-          return `${(n / 1000000).toFixed(1).replace(/\.0$/, "")}M Followers`;
-        }
-        if (n >= 1000) {
-          return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}K Followers`;
-        }
+        if (n >= 1000000) return `${(n / 1000000).toFixed(1).replace(/\.0$/, "")}M Followers`;
+        if (n >= 1000) return `${(n / 1000).toFixed(1).replace(/\.0$/, "")}K Followers`;
         return `${n} ${n === 1 ? "Follower" : "Followers"}`;
       }
 
-      function formatJoinedDate(isoDate) {
-        const d = isoDate ? new Date(isoDate) : new Date();
-        if (Number.isNaN(d.getTime())) return "Joined recently";
+      function formatJoined(isoDate) {
+        if (!isoDate) return "";
+        const d = new Date(isoDate);
+        if (Number.isNaN(d.getTime())) return "";
         return `Joined ${d.toLocaleDateString("en-US", { month: "long", year: "numeric" })}`;
       }
 
-      function escapeHtml(str) {
-        return String(str || "")
-          .replace(/&/g, "&amp;")
-          .replace(/</g, "&lt;")
-          .replace(/>/g, "&gt;")
-          .replace(/"/g, "&quot;");
+      // Navigation & Drawer
+      const tabButtons = document.querySelectorAll(".nr-nav-btn[data-tab]");
+      const pages = document.querySelectorAll(".nr-page");
+      const messagesPage = document.getElementById("tab-messages");
+
+      function setTab(tabName) {
+        tabButtons.forEach((b) => b.classList.toggle("is-active", b.dataset.tab === tabName));
+        pages.forEach((p) => p.classList.toggle("is-active", p.id === `tab-${tabName}`));
+        messagesPage.classList.toggle("is-dm", tabName === "messages" && Boolean(state.activePeerId));
       }
 
-      // Navigation switching (5 top icons + drawer)
-      const navButtons = document.querySelectorAll(".nr-nav-btn[data-nav]");
-      const views = document.querySelectorAll(".nr-view");
-      const messagesView = document.getElementById("view-messages");
-      const inboxPane = document.getElementById("nrInboxPane");
-      const dmScreen = document.getElementById("nrDmScreen");
-
-      function switchTab(section) {
-        navButtons.forEach((btn) => {
-          btn.classList.toggle("is-active", btn.dataset.nav === section);
-        });
-        views.forEach((v) => {
-          v.classList.toggle("is-active", v.id === `view-${section}`);
-        });
-
-        if (section === "messages") {
-          messagesView.classList.toggle("is-chat-active", Boolean(state.activePeerId));
-        } else {
-          messagesView.classList.remove("is-chat-active");
-        }
-      }
-
-      navButtons.forEach((btn) => {
-        btn.addEventListener("click", () => switchTab(btn.dataset.nav));
-      });
-
-      const drawerBackdrop = document.getElementById("nrDrawerBackdrop");
-      document.getElementById("nrMenuBtn").addEventListener("click", () => {
-        drawerBackdrop.classList.add("is-open");
-      });
-      drawerBackdrop.addEventListener("click", (e) => {
-        if (e.target === drawerBackdrop) drawerBackdrop.classList.remove("is-open");
-      });
-      document.querySelectorAll("[data-drawer-nav]").forEach((btn) => {
-        btn.addEventListener("click", () => {
-          drawerBackdrop.classList.remove("is-open");
-          switchTab(btn.dataset.drawerNav);
-        });
-      });
-
-      document.getElementById("nrBrandHome").addEventListener("click", (e) => {
+      tabButtons.forEach((btn) => btn.addEventListener("click", () => setTab(btn.dataset.tab)));
+      document.getElementById("nrHomeBrand").addEventListener("click", (e) => {
         e.preventDefault();
-        switchTab("home");
+        setTab("home");
       });
-      document.getElementById("nrGoMessagesBtn").addEventListener("click", () => switchTab("messages"));
-      document.getElementById("nrNewChatBtn").addEventListener("click", () => switchTab("search"));
 
-      // Load readers & session from Supabase if configured
-      async function initData() {
+      const backdrop = document.getElementById("nrBackdrop");
+      document.getElementById("nrMenuBtn").addEventListener("click", () => backdrop.classList.add("is-open"));
+      backdrop.addEventListener("click", (e) => {
+        if (e.target === backdrop) backdrop.classList.remove("is-open");
+      });
+      document.querySelectorAll("[data-drawer-tab]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          backdrop.classList.remove("is-open");
+          setTab(btn.dataset.drawerTab);
+        });
+      });
+
+      document.querySelectorAll(".nr-subtab[data-msg-sub]").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".nr-subtab").forEach((b) => b.classList.remove("is-active"));
+          btn.classList.add("is-active");
+          state.msgSubTab = btn.dataset.msgSub;
+          renderMessagesSubTab();
+        });
+      });
+
+      async function fetchFollowerCount(userId) {
+        if (!sb || !userId) return 0;
+        const { data } = await sb.rpc("get_reader_follow_stats", { target_user_id: userId });
+        const row = Array.isArray(data) ? data[0] : data;
+        return Number(row?.followers_count ?? 0);
+      }
+
+      async function loadAllRealData() {
+        const homeStatus = document.getElementById("nrHomeStatus");
         if (!sb) {
-          renderAllLists();
+          homeStatus.textContent = "Supabase client failed to initialize.";
           return;
         }
 
-        try {
-          const { data: { session } } = await sb.auth.getSession();
-          if (session && session.user) {
-            state.currentUserId = session.user.id;
-          }
+        const { data: { session } } = await sb.auth.getSession();
+        state.userId = session?.user?.id || null;
 
-          const { data: profiles, error: profErr } = await sb
-            .from("reader_profiles")
-            .select("id, full_name, username, bio, created_at")
-            .limit(50);
+        const { data: rows, error } = await sb
+          .from("reader_profiles")
+          .select("id, full_name, username, created_at")
+          .limit(100);
 
-          if (!profErr && Array.isArray(profiles) && profiles.length > 0) {
-            const enriched = await Promise.all(
-              profiles.map(async (p) => {
-                let followersCount = 0;
-                try {
-                  const { data: stats } = await sb.rpc("get_reader_follow_stats", {
-                    target_user_id: p.id
-                  });
-                  const row = Array.isArray(stats) ? stats[0] : stats;
-                  followersCount = Number(row?.followers_count ?? 0);
-                } catch (_) {}
-                return {
-                  ...p,
-                  followers_count: followersCount
-                };
-              })
-            );
-            state.readers = enriched;
-
-            if (state.currentUserId) {
-              const me = enriched.find((r) => r.id === state.currentUserId);
-              if (me?.username) {
-                state.currentHandle = me.username;
-                document.getElementById("nrCurrentHandle").textContent = me.username;
-              }
-
-              const { data: follows } = await sb
-                .from("reader_follows")
-                .select("following_id")
-                .eq("follower_id", state.currentUserId);
-
-              if (Array.isArray(follows)) {
-                state.followingIds = new Set(follows.map((f) => f.following_id));
-              }
-            }
-          }
-        } catch (err) {
-          console.error(err);
+        if (error) {
+          homeStatus.textContent = `Error loading profiles: ${error.message}`;
+          return;
         }
 
-        renderAllLists();
+        const rawList = Array.isArray(rows) ? rows : [];
+        state.profiles = await Promise.all(
+          rawList.map(async (p) => ({
+            ...p,
+            followers_count: await fetchFollowerCount(p.id)
+          }))
+        );
+
+        if (state.userId) {
+          const me = state.profiles.find((p) => p.id === state.userId);
+          document.getElementById("nrAccountTag").textContent = me?.username ? `@${me.username}` : "Signed in";
+
+          const [{ data: follows }, { data: reqs }] = await Promise.all([
+            sb.from("reader_follows").select("following_id").eq("follower_id", state.userId),
+            sb
+              .from("friend_requests")
+              .select("id, sender_id, receiver_id, status")
+              .or(`sender_id.eq.${state.userId},receiver_id.eq.${state.userId}`)
+          ]);
+
+          state.followingSet = new Set((follows || []).map((f) => f.following_id));
+          state.requests = Array.isArray(reqs) ? reqs : [];
+
+          const incomingPending = state.requests.filter(
+            (r) => r.receiver_id === state.userId && r.status === "pending"
+          );
+          const badge = document.getElementById("nrNotifBadge");
+          if (incomingPending.length > 0) {
+            badge.style.display = "inline-block";
+            badge.textContent = String(incomingPending.length);
+          } else {
+            badge.style.display = "none";
+          }
+        }
+
+        homeStatus.textContent =
+          state.profiles.length > 0
+            ? `${state.profiles.length} readers on Neptune Reads`
+            : "No readers registered yet.";
+
+        renderAll();
       }
 
-      function renderReaderRow(reader, container) {
-        const isFollowing = state.followingIds.has(reader.id);
-        const displayName = reader.full_name || reader.username || "Reader";
-        const handle = (reader.username || displayName).replace(/^@+/, "");
-        const initial = displayName.charAt(0).toUpperCase() || "R";
+      function buildReaderRow(person, mode = "default") {
+        const card = document.createElement("div");
+        card.className = "nr-user-card";
 
-        const item = document.createElement("div");
-        item.className = "nr-reader-item";
-        item.innerHTML = `
-          <div class="nr-reader-left" data-open-peer="${escapeHtml(reader.id)}">
-            <div class="nr-avatar">${escapeHtml(initial)}</div>
-            <div class="nr-reader-meta">
-              <div class="nr-reader-name">${escapeHtml(displayName)}</div>
-              <div class="nr-reader-handle">@${escapeHtml(handle)}</div>
-              <div class="nr-reader-followers">${escapeHtml(formatFollowerCount(reader.followers_count))}</div>
-            </div>
-          </div>
-          <div class="nr-reader-actions">
-            <button
-              type="button"
-              class="nr-btn-outline ${isFollowing ? "is-following" : ""}"
-              data-follow-id="${escapeHtml(reader.id)}"
-            >${isFollowing ? "Following" : "Follow"}</button>
-            <button
-              type="button"
-              class="nr-btn-primary"
-              data-msg-id="${escapeHtml(reader.id)}"
-            >Message</button>
+        const name = person.full_name || person.username || "Reader";
+        const handle = (person.username || "").replace(/^@+/, "");
+        const isFollowing = state.followingSet.has(person.id);
+
+        const left = document.createElement("div");
+        left.className = "nr-user-left";
+        left.innerHTML = `
+          <div class="nr-avatar"></div>
+          <div class="nr-user-meta">
+            <div class="nr-user-name"></div>
+            <div class="nr-user-handle"></div>
+            <div class="nr-user-followers"></div>
           </div>
         `;
+        left.querySelector(".nr-avatar").textContent = name.charAt(0).toUpperCase() || "R";
+        left.querySelector(".nr-user-name").textContent = name;
+        left.querySelector(".nr-user-handle").textContent = handle ? `@${handle}` : "";
+        left.querySelector(".nr-user-followers").textContent = formatFollowers(person.followers_count);
+        left.addEventListener("click", () => openThread(person.id));
 
-        item.querySelector("[data-open-peer]").addEventListener("click", () => openChatWith(reader.id));
-        item.querySelector("[data-msg-id]").addEventListener("click", () => openChatWith(reader.id));
-        item.querySelector("[data-follow-id]").addEventListener("click", (e) => {
-          e.stopPropagation();
-          toggleFollow(reader.id);
-        });
+        const actions = document.createElement("div");
+        actions.className = "nr-actions";
 
-        container.appendChild(item);
+        if (state.userId && state.userId !== person.id) {
+          const followBtn = document.createElement("button");
+          followBtn.type = "button";
+          followBtn.className = `nr-btn ${isFollowing ? "is-following" : ""}`;
+          followBtn.textContent = isFollowing ? "Following" : "Follow";
+          followBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            toggleFollow(person.id);
+          });
+          actions.appendChild(followBtn);
+
+          if (mode === "find") {
+            const existingReq = state.requests.find(
+              (r) =>
+                (r.sender_id === state.userId && r.receiver_id === person.id) ||
+                (r.receiver_id === state.userId && r.sender_id === person.id)
+            );
+            const reqBtn = document.createElement("button");
+            reqBtn.type = "button";
+            reqBtn.className = "nr-btn";
+            reqBtn.textContent = existingReq ? (existingReq.status === "accepted" ? "Connected" : "Requested") : "Add";
+            reqBtn.disabled = Boolean(existingReq);
+            reqBtn.addEventListener("click", (e) => {
+              e.stopPropagation();
+              sendRequest(person.id);
+            });
+            actions.appendChild(reqBtn);
+          }
+
+          const msgBtn = document.createElement("button");
+          msgBtn.type = "button";
+          msgBtn.className = "nr-btn nr-btn-blue";
+          msgBtn.textContent = "Message";
+          msgBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            openThread(person.id);
+          });
+          actions.appendChild(msgBtn);
+        }
+
+        card.appendChild(left);
+        card.appendChild(actions);
+        return card;
       }
 
-      function renderAllLists(filterQuery = "") {
-        const q = filterQuery.trim().replace(/^@+/, "").toLowerCase();
-        const filtered = state.readers.filter((r) => {
+      function renderMessagesSubTab() {
+        const container = document.getElementById("nrMsgSubContent");
+        container.innerHTML = "";
+
+        const otherProfiles = state.profiles.filter((p) => p.id !== state.userId);
+
+        if (state.msgSubTab === "chats") {
+          const acceptedIds = new Set(
+            state.requests
+              .filter((r) => r.status === "accepted")
+              .map((r) => (r.sender_id === state.userId ? r.receiver_id : r.sender_id))
+          );
+          const list = acceptedIds.size > 0
+            ? otherProfiles.filter((p) => acceptedIds.has(p.id))
+            : otherProfiles;
+
+          if (list.length === 0) {
+            container.innerHTML = `<p class="nr-empty">No conversations yet.</p>`;
+            return;
+          }
+          list.forEach((p) => container.appendChild(buildReaderRow(p, "chats")));
+        } else if (state.msgSubTab === "requests") {
+          const pending = state.requests.filter(
+            (r) => r.receiver_id === state.userId && r.status === "pending"
+          );
+          if (pending.length === 0) {
+            container.innerHTML = `<p class="nr-empty">No pending requests.</p>`;
+            return;
+          }
+          pending.forEach((req) => {
+            const sender = state.profiles.find((p) => p.id === req.sender_id);
+            if (!sender) return;
+            const row = buildReaderRow(sender, "requests");
+            const acceptBtn = document.createElement("button");
+            acceptBtn.type = "button";
+            acceptBtn.className = "nr-btn nr-btn-blue";
+            acceptBtn.textContent = "Accept";
+            acceptBtn.addEventListener("click", (e) => {
+              e.stopPropagation();
+              acceptRequest(req.id);
+            });
+            row.querySelector(".nr-actions").prepend(acceptBtn);
+            container.appendChild(row);
+          });
+        } else {
+          if (otherProfiles.length === 0) {
+            container.innerHTML = `<p class="nr-empty">No other readers found.</p>`;
+            return;
+          }
+          otherProfiles.forEach((p) => container.appendChild(buildReaderRow(p, "find")));
+        }
+      }
+
+      function renderAll(queryText = "") {
+        const q = queryText.trim().replace(/^@+/, "").toLowerCase();
+        const homeBox = document.getElementById("nrHomeReaders");
+        const searchBox = document.getElementById("nrSearchResults");
+        const followingBox = document.getElementById("nrFollowingList");
+
+        homeBox.innerHTML = "";
+        searchBox.innerHTML = "";
+        followingBox.innerHTML = "";
+
+        state.profiles.forEach((p) => homeBox.appendChild(buildReaderRow(p)));
+
+        const matched = state.profiles.filter((p) => {
           if (!q) return true;
-          const name = (r.full_name || "").toLowerCase();
-          const uname = (r.username || "").toLowerCase();
-          return name.includes(q) || uname.includes(q);
+          return (
+            (p.full_name || "").toLowerCase().includes(q) ||
+            (p.username || "").toLowerCase().includes(q)
+          );
         });
 
-        const homeList = document.getElementById("nrHomeReaderList");
-        const searchList = document.getElementById("nrSearchResults");
-        const feedList = document.getElementById("nrFeedList");
-        const inboxList = document.getElementById("nrInboxList");
+        if (matched.length === 0) {
+          searchBox.innerHTML = `<p class="nr-empty">No results for "${queryText}"</p>`;
+        } else {
+          matched.forEach((p) => searchBox.appendChild(buildReaderRow(p, "find")));
+        }
 
-        homeList.innerHTML = "";
-        searchList.innerHTML = "";
-        feedList.innerHTML = "";
-        inboxList.innerHTML = "";
+        const followed = state.profiles.filter((p) => state.followingSet.has(p.id));
+        if (followed.length === 0) {
+          followingBox.innerHTML = `<p class="nr-empty">You are not following anyone yet.</p>`;
+        } else {
+          followed.forEach((p) => followingBox.appendChild(buildReaderRow(p)));
+        }
 
-        if (filtered.length === 0) {
-          searchList.innerHTML = `<div class="nr-card"><div class="nr-card-sub">No results for "${escapeHtml(filterQuery)}"</div></div>`;
+        renderMessagesSubTab();
+
+        if (state.activePeerId) {
+          const activePeer = state.profiles.find((p) => p.id === state.activePeerId);
+          if (activePeer) renderThreadHeader(activePeer);
+        }
+      }
+
+      document.getElementById("nrSearchInput").addEventListener("input", (e) => {
+        renderAll(e.target.value);
+      });
+
+      async function sendRequest(receiverId) {
+        if (!sb || !state.userId) return;
+        const { error } = await sb.from("friend_requests").insert({
+          sender_id: state.userId,
+          receiver_id: receiverId,
+          status: "pending"
+        });
+        if (error) {
+          showToast(error.message);
+          return;
+        }
+        showToast("Request sent");
+        await loadAllRealData();
+      }
+
+      async function acceptRequest(requestId) {
+        if (!sb || !state.userId) return;
+        const { error } = await sb
+          .from("friend_requests")
+          .update({ status: "accepted" })
+          .eq("id", requestId);
+        if (error) {
+          showToast(error.message);
+          return;
+        }
+        showToast("Request accepted");
+        await loadAllRealData();
+      }
+
+      async function toggleFollow(targetId) {
+        if (!sb || !state.userId || state.userId === targetId) return;
+        const target = state.profiles.find((p) => p.id === targetId);
+        if (!target) return;
+
+        const isFollowing = state.followingSet.has(targetId);
+        if (isFollowing) {
+          const { error } = await sb
+            .from("reader_follows")
+            .delete()
+            .eq("follower_id", state.userId)
+            .eq("following_id", targetId);
+          if (error) return showToast(error.message);
+          state.followingSet.delete(targetId);
+        } else {
+          const { error } = await sb
+            .from("reader_follows")
+            .insert({ follower_id: state.userId, following_id: targetId });
+          if (error) return showToast(error.message);
+          state.followingSet.add(targetId);
+        }
+
+        target.followers_count = await fetchFollowerCount(targetId);
+        renderAll(document.getElementById("nrSearchInput").value);
+      }
+
+      function renderThreadHeader(peer) {
+        const isFollowing = state.followingSet.has(peer.id);
+        document.getElementById("nrDmPeerName").textContent = peer.full_name || peer.username || "Reader";
+        document.getElementById("nrDmJoined").textContent = formatJoined(peer.created_at);
+        document.getElementById("nrDmFollowers").textContent = formatFollowers(peer.followers_count);
+
+        const followBtn = document.getElementById("nrDmFollowBtn");
+        followBtn.style.display = state.userId && state.userId !== peer.id ? "inline-block" : "none";
+        followBtn.textContent = isFollowing ? "Following" : "Follow";
+        followBtn.classList.toggle("is-following", isFollowing);
+      }
+
+      async function openThread(peerId) {
+        const peer = state.profiles.find((p) => p.id === peerId);
+        if (!peer) return;
+
+        state.activePeerId = peerId;
+        document.getElementById("nrChatDirectory").style.display = "none";
+        document.getElementById("nrDmView").style.display = "flex";
+        setTab("messages");
+        renderThreadHeader(peer);
+
+        const listEl = document.getElementById("nrDmMessages");
+        listEl.innerHTML = "";
+
+        if (!sb || !state.userId) {
+          listEl.innerHTML = `<p class="nr-empty">Sign in to read and send messages.</p>`;
           return;
         }
 
-        filtered.forEach((r) => {
-          renderReaderRow(r, homeList);
-          renderReaderRow(r, searchList);
-          renderReaderRow(r, feedList);
+        const { data: msgs, error } = await sb
+          .from("direct_messages")
+          .select("id, sender_id, receiver_id, body, created_at")
+          .or(
+            `and(sender_id.eq.${state.userId},receiver_id.eq.${peerId}),and(sender_id.eq.${peerId},receiver_id.eq.${state.userId})`
+          )
+          .order("created_at", { ascending: true });
 
-          const card = document.createElement("div");
-          card.className = "nr-card";
-          card.style.cursor = "pointer";
-          card.innerHTML = `
-            <div class="nr-row-between">
-              <div>
-                <div class="nr-card-title">${escapeHtml(r.full_name || r.username)}</div>
-                <div class="nr-card-sub">@${escapeHtml(r.username || "reader")} &middot; ${escapeHtml(formatFollowerCount(r.followers_count))}</div>
-              </div>
-              <button type="button" class="nr-btn-outline">Open Chat</button>
-            </div>
-          `;
-          card.addEventListener("click", () => openChatWith(r.id));
-          inboxList.appendChild(card);
-        });
-
-        if (state.activePeerId) {
-          const activeReader = state.readers.find((r) => r.id === state.activePeerId);
-          if (activeReader) syncDmHeader(activeReader);
-        }
-      }
-
-      document.getElementById("nrReaderSearchInput").addEventListener("input", (e) => {
-        renderAllLists(e.target.value);
-      });
-
-      // Follow / Unfollow logic
-      async function toggleFollow(targetId) {
-        if (!targetId || targetId === state.currentUserId) return;
-        const reader = state.readers.find((r) => r.id === targetId);
-        if (!reader) return;
-
-        const currentlyFollowing = state.followingIds.has(targetId);
-
-        if (currentlyFollowing) {
-          state.followingIds.delete(targetId);
-          reader.followers_count = Math.max(0, Number(reader.followers_count || 0) - 1);
-          if (sb && state.currentUserId) {
-            await sb
-              .from("reader_follows")
-              .delete()
-              .eq("follower_id", state.currentUserId)
-              .eq("following_id", targetId);
-          }
-          showToast(`Unfollowed ${reader.full_name || reader.username}`);
-        } else {
-          state.followingIds.add(targetId);
-          reader.followers_count = Number(reader.followers_count || 0) + 1;
-          if (sb && state.currentUserId) {
-            await sb
-              .from("reader_follows")
-              .insert({ follower_id: state.currentUserId, following_id: targetId });
-          }
-          showToast(`Following ${reader.full_name || reader.username}`);
+        if (error) {
+          listEl.innerHTML = `<p class="nr-empty">${error.message}</p>`;
+          return;
         }
 
-        renderAllLists(document.getElementById("nrReaderSearchInput").value);
-      }
-
-      // X-Style DM Thread logic
-      const dmNameEl = document.getElementById("nrDmName");
-      const dmAvatarEl = document.getElementById("nrDmAvatar");
-      const dmJoinedEl = document.getElementById("nrDmJoined");
-      const dmFollowersEl = document.getElementById("nrDmFollowers");
-      const dmFollowBtn = document.getElementById("nrFollowToggleBtn");
-      const dmMessagesEl = document.getElementById("nrDmMessages");
-      const dmScrollEl = document.getElementById("nrDmScroll");
-
-      function syncDmHeader(reader) {
-        const name = reader.full_name || reader.username || "Reader";
-        const isFollowing = state.followingIds.has(reader.id);
-
-        dmNameEl.textContent = name;
-        dmAvatarEl.textContent = name.charAt(0).toUpperCase() || "R";
-        dmJoinedEl.textContent = formatJoinedDate(reader.created_at);
-        dmFollowersEl.textContent = formatFollowerCount(reader.followers_count);
-        dmFollowBtn.textContent = isFollowing ? "Following" : "Follow";
-        dmFollowBtn.classList.toggle("is-following", isFollowing);
-      }
-
-      function renderThreadMessages(peerId) {
-        const list = state.messagesByPeer[peerId] || [];
-        dmMessagesEl.innerHTML = "";
-
-        if (list.length > 0) {
-          const divider = document.createElement("div");
-          divider.className = "nr-dm-time-divider";
-          divider.textContent = list[list.length - 1].created_at || "Today";
-          dmMessagesEl.appendChild(divider);
+        if (!msgs || msgs.length === 0) {
+          listEl.innerHTML = `<p class="nr-empty">No messages yet.</p>`;
+          return;
         }
 
-        list.forEach((msg) => {
+        const timeDiv = document.createElement("div");
+        timeDiv.className = "nr-dm-time";
+        timeDiv.textContent = new Date(msgs[msgs.length - 1].created_at).toLocaleString();
+        listEl.appendChild(timeDiv);
+
+        msgs.forEach((m) => {
+          const outgoing = m.sender_id === state.userId;
           const row = document.createElement("div");
-          row.className = `nr-dm-row ${msg.outgoing ? "is-outgoing" : "is-incoming"}`;
+          row.className = `nr-msg-row ${outgoing ? "out" : "in"}`;
 
-          const urlMatch = String(msg.body || "").match(/https?:\/\/[^\s]+/i);
+          const urlMatch = String(m.body || "").match(/https?:\/\/[^\s]+/i);
           if (urlMatch) {
             const link = document.createElement("a");
-            link.className = "nr-dm-link-card";
+            link.className = "nr-link-preview";
             link.href = urlMatch[0];
             link.target = "_blank";
             link.rel = "noopener noreferrer";
@@ -1145,84 +1163,44 @@
           }
 
           const bubble = document.createElement("div");
-          bubble.className = "nr-dm-bubble";
-          bubble.textContent = msg.body;
+          bubble.className = "nr-bubble";
+          bubble.textContent = m.body;
           row.appendChild(bubble);
 
-          if (msg.outgoing) {
-            const status = document.createElement("div");
-            status.className = "nr-dm-status";
-            status.textContent = "Sent";
-            row.appendChild(status);
+          if (outgoing) {
+            const st = document.createElement("div");
+            st.className = "nr-status";
+            st.textContent = "Sent";
+            row.appendChild(st);
           }
 
-          dmMessagesEl.appendChild(row);
+          listEl.appendChild(row);
         });
 
-        dmScrollEl.scrollTop = dmScrollEl.scrollHeight;
+        const bodyEl = document.getElementById("nrDmBody");
+        bodyEl.scrollTop = bodyEl.scrollHeight;
       }
 
-      async function openChatWith(peerId) {
-        const reader = state.readers.find((r) => r.id === peerId);
-        if (!reader) return;
-
-        state.activePeerId = peerId;
-        inboxPane.style.display = "none";
-        dmScreen.style.display = "flex";
-        switchTab("messages");
-        syncDmHeader(reader);
-
-        if (sb && state.currentUserId) {
-          try {
-            const { data: rows } = await sb
-              .from("direct_messages")
-              .select("id, sender_id, receiver_id, body, created_at")
-              .or(
-                `and(sender_id.eq.${state.currentUserId},receiver_id.eq.${peerId}),and(sender_id.eq.${peerId},receiver_id.eq.${state.currentUserId})`
-              )
-              .order("created_at", { ascending: true });
-
-            if (Array.isArray(rows) && rows.length > 0) {
-              state.messagesByPeer[peerId] = rows.map((r) => ({
-                id: r.id,
-                sender_id: r.sender_id,
-                body: r.body,
-                created_at: r.created_at
-                  ? new Date(r.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-                  : "Today",
-                outgoing: r.sender_id === state.currentUserId
-              }));
-            }
-          } catch (err) {
-            console.error(err);
-          }
-        }
-
-        renderThreadMessages(peerId);
-      }
-
-      document.getElementById("nrDmBackBtn").addEventListener("click", () => {
+      document.getElementById("nrDmBack").addEventListener("click", () => {
         state.activePeerId = null;
-        dmScreen.style.display = "none";
-        inboxPane.style.display = "block";
-        messagesView.classList.remove("is-chat-active");
+        document.getElementById("nrDmView").style.display = "none";
+        document.getElementById("nrChatDirectory").style.display = "block";
+        messagesPage.classList.remove("is-dm");
       });
 
-      dmFollowBtn.addEventListener("click", () => {
+      document.getElementById("nrDmFollowBtn").addEventListener("click", () => {
         if (state.activePeerId) toggleFollow(state.activePeerId);
       });
 
-      document.getElementById("nrViewProfileBtn").addEventListener("click", () => {
-        const reader = state.readers.find((r) => r.id === state.activePeerId);
-        if (!reader) return;
-        showToast(
-          `${reader.full_name || reader.username} (@${reader.username || "reader"}) · ${formatFollowerCount(reader.followers_count)}`
-        );
+      document.getElementById("nrDmProfileBtn").addEventListener("click", () => {
+        const peer = state.profiles.find((p) => p.id === state.activePeerId);
+        if (!peer) return;
+        showToast(`${peer.full_name || peer.username} (@${peer.username || "reader"}) · ${formatFollowers(peer.followers_count)}`);
       });
 
-      document.getElementById("nrAttachLinkBtn").addEventListener("click", () => {
+      document.getElementById("nrAddLinkBtn").addEventListener("click", () => {
         const input = document.getElementById("nrDmInput");
-        const url = prompt("Paste link to share:");
+        const url = prompt("Paste link:");
         if (url && url.trim()) {
           input.value = `${input.value ? input.value + " " : ""}${url.trim()}`;
           input.focus();
@@ -1233,33 +1211,24 @@
         e.preventDefault();
         const input = document.getElementById("nrDmInput");
         const text = input.value.trim();
-        if (!text || !state.activePeerId) return;
+        if (!text || !state.activePeerId || !sb || !state.userId) return;
 
-        const peerId = state.activePeerId;
         input.value = "";
-
-        if (!state.messagesByPeer[peerId]) state.messagesByPeer[peerId] = [];
-        state.messagesByPeer[peerId].push({
-          id: `local-${Date.now()}`,
-          sender_id: state.currentUserId || "me",
-          body: text,
-          created_at: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-          outgoing: true
+        const { error } = await sb.from("direct_messages").insert({
+          sender_id: state.userId,
+          receiver_id: state.activePeerId,
+          body: text
         });
 
-        renderThreadMessages(peerId);
-
-        if (sb && state.currentUserId) {
-          const { error } = await sb.from("direct_messages").insert({
-            sender_id: state.currentUserId,
-            receiver_id: peerId,
-            body: text
-          });
-          if (error) showToast(`Message error: ${error.message}`);
+        if (error) {
+          showToast(error.message);
+          return;
         }
+
+        await openThread(state.activePeerId);
       });
 
-      initData();
+      loadAllRealData();
     })();
   </script>
 </body>
