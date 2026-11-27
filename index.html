@@ -38,7 +38,6 @@
   <!-- Top Navigation -->
   <header class="sticky top-0 z-40 bg-white/95 dark:bg-black/95 backdrop-blur border-b border-zinc-200 dark:border-zinc-800/90">
     <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between gap-2">
-      <!-- Mobile Menu Trigger + Brand Logo -->
       <div class="flex items-center gap-2.5 min-w-0">
         <button id="mobile-menu-btn" aria-label="Open menu" class="relative md:hidden p-1.5 -ml-1.5 rounded-full text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900 shrink-0">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -47,7 +46,6 @@
           <span id="mobile-menu-dot" class="hidden absolute top-1 right-1 w-2 h-2 rounded-full bg-blue-500"></span>
         </button>
 
-        <!-- Custom SVG Logo -->
         <a href="#home" onclick="navigate('home'); return false;" class="flex items-center gap-2.5 group shrink-0" aria-label="Neptune Reads Home">
           <svg class="w-8 h-8 shrink-0" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -68,7 +66,6 @@
         </a>
       </div>
 
-      <!-- Desktop Nav Links -->
       <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-zinc-600 dark:text-zinc-400">
         <button onclick="navigate('home')" data-nav="home" class="nav-link hover:text-zinc-900 dark:hover:text-white transition">Browse</button>
         <button onclick="navigate('library')" data-nav="library" class="nav-link hover:text-zinc-900 dark:hover:text-white transition">Library</button>
@@ -80,7 +77,6 @@
         <button onclick="openContactModal()" class="hover:text-zinc-900 dark:hover:text-white transition">Contact us</button>
       </nav>
 
-      <!-- Right Actions: Theme + User Chip -->
       <div class="flex items-center gap-2 shrink-0">
         <button onclick="toggleTheme()" aria-label="Toggle dark mode" class="p-2 rounded-full border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-900 transition">
           <svg id="icon-sun" class="w-4 h-4 hidden dark:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -107,7 +103,7 @@
   <!-- Toast Banner -->
   <div id="toast-banner" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 hidden max-w-sm w-[92vw] px-4 py-3 rounded-xl shadow-lg border text-xs font-medium text-center transition-all"></div>
 
-  <!-- X-STYLE CLEAN SLIDE-OUT DRAWER -->
+  <!-- Slide-Out Drawer -->
   <div id="mobile-drawer" class="fixed inset-0 z-50 hidden">
     <div onclick="closeMobileDrawer()" class="fixed inset-0 bg-zinc-900/60 dark:bg-zinc-900/75 backdrop-blur-xs"></div>
     <aside class="relative w-72 max-w-[82vw] h-full bg-white dark:bg-black text-zinc-900 dark:text-white border-r border-zinc-200 dark:border-zinc-800/80 px-5 py-5 flex flex-col justify-between overflow-y-auto">
@@ -258,7 +254,6 @@
         <div id="reader-content" class="mt-6 space-y-4 leading-relaxed text-zinc-800 dark:text-zinc-200 whitespace-pre-line" style="font-size: 17px;"></div>
       </article>
 
-      <!-- Adsterra Native Banner Slot -->
       <div id="reader-ad-wrapper" class="my-6 p-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-zinc-100/50 dark:bg-zinc-950 text-center">
         <span class="block text-[10px] uppercase tracking-wider text-zinc-500 mb-2">Advertisement</span>
         <div id="adsterra-slot">
@@ -273,23 +268,24 @@
       </div>
     </section>
 
-    <!-- VIEW: MESSAGES & READER REQUESTS -->
+    <!-- VIEW: MESSAGES, FOLLOWS & REQUESTS -->
     <section id="view-messages" class="hidden max-w-3xl mx-auto space-y-4">
       <div class="flex items-center justify-between">
-        <h2 class="text-base font-bold">Messages</h2>
+        <div>
+          <h2 class="text-base font-bold">Community</h2>
+          <p id="social-counts-line" class="text-xs text-zinc-500">0 following · 0 followers · 0 connections</p>
+        </div>
         <button onclick="switchMsgTab('discover')" class="px-3.5 py-1.5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black text-xs font-semibold hover:opacity-90">
-          + Find Readers
+          + Find People
         </button>
       </div>
 
-      <!-- Guest Gate -->
       <div id="messages-guest-notice" class="hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 rounded-xl p-6 text-center">
-        <p class="text-sm font-bold">Sign in to connect with readers</p>
-        <p class="text-xs text-zinc-500 mt-1">Send reader requests, accept connections, and chat 1-on-1.</p>
+        <p class="text-sm font-bold">Sign in to follow readers, send requests, and chat</p>
+        <p class="text-xs text-zinc-500 mt-1">Connect with writers and readers across Neptune Reads.</p>
         <button onclick="openAuthModal('signin')" class="mt-4 px-4 py-2 rounded-full bg-blue-600 text-white text-xs font-semibold">Sign In</button>
       </div>
 
-      <!-- Signed-in Social Hub -->
       <div id="messages-main-hub" class="hidden space-y-4">
         <div class="flex border-b border-zinc-200 dark:border-zinc-800 text-xs font-bold">
           <button onclick="switchMsgTab('chats')" id="msg-tab-chats" class="flex-1 py-3 text-center border-b-2 border-blue-500 text-zinc-900 dark:text-white">
@@ -300,26 +296,25 @@
             <span id="tab-req-count" class="hidden px-1.5 py-0.2 text-[10px] rounded-full bg-blue-600 text-white">0</span>
           </button>
           <button onclick="switchMsgTab('discover')" id="msg-tab-discover" class="flex-1 py-3 text-center border-b-2 border-transparent text-zinc-500">
-            Find Readers
+            Find People
           </button>
         </div>
 
-        <!-- PANEL 1: ACCEPTED CHATS + ACTIVE CONVERSATION -->
         <div id="msg-panel-chats" class="space-y-4">
           <div id="chat-friends-list" class="divide-y divide-zinc-200 dark:divide-zinc-800/80 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 overflow-hidden"></div>
 
           <div id="active-chat-box" class="hidden border border-zinc-200 dark:border-zinc-800 rounded-2xl bg-white dark:bg-zinc-950 overflow-hidden flex flex-col">
             <div class="px-4 py-3 border-b border-zinc-200 dark:border-zinc-800 flex items-center justify-between gap-2">
-              <div class="flex items-center gap-2.5 min-w-0">
-                <button onclick="closeChatThread()" class="p-1.5 -ml-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-500">
+              <button onclick="openPublicProfile(state.activeChatPeerId)" class="flex items-center gap-2.5 min-w-0 text-left hover:opacity-80">
+                <span onclick="event.stopPropagation(); closeChatThread();" class="p-1.5 -ml-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-500">
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
-                </button>
+                </span>
                 <div id="chat-peer-avatar" class="w-8 h-8 rounded-full bg-zinc-800 text-white flex items-center justify-center text-xs font-bold shrink-0">U</div>
                 <div class="min-w-0">
                   <p id="chat-peer-name" class="text-sm font-bold truncate">Reader</p>
                   <p id="chat-peer-username" class="text-[11px] text-zinc-500 truncate">@reader</p>
                 </div>
-              </div>
+              </button>
             </div>
 
             <div id="chat-messages-scroll" class="p-4 h-80 overflow-y-auto space-y-2.5 bg-zinc-50/60 dark:bg-black/60"></div>
@@ -331,7 +326,6 @@
           </div>
         </div>
 
-        <!-- PANEL 2: INCOMING & OUTGOING REQUESTS -->
         <div id="msg-panel-requests" class="hidden space-y-5">
           <div>
             <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-500 mb-2">Incoming Requests</h3>
@@ -344,7 +338,6 @@
           </div>
         </div>
 
-        <!-- PANEL 3: X-STYLE LIVE PEOPLE SEARCH -->
         <div id="msg-panel-discover" class="hidden space-y-3">
           <div class="relative">
             <input id="reader-search-input" type="text" autocomplete="off" oninput="handleLiveReaderSearch(this.value)" placeholder="Search people by name or @username..." class="w-full pl-10 pr-9 py-2.5 text-sm rounded-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-500" />
@@ -354,7 +347,7 @@
             <button id="clear-reader-search" type="button" onclick="clearReaderSearch()" class="hidden absolute right-3 top-2.5 w-5 h-5 rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 text-xs items-center justify-center">✕</button>
           </div>
 
-          <p id="discover-section-label" class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 px-1">Suggested readers</p>
+          <p id="discover-section-label" class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 px-1">People on Neptune Reads</p>
           <div id="discover-readers-list" class="divide-y divide-zinc-200 dark:divide-zinc-800/80 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 overflow-hidden"></div>
         </div>
       </div>
@@ -486,7 +479,13 @@
     </div>
   </footer>
 
-  <!-- CLEAN PROFESSIONAL AUTH MODAL -->
+  <!-- PUBLIC USER PROFILE MODAL -->
+  <div id="public-profile-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+    <div onclick="closePublicProfile()" class="fixed inset-0 bg-zinc-900/70 backdrop-blur-xs"></div>
+    <div id="public-profile-card" class="relative w-full max-w-sm bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-2xl space-y-4"></div>
+  </div>
+
+  <!-- AUTH MODAL -->
   <div id="auth-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
     <div onclick="closeAuthModal()" class="fixed inset-0 bg-zinc-900/70 backdrop-blur-xs"></div>
     <div class="relative w-full max-w-sm bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-2xl space-y-5">
@@ -535,7 +534,7 @@
     </div>
   </div>
 
-  <!-- PROFILE & SETTINGS AND PRIVACY MODAL -->
+  <!-- PROFILE & PRIVACY MODAL -->
   <div id="profile-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 overflow-y-auto">
     <div onclick="closeProfileModal()" class="fixed inset-0 bg-zinc-900/70 backdrop-blur-xs"></div>
     <div class="relative w-full max-w-md bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-2xl space-y-4 my-auto max-h-[90vh] overflow-y-auto">
@@ -548,7 +547,6 @@
         <button onclick="closeProfileModal()" class="p-1.5 rounded-full text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900">✕</button>
       </div>
 
-      <!-- TAB 1: PROFILE OVERVIEW -->
       <div id="profile-view-panel" class="space-y-4">
         <div class="flex items-center gap-3.5">
           <img id="view-avatar-img" src="" alt="" class="w-16 h-16 rounded-full object-cover border border-zinc-300 dark:border-zinc-800 hidden shrink-0" />
@@ -575,7 +573,6 @@
         </div>
       </div>
 
-      <!-- TAB 2: EDIT PROFILE FORM -->
       <form id="profile-edit-form" onsubmit="handleSaveProfile(event)" class="hidden space-y-3">
         <div class="flex items-center gap-3.5 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
           <div class="relative shrink-0">
@@ -652,7 +649,6 @@
         </div>
       </form>
 
-      <!-- TAB 3: SETTINGS AND PRIVACY -->
       <div id="profile-privacy-panel" class="hidden space-y-4">
         <div id="privacy-status" class="hidden text-xs p-2.5 rounded-lg border leading-relaxed"></div>
 
@@ -692,7 +688,7 @@
     </div>
   </div>
 
-  <!-- MINIMAL X-STYLE CONTACT US MODAL -->
+  <!-- CONTACT US MODAL -->
   <div id="contact-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
     <div onclick="closeContactModal()" class="fixed inset-0 bg-zinc-900/70 backdrop-blur-xs"></div>
     <div class="relative w-full max-w-xs bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-2xl space-y-3">
@@ -759,6 +755,7 @@
       searchResults: [],
       isSearchingReaders: false,
       requests: [],
+      follows: [],
       messages: [],
       activeChatPeerId: null,
       msgTab: 'chats',
@@ -874,11 +871,17 @@
       document.getElementById('contact-modal').classList.remove('flex');
     }
 
+    function closePublicProfile() {
+      document.getElementById('public-profile-modal').classList.add('hidden');
+      document.getElementById('public-profile-modal').classList.remove('flex');
+    }
+
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         closeMobileDrawer();
         closeAuthModal();
         closeProfileModal();
+        closePublicProfile();
         closeContactModal();
         cancelMatureGate();
       }
@@ -1078,6 +1081,7 @@
         `;
         state.bookmarks = [];
         state.requests = [];
+        state.follows = [];
         state.messages = [];
         state.activeChatPeerId = null;
         if (state.realtimeChannel) {
@@ -1098,7 +1102,7 @@
     }
 
     // ==========================================
-    // X-STYLE LIVE READER SEARCH, REQUESTS & CHAT
+    // SOCIAL: FOLLOWS, REQUESTS, SEARCH & CHAT
     // ==========================================
     let readerSearchTimer = null;
 
@@ -1123,7 +1127,7 @@
       if (!clean) {
         state.isSearchingReaders = false;
         state.searchResults = [];
-        if (label) label.textContent = 'Suggested readers';
+        if (label) label.textContent = 'People on Neptune Reads';
         renderDiscoverReaders();
         return;
       }
@@ -1159,9 +1163,10 @@
 
     async function loadSocialData() {
       if (!state.user) return;
-      const [{ data: readers, error: readersErr }, { data: reqs, error: reqsErr }] = await Promise.all([
+      const [{ data: readers, error: readersErr }, { data: reqs, error: reqsErr }, { data: follows, error: followsErr }] = await Promise.all([
         sb.from('reader_profiles').select('id, username, full_name, avatar_url, bio, updated_at').order('updated_at', { ascending: false }).limit(50),
-        sb.from('friend_requests').select('*').or(`sender_id.eq.${state.user.id},receiver_id.eq.${state.user.id}`)
+        sb.from('friend_requests').select('*').or(`sender_id.eq.${state.user.id},receiver_id.eq.${state.user.id}`),
+        sb.from('reader_follows').select('*').or(`follower_id.eq.${state.user.id},following_id.eq.${state.user.id}`)
       ]);
 
       if (readersErr || reqsErr) {
@@ -1171,7 +1176,9 @@
 
       state.readers = readers || [];
       state.requests = reqs || [];
+      state.follows = followsErr ? [] : (follows || []);
       updateRequestBadges();
+      renderSocialStats();
       renderMessagesView();
     }
 
@@ -1182,6 +1189,9 @@
       state.realtimeChannel = sb
         .channel('reader-social-' + state.user.id)
         .on('postgres_changes', { event: '*', schema: 'public', table: 'friend_requests' }, () => {
+          loadSocialData();
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'reader_follows' }, () => {
           loadSocialData();
         })
         .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'direct_messages' }, (payload) => {
@@ -1203,6 +1213,43 @@
           }
         })
         .subscribe();
+    }
+
+    function renderSocialStats() {
+      const el = document.getElementById('social-counts-line');
+      if (!el || !state.user) return;
+      const followingCount = state.follows.filter(f => f.follower_id === state.user.id).length;
+      const followersCount = state.follows.filter(f => f.following_id === state.user.id).length;
+      const friendsCount = state.requests.filter(r => r.status === 'accepted').length;
+      el.textContent = `${followingCount} following · ${followersCount} followers · ${friendsCount} connected`;
+    }
+
+    function isFollowingUser(targetId) {
+      if (!state.user) return false;
+      return state.follows.some(f => f.follower_id === state.user.id && f.following_id === targetId);
+    }
+
+    async function toggleFollowUser(targetId) {
+      if (!state.user) return openAuthModal('signin');
+      if (targetId === state.user.id) return showToast('You cannot follow yourself.', true);
+
+      if (isFollowingUser(targetId)) {
+        const { error } = await sb
+          .from('reader_follows')
+          .delete()
+          .eq('follower_id', state.user.id)
+          .eq('following_id', targetId);
+        if (error) return showToast(error.message, true);
+        showToast('Unfollowed.');
+      } else {
+        const { error } = await sb
+          .from('reader_follows')
+          .insert({ follower_id: state.user.id, following_id: targetId });
+        if (error) return showToast(error.message, true);
+        showToast('Following!');
+      }
+      await loadSocialData();
+      refreshOpenPublicProfile(targetId);
     }
 
     function updateRequestBadges() {
@@ -1273,11 +1320,12 @@
       if (error) {
         return showToast(error.message.includes('duplicate') ? 'Request already sent.' : error.message, true);
       }
-      showToast('Reader request sent!');
+      showToast('Request sent!');
       await loadSocialData();
+      refreshOpenPublicProfile(receiverId);
     }
 
-    async function acceptReaderRequest(requestId) {
+    async function acceptReaderRequest(requestId, peerId = null) {
       const { error } = await sb
         .from('friend_requests')
         .update({ status: 'accepted' })
@@ -1286,13 +1334,15 @@
       if (error) return showToast(error.message, true);
       showToast('Request accepted! You can now message each other.');
       await loadSocialData();
+      if (peerId) refreshOpenPublicProfile(peerId);
     }
 
-    async function cancelOrDeclineRequest(requestId) {
+    async function cancelOrDeclineRequest(requestId, peerId = null) {
       const { error } = await sb.from('friend_requests').delete().eq('id', requestId);
       if (error) return showToast(error.message, true);
-      showToast('Request removed.');
+      showToast('Request updated.');
       await loadSocialData();
+      if (peerId) refreshOpenPublicProfile(peerId);
     }
 
     function avatarMarkup(profile, sizeClass = 'w-10 h-10 text-sm') {
@@ -1301,6 +1351,105 @@
         return `<img src="${escapeHtml(profile.avatar_url)}" class="${sizeClass} rounded-full object-cover shrink-0" />`;
       }
       return `<div class="${sizeClass} rounded-full bg-zinc-800 text-white flex items-center justify-center font-bold shrink-0">${escapeHtml(name.charAt(0).toUpperCase())}</div>`;
+    }
+
+    let currentPublicProfileId = null;
+
+    function refreshOpenPublicProfile(userId) {
+      const modal = document.getElementById('public-profile-modal');
+      if (modal && !modal.classList.contains('hidden') && currentPublicProfileId === userId) {
+        openPublicProfile(userId);
+      }
+    }
+
+    async function openPublicProfile(userId) {
+      if (!userId) return;
+      currentPublicProfileId = userId;
+
+      if (state.user && userId === state.user.id) {
+        closePublicProfile();
+        return openProfileModal('view');
+      }
+
+      let profile = state.readers.find(r => r.id === userId);
+      if (!profile) {
+        const { data } = await sb
+          .from('reader_profiles')
+          .select('id, username, full_name, avatar_url, bio')
+          .eq('id', userId)
+          .maybeSingle();
+        profile = data;
+      }
+
+      const fallbackNovel = state.novels.find(n => n.author_id === userId);
+      const displayName = profile?.full_name || fallbackNovel?.author_name || 'Reader';
+      const username = profile?.username || displayName.toLowerCase().replace(/[^a-z0-9_]/g, '') || 'reader';
+      const bio = profile?.bio || 'Member of Neptune Reads.';
+      const authoredNovels = state.novels.filter(n => n.author_id === userId);
+
+      const following = isFollowingUser(userId);
+      const conn = getConnectionBetween(userId);
+
+      let connectBtnHTML = `<button onclick="sendReaderRequest('${userId}')" class="flex-1 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition">Add to Chat</button>`;
+      if (!state.user) {
+        connectBtnHTML = `<button onclick="closePublicProfile(); openAuthModal('signin');" class="flex-1 py-2 rounded-full bg-blue-600 text-white text-xs font-bold">Sign In to Add</button>`;
+      } else if (conn) {
+        if (conn.status === 'accepted') {
+          connectBtnHTML = `<button onclick="closePublicProfile(); navigate('messages'); switchMsgTab('chats'); openChatThread('${userId}');" class="flex-1 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition">Message</button>`;
+        } else if (conn.sender_id === state.user.id) {
+          connectBtnHTML = `<button onclick="cancelOrDeclineRequest('${conn.id}', '${userId}')" class="flex-1 py-2 rounded-full border border-zinc-300 dark:border-zinc-700 text-zinc-500 text-xs font-semibold">Requested</button>`;
+        } else {
+          connectBtnHTML = `<button onclick="acceptReaderRequest('${conn.id}', '${userId}')" class="flex-1 py-2 rounded-full bg-blue-600 text-white text-xs font-bold">Accept Request</button>`;
+        }
+      }
+
+      const followBtnHTML = `
+        <button onclick="toggleFollowUser('${userId}')" class="px-4 py-2 rounded-full text-xs font-bold transition ${
+          following
+            ? 'border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-900'
+            : 'bg-zinc-900 dark:bg-white text-white dark:text-black hover:opacity-90'
+        }">
+          ${following ? 'Following' : 'Follow'}
+        </button>
+      `;
+
+      document.getElementById('public-profile-card').innerHTML = `
+        <div class="flex items-start justify-between gap-2">
+          <div class="flex items-center gap-3 min-w-0">
+            ${avatarMarkup({ ...profile, full_name: displayName }, 'w-14 h-14 text-lg')}
+            <div class="min-w-0">
+              <h3 class="text-base font-bold truncate">${escapeHtml(displayName)}</h3>
+              <p class="text-xs text-zinc-500 truncate">@${escapeHtml(username)}</p>
+            </div>
+          </div>
+          <button onclick="closePublicProfile()" class="p-1.5 rounded-full text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900">✕</button>
+        </div>
+
+        <p class="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed">${escapeHtml(bio)}</p>
+
+        <div class="flex items-center gap-2 pt-1">
+          ${followBtnHTML}
+          ${connectBtnHTML}
+        </div>
+
+        ${authoredNovels.length ? `
+          <div class="pt-3 border-t border-zinc-200 dark:border-zinc-800 space-y-2">
+            <p class="text-[11px] font-bold uppercase tracking-wider text-zinc-500">Published Novels (${authoredNovels.length})</p>
+            <div class="space-y-1.5 max-h-36 overflow-y-auto">
+              ${authoredNovels.map(n => `
+                <button onclick="closePublicProfile(); openNovel('${n.id}');" class="w-full text-left px-3 py-2 rounded-lg bg-zinc-50 dark:bg-zinc-900/70 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-xs font-medium flex items-center justify-between">
+                  <span class="truncate">${escapeHtml(n.title)}</span>
+                  <span class="text-zinc-400 ml-2">→</span>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+      `;
+
+      const modal = document.getElementById('public-profile-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
     }
 
     function renderMessagesView() {
@@ -1316,6 +1465,7 @@
       guestNotice.classList.add('hidden');
       mainHub.classList.remove('hidden');
 
+      renderSocialStats();
       renderAcceptedChats();
       renderRequestsTab();
       renderDiscoverReaders();
@@ -1328,9 +1478,9 @@
       if (accepted.length === 0) {
         listEl.innerHTML = `
           <div class="p-6 text-center space-y-2">
-            <p class="text-sm font-bold">No connections yet</p>
-            <p class="text-xs text-zinc-500">Find readers and send a request to start messaging.</p>
-            <button onclick="switchMsgTab('discover')" class="mt-2 px-4 py-1.5 rounded-full bg-blue-600 text-white text-xs font-semibold">Find Readers</button>
+            <p class="text-sm font-bold">No connected chats yet</p>
+            <p class="text-xs text-zinc-500">Find people, send a request, and once accepted you can chat here.</p>
+            <button onclick="switchMsgTab('discover')" class="mt-2 px-4 py-1.5 rounded-full bg-blue-600 text-white text-xs font-semibold">Find People</button>
           </div>
         `;
         return;
@@ -1368,16 +1518,16 @@
             const sender = state.readers.find(r => r.id === req.sender_id) || { full_name: 'Reader', username: 'reader' };
             return `
               <div class="px-4 py-3 flex items-center justify-between gap-3">
-                <div class="flex items-center gap-3 min-w-0">
+                <button onclick="openPublicProfile('${req.sender_id}')" class="flex items-center gap-3 min-w-0 text-left hover:opacity-80">
                   ${avatarMarkup(sender)}
                   <div class="min-w-0">
                     <p class="text-sm font-bold truncate">${escapeHtml(sender.full_name)}</p>
                     <p class="text-xs text-zinc-500 truncate">@${escapeHtml(sender.username)}</p>
                   </div>
-                </div>
+                </button>
                 <div class="flex items-center gap-2 shrink-0">
-                  <button onclick="acceptReaderRequest('${req.id}')" class="px-3.5 py-1.5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black text-xs font-bold">Accept</button>
-                  <button onclick="cancelOrDeclineRequest('${req.id}')" class="px-3.5 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-xs font-semibold text-zinc-500">Decline</button>
+                  <button onclick="acceptReaderRequest('${req.id}', '${req.sender_id}')" class="px-3.5 py-1.5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black text-xs font-bold">Accept</button>
+                  <button onclick="cancelOrDeclineRequest('${req.id}', '${req.sender_id}')" class="px-3.5 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-xs font-semibold text-zinc-500">Decline</button>
                 </div>
               </div>
             `;
@@ -1389,14 +1539,14 @@
             const receiver = state.readers.find(r => r.id === req.receiver_id) || { full_name: 'Reader', username: 'reader' };
             return `
               <div class="px-4 py-3 flex items-center justify-between gap-3">
-                <div class="flex items-center gap-3 min-w-0">
+                <button onclick="openPublicProfile('${req.receiver_id}')" class="flex items-center gap-3 min-w-0 text-left hover:opacity-80">
                   ${avatarMarkup(receiver)}
                   <div class="min-w-0">
                     <p class="text-sm font-bold truncate">${escapeHtml(receiver.full_name)}</p>
                     <p class="text-xs text-zinc-500 truncate">@${escapeHtml(receiver.username)}</p>
                   </div>
-                </div>
-                <button onclick="cancelOrDeclineRequest('${req.id}')" class="px-3 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-xs font-semibold text-zinc-500 shrink-0">Cancel</button>
+                </button>
+                <button onclick="cancelOrDeclineRequest('${req.id}', '${req.receiver_id}')" class="px-3 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-xs font-semibold text-zinc-500 shrink-0">Cancel</button>
               </div>
             `;
           }).join('')
@@ -1439,35 +1589,49 @@
       if (matches.length === 0) {
         listEl.innerHTML = q
           ? `<p class="p-5 text-center text-xs text-zinc-500">No results for "${escapeHtml(raw)}"</p>`
-          : `<p class="p-5 text-center text-xs text-zinc-500">No other readers found yet.</p>`;
+          : `<p class="p-5 text-center text-xs text-zinc-500">No other users found yet.</p>`;
         return;
       }
 
       listEl.innerHTML = matches.map(reader => {
         const conn = getConnectionBetween(reader.id);
-        let actionBtn = `<button onclick="sendReaderRequest('${reader.id}')" class="px-4 py-1.5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black text-xs font-bold hover:opacity-90 shrink-0">Add</button>`;
+        const following = isFollowingUser(reader.id);
 
+        const followBtn = `
+          <button onclick="toggleFollowUser('${reader.id}')" class="px-3 py-1.5 rounded-full text-xs font-bold shrink-0 transition ${
+            following
+              ? 'border border-zinc-300 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300'
+              : 'border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-900'
+          }">
+            ${following ? 'Following' : 'Follow'}
+          </button>
+        `;
+
+        let reqBtn = `<button onclick="sendReaderRequest('${reader.id}')" class="px-3.5 py-1.5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black text-xs font-bold hover:opacity-90 shrink-0">Add</button>`;
         if (conn) {
           if (conn.status === 'accepted') {
-            actionBtn = `<button onclick="switchMsgTab('chats'); openChatThread('${reader.id}');" class="px-3.5 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-xs font-bold hover:bg-zinc-100 dark:hover:bg-zinc-900 shrink-0">Message</button>`;
+            reqBtn = `<button onclick="switchMsgTab('chats'); openChatThread('${reader.id}');" class="px-3.5 py-1.5 rounded-full bg-blue-600 text-white text-xs font-bold shrink-0">Message</button>`;
           } else if (conn.sender_id === state.user.id) {
-            actionBtn = `<button onclick="cancelOrDeclineRequest('${conn.id}')" class="px-3.5 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-zinc-500 text-xs font-semibold shrink-0">Requested</button>`;
+            reqBtn = `<button onclick="cancelOrDeclineRequest('${conn.id}', '${reader.id}')" class="px-3.5 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-zinc-500 text-xs font-semibold shrink-0">Requested</button>`;
           } else {
-            actionBtn = `<button onclick="acceptReaderRequest('${conn.id}')" class="px-4 py-1.5 rounded-full bg-blue-600 text-white text-xs font-bold shrink-0">Accept</button>`;
+            reqBtn = `<button onclick="acceptReaderRequest('${conn.id}', '${reader.id}')" class="px-3.5 py-1.5 rounded-full bg-blue-600 text-white text-xs font-bold shrink-0">Accept</button>`;
           }
         }
 
         return `
           <div class="px-4 py-3 flex items-center justify-between gap-3 hover:bg-zinc-50 dark:hover:bg-zinc-900/60 transition">
-            <div class="flex items-center gap-3 min-w-0">
+            <button onclick="openPublicProfile('${reader.id}')" class="flex items-center gap-3 min-w-0 text-left hover:opacity-85">
               ${avatarMarkup(reader, 'w-11 h-11 text-sm')}
               <div class="min-w-0">
                 <p class="text-sm font-bold text-zinc-900 dark:text-white truncate">${escapeHtml(reader.full_name)}</p>
                 <p class="text-xs text-zinc-500 truncate">@${escapeHtml(reader.username)}</p>
                 ${reader.bio ? `<p class="text-xs text-zinc-600 dark:text-zinc-300 line-clamp-1 mt-0.5">${escapeHtml(reader.bio)}</p>` : ''}
               </div>
+            </button>
+            <div class="flex items-center gap-1.5 shrink-0">
+              ${followBtn}
+              ${reqBtn}
             </div>
-            ${actionBtn}
           </div>
         `;
       }).join('');
@@ -1477,7 +1641,7 @@
       if (!state.user) return;
       const conn = getConnectionBetween(peerId);
       if (!conn || conn.status !== 'accepted') {
-        return showToast('Accept the reader request first before messaging.', true);
+        return showToast('Accept the request first before messaging.', true);
       }
 
       state.activeChatPeerId = peerId;
@@ -2066,22 +2230,30 @@
 
       const isBookmarked = state.bookmarks.includes(novelId);
       const isOwnNovel = state.user && novel.author_id === state.user.id;
+      const followingAuthor = novel.author_id && !isOwnNovel ? isFollowingUser(novel.author_id) : false;
       const conn = novel.author_id ? getConnectionBetween(novel.author_id) : null;
 
       let authorActionHTML = '';
       if (novel.author_id && !isOwnNovel) {
+        const followLabel = followingAuthor ? 'Following Author' : '+ Follow Author';
+        authorActionHTML += `<button onclick="toggleFollowUser('${novel.author_id}'); setTimeout(() => openNovel('${novel.id}'), 200);" class="px-4 py-2 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-semibold">${followLabel}</button>`;
+
         if (conn?.status === 'accepted') {
-          authorActionHTML = `<button onclick="navigate('messages'); switchMsgTab('chats'); openChatThread('${novel.author_id}');" class="px-4 py-2 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-semibold">Message Author</button>`;
+          authorActionHTML += `<button onclick="navigate('messages'); switchMsgTab('chats'); openChatThread('${novel.author_id}');" class="px-4 py-2 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-semibold">Message Author</button>`;
         } else if (conn?.status === 'pending') {
-          authorActionHTML = `<span class="px-3.5 py-2 rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-500 text-xs font-semibold">Request Pending</span>`;
+          authorActionHTML += `<span class="px-3.5 py-2 rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-500 text-xs font-semibold">Request Pending</span>`;
         } else {
-          authorActionHTML = `<button onclick="sendReaderRequest('${novel.author_id}')" class="px-4 py-2 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-semibold">+ Connect with Author</button>`;
+          authorActionHTML += `<button onclick="sendReaderRequest('${novel.author_id}')" class="px-4 py-2 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-semibold">+ Connect with Author</button>`;
         }
       }
 
       const cover = novel.cover_url
         ? `<img src="${escapeHtml(novel.cover_url)}" alt="" class="w-28 sm:w-36 aspect-[2/3] object-cover rounded-lg border border-zinc-200 dark:border-zinc-800 shrink-0" />`
         : `<div class="w-28 sm:w-36 aspect-[2/3] rounded-lg bg-zinc-200 dark:bg-zinc-900 flex items-center justify-center p-3 text-center text-xs font-semibold shrink-0">${escapeHtml(novel.title)}</div>`;
+
+      const authorNameMarkup = novel.author_id
+        ? `<button type="button" onclick="openPublicProfile('${novel.author_id}')" class="text-zinc-800 dark:text-zinc-200 font-semibold hover:underline">${escapeHtml(novel.author_name)}</button>`
+        : `<span class="text-zinc-800 dark:text-zinc-200 font-medium">${escapeHtml(novel.author_name)}</span>`;
 
       document.getElementById('novel-detail-container').innerHTML = `
         <div class="flex flex-col sm:flex-row gap-5">
@@ -2093,7 +2265,7 @@
               ${novel.is_mature ? '<span class="px-2.5 py-0.5 text-xs rounded-full bg-red-500/15 text-red-500 font-medium">18+</span>' : ''}
             </div>
             <h1 class="text-xl font-bold">${escapeHtml(novel.title)}</h1>
-            <p class="text-xs text-zinc-500">By <span class="text-zinc-800 dark:text-zinc-200 font-medium">${escapeHtml(novel.author_name)}</span></p>
+            <p class="text-xs text-zinc-500">By ${authorNameMarkup}</p>
             <p class="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">${escapeHtml(novel.synopsis)}</p>
             <div class="pt-2 flex flex-wrap gap-2">
               <button id="read-first-btn" class="px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold">Start Reading</button>
