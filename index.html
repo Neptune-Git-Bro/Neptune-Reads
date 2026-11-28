@@ -1,4 +1,369 @@
 <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Neptune Reads — Complete Code & PDF Exporter</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @media print {
+      .no-print { display: none !important; }
+      body { background: #ffffff !important; color: #000000 !important; padding: 0 !important; }
+      pre {
+        white-space: pre-wrap !important;
+        word-break: break-word !important;
+        font-size: 8.5pt !important;
+        border: 1px solid #cbd5e1 !important;
+        background: #f8fafc !important;
+        color: #0f172a !important;
+      }
+      .print-section { break-inside: auto; page-break-before: auto; }
+    }
+  </style>
+</head>
+<body class="bg-zinc-950 text-zinc-100 min-h-screen font-sans">
+
+  <!-- Sticky Control Bar (Hidden when printing/saving as PDF) -->
+  <header class="no-print sticky top-0 z-30 bg-zinc-900/95 backdrop-blur border-b border-zinc-800 px-4 py-3">
+    <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <h1 class="text-base font-bold text-white">Neptune Reads — Complete Code & PDF Exporter</h1>
+        <p class="text-xs text-zinc-400">100% complete, patched SQL &amp; Website Code ready to copy or save as PDF</p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2">
+        <button type="button" onclick="copyCode('sql-code', this)" class="px-3.5 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold text-white transition">
+          Copy SQL
+        </button>
+        <button type="button" onclick="copyCode('html-code', this)" class="px-3.5 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold text-white transition">
+          Copy index.html
+        </button>
+        <button type="button" onclick="downloadFile('neptune_reads_setup.sql', 'sql-code')" class="px-3.5 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold text-blue-400 transition">
+          Download .sql
+        </button>
+        <button type="button" onclick="downloadFile('index.html', 'html-code')" class="px-3.5 py-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-xs font-semibold text-blue-400 transition">
+          Download index.html
+        </button>
+        <button type="button" onclick="window.print()" class="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-xs font-bold text-white shadow transition">
+          Save / Print as PDF
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 py-6 space-y-8">
+    <!-- Section 1: Complete Supabase SQL -->
+    <section class="print-section space-y-3">
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
+        <div>
+          <h2 class="text-lg font-bold text-blue-400">1. Complete Supabase Database &amp; RLS SQL</h2>
+          <p class="text-xs text-zinc-400">Run in Supabase → SQL Editor → + New query (includes profiles, messaging, novels, chapters, bookmarks, and author delete policies).</p>
+        </div>
+        <span id="sql-line-count" class="no-print text-xs text-zinc-500 font-mono"></span>
+      </div>
+      <pre id="sql-code" class="p-4 rounded-xl bg-zinc-900 border border-zinc-800 text-xs font-mono leading-relaxed text-zinc-200 overflow-x-auto select-all"></pre>
+    </section>
+
+    <!-- Section 2: Complete index.html Source Code -->
+    <section class="print-section space-y-3">
+      <div class="flex items-center justify-between border-b border-zinc-800 pb-2">
+        <div>
+          <h2 class="text-lg font-bold text-blue-400">2. Complete Website Source Code (index.html)</h2>
+          <p class="text-xs text-zinc-400">Includes Catalog, Reader, Messages, Author Studio (with Novel Delete), and Adsterra Native Ad below the Catalog.</p>
+        </div>
+        <span id="html-line-count" class="no-print text-xs text-zinc-500 font-mono"></span>
+      </div>
+      <pre id="html-code" class="p-4 rounded-xl bg-zinc-900 border border-zinc-800 text-xs font-mono leading-relaxed text-zinc-200 overflow-x-auto select-all"></pre>
+    </section>
+  </main>
+
+  <script>
+    // Complete Supabase SQL Code
+    const FULL_SQL = `-- Neptune Reads Complete Database, Social & RLS Setup SQL
+-- Run this in Supabase SQL Editor -> + New query
+
+CREATE TABLE IF NOT EXISTS public.reader_profiles (
+  id uuid REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
+  username text UNIQUE,
+  full_name text,
+  avatar_url text,
+  bio text DEFAULT '',
+  updated_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS public.friend_requests (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  sender_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  receiver_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  status text DEFAULT 'pending' CHECK (status IN ('pending', 'accepted')),
+  created_at timestamptz DEFAULT now(),
+  UNIQUE(sender_id, receiver_id),
+  CHECK (sender_id <> receiver_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.direct_messages (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  sender_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  receiver_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  body text NOT NULL,
+  created_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS public.novels (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  author_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  title text NOT NULL,
+  author_name text NOT NULL,
+  genre text DEFAULT 'Fantasy',
+  cover_url text,
+  synopsis text NOT NULL,
+  status text DEFAULT 'Ongoing',
+  is_mature boolean DEFAULT false,
+  created_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS public.chapters (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  novel_id uuid REFERENCES public.novels(id) ON DELETE CASCADE NOT NULL,
+  chapter_number integer NOT NULL,
+  chapter_title text NOT NULL,
+  content text NOT NULL,
+  created_at timestamptz DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS public.bookmarks (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
+  novel_id uuid REFERENCES public.novels(id) ON DELETE CASCADE NOT NULL,
+  created_at timestamptz DEFAULT now(),
+  UNIQUE(user_id, novel_id)
+);
+
+ALTER TABLE public.reader_profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.friend_requests ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.direct_messages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.novels ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.chapters ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.bookmarks ENABLE ROW LEVEL SECURITY;
+
+GRANT USAGE ON SCHEMA public TO anon, authenticated;
+GRANT SELECT, INSERT, UPDATE ON public.reader_profiles TO authenticated;
+GRANT SELECT ON public.reader_profiles TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.friend_requests TO authenticated;
+GRANT SELECT, INSERT ON public.direct_messages TO authenticated;
+GRANT SELECT ON public.novels TO anon, authenticated;
+GRANT INSERT, UPDATE, DELETE ON public.novels TO authenticated;
+GRANT SELECT ON public.chapters TO anon, authenticated;
+GRANT INSERT, UPDATE, DELETE ON public.chapters TO authenticated;
+GRANT SELECT, INSERT, DELETE ON public.bookmarks TO authenticated;
+
+-- Reader Profiles Policies
+DROP POLICY IF EXISTS "Public read profiles" ON public.reader_profiles;
+CREATE POLICY "Public read profiles"
+ON public.reader_profiles FOR SELECT TO anon, authenticated USING (true);
+
+DROP POLICY IF EXISTS "Users insert own profile" ON public.reader_profiles;
+CREATE POLICY "Users insert own profile"
+ON public.reader_profiles FOR INSERT TO authenticated WITH CHECK (auth.uid() = id);
+
+DROP POLICY IF EXISTS "Users update own profile" ON public.reader_profiles;
+CREATE POLICY "Users update own profile"
+ON public.reader_profiles FOR UPDATE TO authenticated USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
+
+-- Friend Requests Policies
+DROP POLICY IF EXISTS "Users read own requests" ON public.friend_requests;
+CREATE POLICY "Users read own requests"
+ON public.friend_requests FOR SELECT TO authenticated USING (auth.uid() = sender_id OR auth.uid() = receiver_id);
+
+DROP POLICY IF EXISTS "Users send requests" ON public.friend_requests;
+CREATE POLICY "Users send requests"
+ON public.friend_requests FOR INSERT TO authenticated WITH CHECK (auth.uid() = sender_id);
+
+DROP POLICY IF EXISTS "Users update received requests" ON public.friend_requests;
+CREATE POLICY "Users update received requests"
+ON public.friend_requests FOR UPDATE TO authenticated USING (auth.uid() = receiver_id) WITH CHECK (auth.uid() = receiver_id);
+
+DROP POLICY IF EXISTS "Users delete own requests" ON public.friend_requests;
+CREATE POLICY "Users delete own requests"
+ON public.friend_requests FOR DELETE TO authenticated USING (auth.uid() = sender_id OR auth.uid() = receiver_id);
+
+-- Direct Messages Policies
+DROP POLICY IF EXISTS "Users read own messages" ON public.direct_messages;
+CREATE POLICY "Users read own messages"
+ON public.direct_messages FOR SELECT TO authenticated USING (auth.uid() = sender_id OR auth.uid() = receiver_id);
+
+DROP POLICY IF EXISTS "Users send messages" ON public.direct_messages;
+CREATE POLICY "Users send messages"
+ON public.direct_messages FOR INSERT TO authenticated WITH CHECK (auth.uid() = sender_id);
+
+-- Novels Policies
+DROP POLICY IF EXISTS "Public read novels" ON public.novels;
+CREATE POLICY "Public read novels"
+ON public.novels FOR SELECT TO anon, authenticated USING (true);
+
+DROP POLICY IF EXISTS "Authors insert own novels" ON public.novels;
+CREATE POLICY "Authors insert own novels"
+ON public.novels FOR INSERT TO authenticated WITH CHECK (auth.uid() = author_id);
+
+DROP POLICY IF EXISTS "Authors update own novels" ON public.novels;
+CREATE POLICY "Authors update own novels"
+ON public.novels FOR UPDATE TO authenticated USING (auth.uid() = author_id) WITH CHECK (auth.uid() = author_id);
+
+DROP POLICY IF EXISTS "Authors delete own novels" ON public.novels;
+CREATE POLICY "Authors delete own novels"
+ON public.novels FOR DELETE TO authenticated USING (auth.uid() = author_id);
+
+-- Chapters Policies
+DROP POLICY IF EXISTS "Public read chapters" ON public.chapters;
+CREATE POLICY "Public read chapters"
+ON public.chapters FOR SELECT TO anon, authenticated USING (true);
+
+DROP POLICY IF EXISTS "Authors insert chapters to own novels" ON public.chapters;
+CREATE POLICY "Authors insert chapters to own novels"
+ON public.chapters FOR INSERT TO authenticated
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM public.novels
+    WHERE public.novels.id = public.chapters.novel_id
+      AND public.novels.author_id = auth.uid()
+  )
+);
+
+DROP POLICY IF EXISTS "Authors update chapters of own novels" ON public.chapters;
+CREATE POLICY "Authors update chapters of own novels"
+ON public.chapters FOR UPDATE TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM public.novels
+    WHERE public.novels.id = public.chapters.novel_id
+      AND public.novels.author_id = auth.uid()
+  )
+);
+
+DROP POLICY IF EXISTS "Authors delete chapters of own novels" ON public.chapters;
+CREATE POLICY "Authors delete chapters of own novels"
+ON public.chapters FOR DELETE TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM public.novels
+    WHERE public.novels.id = public.chapters.novel_id
+      AND public.novels.author_id = auth.uid()
+  )
+);
+
+-- Bookmarks Policies
+DROP POLICY IF EXISTS "Users read own bookmarks" ON public.bookmarks;
+CREATE POLICY "Users read own bookmarks"
+ON public.bookmarks FOR SELECT TO authenticated USING (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users insert own bookmarks" ON public.bookmarks;
+CREATE POLICY "Users insert own bookmarks"
+ON public.bookmarks FOR INSERT TO authenticated WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "Users or novel authors delete bookmarks" ON public.bookmarks;
+CREATE POLICY "Users or novel authors delete bookmarks"
+ON public.bookmarks FOR DELETE TO authenticated
+USING (
+  auth.uid() = user_id
+  OR EXISTS (
+    SELECT 1 FROM public.novels
+    WHERE public.novels.id = public.bookmarks.novel_id
+      AND public.novels.author_id = auth.uid()
+  )
+);
+
+-- Auto-create Reader Profile on Sign Up
+CREATE OR REPLACE FUNCTION public.handle_new_reader_profile()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  base_username text;
+  final_username text;
+  display_name text;
+BEGIN
+  display_name := COALESCE(
+    NULLIF(TRIM(NEW.raw_user_meta_data->>'full_name'), ''),
+    NULLIF(TRIM(NEW.raw_user_meta_data->>'pen_name'), ''),
+    split_part(COALESCE(NEW.email, 'reader'), '@', 1)
+  );
+
+  base_username := regexp_replace(
+    lower(
+      COALESCE(
+        NULLIF(TRIM(NEW.raw_user_meta_data->>'username'), ''),
+        NULLIF(TRIM(NEW.raw_user_meta_data->>'pen_name'), ''),
+        split_part(COALESCE(NEW.email, 'reader'), '@', 1)
+      )
+    ),
+    '[^a-z0-9_]',
+    '',
+    'g'
+  );
+
+  IF base_username = '' THEN
+    base_username := 'reader';
+  END IF;
+
+  final_username := base_username;
+
+  IF EXISTS (SELECT 1 FROM public.reader_profiles WHERE username = final_username AND id <> NEW.id) THEN
+    final_username := base_username || '_' || substr(replace(NEW.id::text, '-', ''), 1, 4);
+  END IF;
+
+  INSERT INTO public.reader_profiles (id, username, full_name, bio, updated_at)
+  VALUES (NEW.id, final_username, display_name, COALESCE(NEW.raw_user_meta_data->>'bio', ''), now())
+  ON CONFLICT (id) DO NOTHING;
+
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS on_auth_user_created_reader_profile ON auth.users;
+CREATE TRIGGER on_auth_user_created_reader_profile
+AFTER INSERT ON auth.users
+FOR EACH ROW
+EXECUTE FUNCTION public.handle_new_reader_profile();
+
+INSERT INTO public.reader_profiles (id, username, full_name, bio, updated_at)
+SELECT
+  u.id,
+  COALESCE(
+    NULLIF(regexp_replace(lower(COALESCE(u.raw_user_meta_data->>'username', split_part(COALESCE(u.email, 'reader'), '@', 1))), '[^a-z0-9_]', '', 'g'), ''),
+    'reader'
+  ) || '_' || substr(replace(u.id::text, '-', ''), 1, 4),
+  COALESCE(
+    NULLIF(TRIM(u.raw_user_meta_data->>'full_name'), ''),
+    NULLIF(TRIM(u.raw_user_meta_data->>'pen_name'), ''),
+    split_part(COALESCE(u.email, 'reader'), '@', 1)
+  ),
+  COALESCE(u.raw_user_meta_data->>'bio', ''),
+  now()
+FROM auth.users u
+LEFT JOIN public.reader_profiles p ON p.id = u.id
+WHERE p.id IS NULL;
+
+-- Realtime for Requests and Direct Messages
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'friend_requests'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.friend_requests;
+  END IF;
+
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'direct_messages'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.direct_messages;
+  END IF;
+END $$;`;
+
+    // Complete Website Source Code (index.html)
+    const FULL_HTML = `<!DOCTYPE html>
 <html lang="en" class="dark">
 <head>
   <meta charset="UTF-8" />
@@ -7,10 +372,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style type="text/tailwindcss">
-    @custom-variant dark (&:where(.dark, .dark *));
-  </style>
+  <script src="https://cdn.tailwindcss.com"><\/script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -29,8 +391,8 @@
         }
       }
     };
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <\/script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"><\/script>
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
@@ -88,7 +450,7 @@
       </div>
 
       <nav aria-label="Primary Navigation" class="hidden md:flex items-center gap-6 text-sm font-medium text-zinc-600 dark:text-zinc-400">
-        <button type="button" onclick="navigate('home')" data-nav="home" class="nav-link py-1 border-b-2 border-blue-600 text-zinc-900 dark:text-white transition">Browse</button>
+        <button type="button" onclick="navigate('home')" data-nav="home" class="nav-link py-1 border-b-2 border-blue-600 text-zinc-900 dark:text-white font-semibold transition">Browse</button>
         <button type="button" onclick="navigate('library')" data-nav="library" class="nav-link py-1 border-b-2 border-transparent hover:text-zinc-900 dark:hover:text-white transition">Library</button>
         <button type="button" onclick="navigate('messages')" data-nav="messages" class="nav-link py-1 border-b-2 border-transparent inline-flex items-center gap-1.5 hover:text-zinc-900 dark:hover:text-white transition">
           <span>Messages</span>
@@ -124,7 +486,7 @@
   <div id="toast-banner" role="status" aria-live="polite" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 hidden max-w-sm w-[92vw] px-4 py-3 rounded-xl shadow-lg border text-xs font-medium text-center transition-all"></div>
 
   <div id="mobile-drawer" class="fixed inset-0 z-50 hidden">
-    <div onclick="closeMobileDrawer()" class="fixed inset-0 bg-zinc-900/60 dark:bg-zinc-900/75 backdrop-blur-xs"></div>
+    <div onclick="closeMobileDrawer()" class="fixed inset-0 bg-zinc-900/60 dark:bg-zinc-900/75 backdrop-blur-sm"></div>
     <aside aria-label="Mobile Navigation" class="relative w-72 max-w-[82vw] h-full bg-white dark:bg-black text-zinc-900 dark:text-white border-r border-zinc-200 dark:border-zinc-800/80 px-5 py-5 flex flex-col justify-between overflow-y-auto">
       <div>
         <div id="drawer-user-box" class="pb-5 border-b border-zinc-200 dark:border-zinc-800/80">
@@ -171,7 +533,7 @@
     <section id="view-home" class="space-y-6">
       <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
         <div class="relative flex-1 max-w-md">
-          <input id="search-input" type="text" oninput="renderNovels()" placeholder="Search title or author..." aria-label="Search novels by title or author" class="w-full pl-9 pr-3 py-2 text-sm rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
+          <input id="search-input" type="text" oninput="renderNovels()" placeholder="Search title or author..." aria-label="Search novels by title or author" class="w-full px-4 py-2 text-sm rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
         </div>
 
         <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 sm:pb-0">
@@ -203,8 +565,8 @@
       <div class="pt-2">
         <div class="bg-white dark:bg-zinc-950 border border-zinc-200/80 dark:border-zinc-800/80 rounded-xl p-3">
           <p class="text-[10px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500 mb-2">Sponsored</p>
-          <script async fetchpriority="high" data-cfasync="false" src="https://bauval.org/21/f9f71428a0fb6d965cf3f6bd17bb38fb"></script>
           <div id="container-f9f71428a0fb6d965cf3f6bd17bb38fb"></div>
+          <script async fetchpriority="high" data-cfasync="false" src="https://bauval.org/21/f9f71428a0fb6d965cf3f6bd17bb38fb"><\/script>
         </div>
       </div>
     </section>
@@ -298,7 +660,7 @@
 
         <div id="msg-panel-discover" class="hidden space-y-3">
           <div class="relative">
-            <input id="reader-search-input" type="text" autocomplete="off" oninput="handleLiveReaderSearch(this.value)" placeholder="Search people by name or @username..." class="w-full pl-10 pr-9 py-2.5 text-sm rounded-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-500" />
+            <input id="reader-search-input" type="text" autocomplete="off" oninput="handleLiveReaderSearch(this.value)" placeholder="Search people by name or @username..." class="w-full px-4 pr-9 py-2.5 text-sm rounded-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-500" />
             <button id="clear-reader-search" type="button" onclick="clearReaderSearch()" aria-label="Clear reader search" class="hidden absolute right-3 top-2.5 w-5 h-5 rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 text-xs items-center justify-center">X</button>
           </div>
           <p id="discover-section-label" class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 px-1">Suggested readers</p>
@@ -442,7 +804,7 @@
   </nav>
 
   <div id="auth-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
-    <div onclick="closeAuthModal()" class="fixed inset-0 bg-zinc-900/70 backdrop-blur-xs"></div>
+    <div onclick="closeAuthModal()" class="fixed inset-0 bg-zinc-900/70 backdrop-blur-sm"></div>
     <div class="relative w-full max-w-sm bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-2xl p-6 shadow-2xl space-y-5">
       <div class="flex items-start justify-between">
         <div>
@@ -483,11 +845,11 @@
   </div>
 
   <div id="profile-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="view-full-name">
-    <div onclick="closeProfileModal()" class="fixed inset-0 bg-zinc-900/70 backdrop-blur-xs"></div>
+    <div onclick="closeProfileModal()" class="fixed inset-0 bg-zinc-900/70 backdrop-blur-sm"></div>
     <div class="relative w-full max-w-md bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-2xl space-y-4 my-auto max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between gap-2">
         <div class="inline-flex rounded-full bg-zinc-100 dark:bg-zinc-900 p-1 text-xs font-semibold">
-          <button type="button" id="profile-tab-view" onclick="switchProfileMode('view')" class="px-3 py-1 rounded-full bg-white dark:bg-zinc-800 shadow-xs">Profile</button>
+          <button type="button" id="profile-tab-view" onclick="switchProfileMode('view')" class="px-3 py-1 rounded-full bg-white dark:bg-zinc-800 shadow-sm">Profile</button>
           <button type="button" id="profile-tab-edit" onclick="switchProfileMode('edit')" class="px-3 py-1 rounded-full text-zinc-500">Edit profile</button>
           <button type="button" id="profile-tab-privacy" onclick="switchProfileMode('privacy')" class="px-3 py-1 rounded-full text-zinc-500">Privacy</button>
         </div>
@@ -506,8 +868,7 @@
         </div>
         <p id="view-bio-box" class="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed"></p>
         <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-zinc-500">
-          <span><strong id="view-followers-count" class="font-bold text-zinc-900 dark:text-white">0</strong> Followers</span>
-          <span><strong id="view-following-count" class="font-bold text-zinc-900 dark:text-white">0</strong> Following</span>
+          <span><strong id="view-connections-count" class="font-bold text-zinc-900 dark:text-white">0</strong> Connections</span>
           <span>Phone: <strong id="view-phone" class="font-medium text-zinc-800 dark:text-zinc-200">Not added</strong></span>
           <span>Genre: <strong id="view-genre" class="font-medium text-zinc-800 dark:text-zinc-200">Fantasy</strong></span>
         </div>
@@ -628,7 +989,7 @@
   </div>
 
   <div id="contact-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title">
-    <div onclick="closeContactModal()" class="fixed inset-0 bg-zinc-900/70 backdrop-blur-xs"></div>
+    <div onclick="closeContactModal()" class="fixed inset-0 bg-zinc-900/70 backdrop-blur-sm"></div>
     <div class="relative w-full max-w-xs bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-2xl space-y-3">
       <div class="flex items-center justify-between pb-2 border-b border-zinc-200 dark:border-zinc-800">
         <h3 id="contact-modal-title" class="text-base font-bold">Contact us</h3>
@@ -637,11 +998,11 @@
       <div class="divide-y divide-zinc-200 dark:divide-zinc-800/80">
         <a href="https://wa.me/2347050304562?text=Hello%20Neptune%20Reads%20Support" target="_blank" rel="noopener noreferrer" class="flex items-center justify-between py-3.5 hover:opacity-75 transition">
           <span class="text-sm font-bold">WhatsApp</span>
-          <span class="text-xs text-zinc-500">-&gt;</span>
+          <span class="text-xs text-zinc-500">-></span>
         </a>
         <a href="mailto:rulemoni8@gmail.com?subject=Neptune%20Reads%20Support" class="flex items-center justify-between py-3.5 hover:opacity-75 transition">
           <span class="text-sm font-bold">Email</span>
-          <span class="text-xs text-zinc-500">-&gt;</span>
+          <span class="text-xs text-zinc-500">-></span>
         </a>
       </div>
     </div>
@@ -688,6 +1049,8 @@
     };
 
     let toastTimer = null;
+    let prevAvatarBlobUrl = null;
+    let prevCoverBlobUrl = null;
 
     function showToast(msg, isError = false) {
       const el = document.getElementById('toast-banner');
@@ -749,20 +1112,23 @@
       });
     }
 
-    function setActiveNav(view) {
-      document.querySelectorAll('.nav-link').forEach(btn => {
-        const active = btn.dataset.nav === view;
-        btn.classList.toggle('text-zinc-900', active);
-        btn.classList.toggle('dark:text-white', active);
-        btn.classList.toggle('font-semibold', active);
+    function updateNavigationHighlights(view) {
+      const desktopTarget = (view === 'novel' || view === 'reader') ? 'home' : view;
+      document.querySelectorAll('.nav-link').forEach((btn) => {
+        const isCurrent = btn.dataset.nav === desktopTarget;
+        btn.classList.toggle('text-zinc-900', isCurrent);
+        btn.classList.toggle('dark:text-white', isCurrent);
+        btn.classList.toggle('font-semibold', isCurrent);
+        btn.classList.toggle('border-blue-600', isCurrent);
+        btn.classList.toggle('border-transparent', !isCurrent);
       });
 
-      const activeBottomKey = view === 'messages'
+      const bottomTarget = desktopTarget === 'messages'
         ? (state.msgTab === 'discover' ? 'discover' : 'messages')
-        : view;
+        : desktopTarget;
 
-      document.querySelectorAll('.bottom-nav-btn').forEach(btn => {
-        const isActive = btn.dataset.bottomNav === activeBottomKey;
+      document.querySelectorAll('.bottom-nav-btn').forEach((btn) => {
+        const isActive = btn.dataset.bottomNav === bottomTarget;
         btn.classList.toggle('mobile-pill-active', isActive);
         btn.classList.toggle('text-zinc-500', !isActive);
         btn.classList.toggle('dark:text-zinc-400', !isActive);
@@ -772,7 +1138,7 @@
     async function uploadImageFile(file, folder) {
       if (!state.user) throw new Error('Please sign in before uploading images.');
       const { blob, dataUrl } = await compressImage(file, folder === 'avatars' ? 400 : 720, 0.82);
-      const filePath = `${folder}/${state.user.id}-${Date.now()}.jpg`;
+      const filePath = \`\${folder}/\${state.user.id}-\${Date.now()}.jpg\`;
 
       try {
         const { error } = await sb.storage
@@ -793,11 +1159,11 @@
       const clean = (val || '').trim();
       if (!clean) return null;
       if (clean.startsWith('http://') || clean.startsWith('https://')) return clean;
-      const handle = clean.replace(/^@/, '').replace(/^u\//, '');
-      if (platform === 'x') return `https://x.com/${handle}`;
-      if (platform === 'telegram') return `https://t.me/${handle}`;
-      if (platform === 'reddit') return `https://reddit.com/u/${handle}`;
-      return `https://${clean}`;
+      const handle = clean.replace(/^@/, '').replace(/^u\\//, '');
+      if (platform === 'x') return \`https://x.com/\${handle}\`;
+      if (platform === 'telegram') return \`https://t.me/\${handle}\`;
+      if (platform === 'reddit') return \`https://reddit.com/u/\${handle}\`;
+      return \`https://\${clean}\`;
     }
 
     function toggleTheme() {
@@ -839,17 +1205,6 @@
       cancelMatureGate();
     });
 
-    function updateActiveNav(view) {
-      const navTarget = view === 'novel' || view === 'reader' ? 'home' : view;
-      document.querySelectorAll('.nav-link').forEach((btn) => {
-        const isCurrent = btn.dataset.nav === navTarget;
-        btn.classList.toggle('text-zinc-900', isCurrent);
-        btn.classList.toggle('dark:text-white', isCurrent);
-        btn.classList.toggle('border-blue-600', isCurrent);
-        btn.classList.toggle('border-transparent', !isCurrent);
-      });
-    }
-
     function navigate(view) {
       const validViews = ['home', 'novel', 'reader', 'messages', 'library', 'publish'];
       const target = validViews.includes(view) ? view : 'home';
@@ -860,8 +1215,7 @@
         if (sec) sec.classList.toggle('hidden', v !== target);
       });
 
-      updateActiveNav(target);
-      setActiveNav(target);
+      updateNavigationHighlights(target);
 
       if (target === 'home') renderNovels();
       if (target === 'library') renderLibrary();
@@ -904,7 +1258,7 @@
         if (error && error.message?.includes('username')) {
           await sb.from('reader_profiles').upsert({
             id: user.id,
-            username: `${baseUsername}_${user.id.slice(0, 4)}`,
+            username: \`\${baseUsername}_\${user.id.slice(0, 4)}\`,
             full_name: fullName,
             avatar_url: avatarUrl,
             bio,
@@ -988,27 +1342,27 @@
           headerInit.textContent = displayName.charAt(0).toUpperCase();
         }
 
-        drawerBox.innerHTML = `
+        drawerBox.innerHTML = \`
           <div onclick="closeMobileDrawer(); openProfileModal('view');" class="cursor-pointer">
-            ${avatarUrl
-              ? `<img src="${escapeHtml(avatarUrl)}" alt="" class="w-11 h-11 rounded-full object-cover" />`
-              : `<div class="w-11 h-11 rounded-full bg-zinc-800 text-white flex items-center justify-center font-bold text-base">${escapeHtml(displayName.charAt(0).toUpperCase())}</div>`
+            \${avatarUrl
+              ? \`<img src="\${escapeHtml(avatarUrl)}" alt="" class="w-11 h-11 rounded-full object-cover" />\`
+              : \`<div class="w-11 h-11 rounded-full bg-zinc-800 text-white flex items-center justify-center font-bold text-base">\${escapeHtml(displayName.charAt(0).toUpperCase())}</div>\`
             }
-            <p class="font-bold text-[15px] text-zinc-900 dark:text-white mt-3 truncate">${escapeHtml(displayName)}</p>
-            <p class="text-xs text-zinc-500 truncate">@${escapeHtml(username)}</p>
+            <p class="font-bold text-[15px] text-zinc-900 dark:text-white mt-3 truncate">\${escapeHtml(displayName)}</p>
+            <p class="text-xs text-zinc-500 truncate">@\${escapeHtml(username)}</p>
           </div>
-        `;
+        \`;
 
         drawerProfileNav.classList.remove('hidden');
         drawerProfileNav.classList.add('flex');
         drawerSettingsNav.classList.remove('hidden');
         drawerSettingsNav.classList.add('flex');
 
-        drawerFooter.innerHTML = `
+        drawerFooter.innerHTML = \`
           <button type="button" onclick="closeMobileDrawer(); signOutUser();" class="flex items-center gap-4 py-2.5 text-left text-[17px] font-bold hover:opacity-75 transition">
             <span>Log out</span>
           </button>
-        `;
+        \`;
 
         await syncPublicReaderProfile(state.user);
         await loadUserBookmarks();
@@ -1023,16 +1377,16 @@
         drawerSettingsNav.classList.add('hidden');
         drawerSettingsNav.classList.remove('flex');
 
-        drawerBox.innerHTML = `
+        drawerBox.innerHTML = \`
           <div class="w-11 h-11 rounded-full bg-zinc-200 dark:bg-zinc-800 flex items-center justify-center font-bold text-base">G</div>
           <p class="font-bold text-[15px] text-zinc-900 dark:text-white mt-3">Guest Reader</p>
           <p class="text-xs text-zinc-500 mt-0.5">@guest</p>
-        `;
-        drawerFooter.innerHTML = `
+        \`;
+        drawerFooter.innerHTML = \`
           <button type="button" onclick="closeMobileDrawer(); openAuthModal('signin');" class="flex items-center gap-4 py-2.5 text-left text-[17px] font-bold hover:opacity-75 transition">
             <span>Sign in</span>
           </button>
-        `;
+        \`;
         state.bookmarks = [];
         state.requests = [];
         state.messages = [];
@@ -1090,7 +1444,7 @@
         return;
       }
 
-      if (label) label.textContent = `People matching "${clean}"`;
+      if (label) label.textContent = \`People matching "\${clean}"\`;
       state.isSearchingReaders = true;
       renderDiscoverReaders();
 
@@ -1101,7 +1455,7 @@
             .from('reader_profiles')
             .select('id, username, full_name, avatar_url, bio')
             .neq('id', state.user.id)
-            .or(`full_name.ilike.%${safe}%,username.ilike.%${safe}%,bio.ilike.%${safe}%`)
+            .or(\`full_name.ilike.%\${safe}%,username.ilike.%\${safe}%,bio.ilike.%\${safe}%\`)
             .limit(25);
 
           if (error) throw error;
@@ -1164,7 +1518,7 @@
             }
           } else if (msg.receiver_id === state.user.id) {
             const sender = state.readers.find(r => r.id === msg.sender_id);
-            showToast(`New message from ${sender?.full_name || 'a reader'}`);
+            showToast(\`New message from \${sender?.full_name || 'a reader'}\`);
           }
         })
         .subscribe();
@@ -1214,7 +1568,7 @@
         btn.classList.toggle('border-transparent', !active);
         btn.classList.toggle('text-zinc-500', !active);
       });
-      setActiveNav('messages');
+      updateNavigationHighlights('messages');
       if (tab === 'discover') {
         loadSocialData();
         setTimeout(() => document.getElementById('reader-search-input')?.focus(), 50);
@@ -1232,12 +1586,10 @@
       );
     }
 
-    function getFollowerCount(profileId) {
-      return state.requests.filter(r => r.receiver_id === profileId && r.status === 'accepted').length;
-    }
-
-    function getFollowingCount(profileId) {
-      return state.requests.filter(r => r.sender_id === profileId && r.status === 'accepted').length;
+    function getConnectionCount(profileId) {
+      return state.requests.filter(
+        r => r.status === 'accepted' && (r.sender_id === profileId || r.receiver_id === profileId)
+      ).length;
     }
 
     function canMessagePeer(peerId) {
@@ -1284,19 +1636,19 @@
       try {
         const { error } = await sb.from('friend_requests').delete().eq('id', requestId);
         if (error) throw error;
-        showToast('Request removed.');
+        showToast('Connection removed.');
         await loadSocialData();
       } catch (err) {
-        showToast(err.message || 'Could not remove request.', true);
+        showToast(err.message || 'Could not remove connection.', true);
       }
     }
 
     function avatarMarkup(profile, sizeClass = 'w-10 h-10 text-sm') {
       const name = profile?.full_name || 'Reader';
       if (profile?.avatar_url) {
-        return `<img src="${escapeHtml(profile.avatar_url)}" alt="" class="${sizeClass} rounded-full object-cover shrink-0" />`;
+        return \`<img src="\${escapeHtml(profile.avatar_url)}" alt="" class="\${sizeClass} rounded-full object-cover shrink-0" />\`;
       }
-      return `<div class="${sizeClass} rounded-full bg-zinc-800 text-white flex items-center justify-center font-bold shrink-0">${escapeHtml(name.charAt(0).toUpperCase())}</div>`;
+      return \`<div class="\${sizeClass} rounded-full bg-zinc-800 text-white flex items-center justify-center font-bold shrink-0">\${escapeHtml(name.charAt(0).toUpperCase())}</div>\`;
     }
 
     function renderMessagesView() {
@@ -1325,13 +1677,13 @@
       );
 
       if (accepted.length === 0) {
-        listEl.innerHTML = `
+        listEl.innerHTML = \`
           <div class="p-6 text-center space-y-2">
             <p class="text-sm font-bold">No connected readers yet</p>
-            <p class="text-xs text-zinc-500">Follow readers and accept connection requests to message 1-on-1.</p>
+            <p class="text-xs text-zinc-500">Connect with readers and accept requests to message 1-on-1.</p>
             <button type="button" onclick="switchMsgTab('discover')" class="mt-2 px-4 py-1.5 rounded-full bg-blue-600 text-white text-xs font-semibold">Find Readers</button>
           </div>
-        `;
+        \`;
         return;
       }
 
@@ -1339,20 +1691,20 @@
         const peerId = conn.sender_id === state.user.id ? conn.receiver_id : conn.sender_id;
         const peer = state.readers.find(r => r.id === peerId) || { id: peerId, full_name: 'Reader', username: 'reader' };
         const isActive = state.activeChatPeerId === peerId;
-        const followers = getFollowerCount(peerId);
+        const connections = getConnectionCount(peerId);
 
-        return `
-          <button type="button" onclick="openChatThread('${peerId}')" class="w-full px-4 py-3 flex items-center justify-between gap-3 text-left hover:bg-zinc-50 dark:hover:bg-zinc-900/70 transition ${isActive ? 'bg-zinc-100/80 dark:bg-zinc-900' : ''}">
+        return \`
+          <button type="button" onclick="openChatThread('\${peerId}')" class="w-full px-4 py-3 flex items-center justify-between gap-3 text-left hover:bg-zinc-50 dark:hover:bg-zinc-900/70 transition \${isActive ? 'bg-zinc-100/80 dark:bg-zinc-900' : ''}">
             <div class="flex items-center gap-3 min-w-0">
-              ${avatarMarkup(peer)}
+              \${avatarMarkup(peer)}
               <div class="min-w-0">
-                <p class="text-sm font-bold truncate">${escapeHtml(peer.full_name)}</p>
-                <p class="text-xs text-zinc-500 truncate">@${escapeHtml(peer.username)} · ${followers} follower${followers === 1 ? '' : 's'}</p>
+                <p class="text-sm font-bold truncate">\${escapeHtml(peer.full_name)}</p>
+                <p class="text-xs text-zinc-500 truncate">@\${escapeHtml(peer.username)} · \${connections} connection\${connections === 1 ? '' : 's'}</p>
               </div>
             </div>
-            <span class="text-xs font-semibold text-blue-500 shrink-0">Message -&gt;</span>
+            <span class="text-xs font-semibold text-blue-500 shrink-0">Message -></span>
           </button>
-        `;
+        \`;
       }).join('');
     }
 
@@ -1366,41 +1718,41 @@
       incomingEl.innerHTML = incoming.length
         ? incoming.map(req => {
             const sender = state.readers.find(r => r.id === req.sender_id) || { full_name: 'Reader', username: 'reader' };
-            return `
+            return \`
               <div class="px-4 py-3 flex items-center justify-between gap-3">
                 <div class="flex items-center gap-3 min-w-0">
-                  ${avatarMarkup(sender)}
+                  \${avatarMarkup(sender)}
                   <div class="min-w-0">
-                    <p class="text-sm font-bold truncate">${escapeHtml(sender.full_name)}</p>
-                    <p class="text-xs text-zinc-500 truncate">@${escapeHtml(sender.username)}</p>
+                    <p class="text-sm font-bold truncate">\${escapeHtml(sender.full_name)}</p>
+                    <p class="text-xs text-zinc-500 truncate">@\${escapeHtml(sender.username)}</p>
                   </div>
                 </div>
                 <div class="flex items-center gap-2 shrink-0">
-                  <button type="button" onclick="acceptReaderRequest('${req.id}')" class="px-3.5 py-1.5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black text-xs font-bold">Accept</button>
-                  <button type="button" onclick="cancelOrDeclineRequest('${req.id}')" class="px-3.5 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-xs font-semibold text-zinc-500">Decline</button>
+                  <button type="button" onclick="acceptReaderRequest('\${req.id}')" class="px-3.5 py-1.5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black text-xs font-bold">Accept</button>
+                  <button type="button" onclick="cancelOrDeclineRequest('\${req.id}')" class="px-3.5 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-xs font-semibold text-zinc-500">Decline</button>
                 </div>
               </div>
-            `;
+            \`;
           }).join('')
-        : `<p class="p-4 text-xs text-zinc-500">No incoming requests.</p>`;
+        : \`<p class="p-4 text-xs text-zinc-500">No incoming requests.</p>\`;
 
       outgoingEl.innerHTML = outgoing.length
         ? outgoing.map(req => {
             const receiver = state.readers.find(r => r.id === req.receiver_id) || { full_name: 'Reader', username: 'reader' };
-            return `
+            return \`
               <div class="px-4 py-3 flex items-center justify-between gap-3">
                 <div class="flex items-center gap-3 min-w-0">
-                  ${avatarMarkup(receiver)}
+                  \${avatarMarkup(receiver)}
                   <div class="min-w-0">
-                    <p class="text-sm font-bold truncate">${escapeHtml(receiver.full_name)}</p>
-                    <p class="text-xs text-zinc-500 truncate">@${escapeHtml(receiver.username)}</p>
+                    <p class="text-sm font-bold truncate">\${escapeHtml(receiver.full_name)}</p>
+                    <p class="text-xs text-zinc-500 truncate">@\${escapeHtml(receiver.username)}</p>
                   </div>
                 </div>
-                <button type="button" onclick="cancelOrDeclineRequest('${req.id}')" class="px-3.5 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-xs font-semibold text-zinc-500 shrink-0">Cancel</button>
+                <button type="button" onclick="cancelOrDeclineRequest('\${req.id}')" class="px-3.5 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-xs font-semibold text-zinc-500 shrink-0">Cancel</button>
               </div>
-            `;
+            \`;
           }).join('')
-        : `<p class="p-4 text-xs text-zinc-500">No pending sent requests.</p>`;
+        : \`<p class="p-4 text-xs text-zinc-500">No pending sent requests.</p>\`;
     }
 
     function renderDiscoverReaders() {
@@ -1411,7 +1763,7 @@
       const q = raw.replace(/^@+/, '').toLowerCase();
 
       if (state.isSearchingReaders) {
-        listEl.innerHTML = `<p class="p-5 text-center text-xs text-zinc-500">Searching people...</p>`;
+        listEl.innerHTML = \`<p class="p-5 text-center text-xs text-zinc-500">Searching people...</p>\`;
         return;
       }
 
@@ -1438,45 +1790,44 @@
 
       if (matches.length === 0) {
         listEl.innerHTML = q
-          ? `<p class="p-5 text-center text-xs text-zinc-500">No results for "${escapeHtml(raw)}"</p>`
-          : `<p class="p-5 text-center text-xs text-zinc-500">No other readers found yet.</p>`;
+          ? \`<p class="p-5 text-center text-xs text-zinc-500">No results for "\${escapeHtml(raw)}"</p>\`
+          : \`<p class="p-5 text-center text-xs text-zinc-500">No other readers found yet.</p>\`;
         return;
       }
 
       listEl.innerHTML = matches.map(reader => {
         const conn = getConnectionBetween(reader.id);
-        const followers = getFollowerCount(reader.id);
-        const following = getFollowingCount(reader.id);
-        let actionBtn = `<button type="button" onclick="sendReaderRequest('${reader.id}')" class="px-4 py-1.5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black text-xs font-bold hover:opacity-90 shrink-0">Follow / Add</button>`;
+        const connections = getConnectionCount(reader.id);
+        let actionBtn = \`<button type="button" onclick="sendReaderRequest('\${reader.id}')" class="px-4 py-1.5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black text-xs font-bold hover:opacity-90 shrink-0">+ Connect</button>\`;
 
         if (conn) {
           if (conn.status === 'accepted') {
-            actionBtn = `
+            actionBtn = \`
               <div class="flex items-center gap-1.5 shrink-0">
-                <button type="button" onclick="switchMsgTab('chats'); openChatThread('${reader.id}');" class="px-3 py-1.5 rounded-full bg-blue-600 text-white text-xs font-bold hover:bg-blue-700">Message</button>
-                <button type="button" onclick="cancelOrDeclineRequest('${conn.id}')" class="px-2.5 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-[11px] font-semibold text-zinc-500 hover:text-red-500">Unfollow</button>
+                <button type="button" onclick="switchMsgTab('chats'); openChatThread('\${reader.id}');" class="px-3 py-1.5 rounded-full bg-blue-600 text-white text-xs font-bold hover:bg-blue-700">Message</button>
+                <button type="button" onclick="cancelOrDeclineRequest('\${conn.id}')" class="px-2.5 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-[11px] font-semibold text-zinc-500 hover:text-red-500">Remove</button>
               </div>
-            `;
+            \`;
           } else if (conn.sender_id === state.user.id) {
-            actionBtn = `<button type="button" onclick="cancelOrDeclineRequest('${conn.id}')" class="px-3.5 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-zinc-500 text-xs font-semibold shrink-0">Requested</button>`;
+            actionBtn = \`<button type="button" onclick="cancelOrDeclineRequest('\${conn.id}')" class="px-3.5 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-zinc-500 text-xs font-semibold shrink-0">Requested</button>\`;
           } else {
-            actionBtn = `<button type="button" onclick="acceptReaderRequest('${conn.id}')" class="px-4 py-1.5 rounded-full bg-blue-600 text-white text-xs font-bold shrink-0">Accept</button>`;
+            actionBtn = \`<button type="button" onclick="acceptReaderRequest('\${conn.id}')" class="px-4 py-1.5 rounded-full bg-blue-600 text-white text-xs font-bold shrink-0">Accept</button>\`;
           }
         }
 
-        return `
+        return \`
           <div class="px-4 py-3 flex items-center justify-between gap-3 hover:bg-zinc-50 dark:hover:bg-zinc-900/60 transition">
             <div class="flex items-center gap-3 min-w-0">
-              ${avatarMarkup(reader, 'w-11 h-11 text-sm')}
+              \${avatarMarkup(reader, 'w-11 h-11 text-sm')}
               <div class="min-w-0">
-                <p class="text-sm font-bold text-zinc-900 dark:text-white truncate">${escapeHtml(reader.full_name)}</p>
-                <p class="text-xs text-zinc-500 truncate">@${escapeHtml(reader.username)} · <strong class="text-zinc-700 dark:text-zinc-300">${followers}</strong> followers · <strong class="text-zinc-700 dark:text-zinc-300">${following}</strong> following</p>
-                ${reader.bio ? `<p class="text-xs text-zinc-600 dark:text-zinc-300 line-clamp-1 mt-0.5">${escapeHtml(reader.bio)}</p>` : ''}
+                <p class="text-sm font-bold text-zinc-900 dark:text-white truncate">\${escapeHtml(reader.full_name)}</p>
+                <p class="text-xs text-zinc-500 truncate">@\${escapeHtml(reader.username)} · <strong class="text-zinc-700 dark:text-zinc-300">\${connections}</strong> connection\${connections === 1 ? '' : 's'}</p>
+                \${reader.bio ? \`<p class="text-xs text-zinc-600 dark:text-zinc-300 line-clamp-1 mt-0.5">\${escapeHtml(reader.bio)}</p>\` : ''}
               </div>
             </div>
-            ${actionBtn}
+            \${actionBtn}
           </div>
-        `;
+        \`;
       }).join('');
     }
 
@@ -1489,10 +1840,10 @@
       const peer = state.readers.find(r => r.id === peerId) || { full_name: 'Reader', username: 'reader' };
 
       document.getElementById('chat-peer-name').textContent = peer.full_name;
-      document.getElementById('chat-peer-username').textContent = `@${peer.username}`;
+      document.getElementById('chat-peer-username').textContent = \`@\${peer.username}\`;
       const avatarBox = document.getElementById('chat-peer-avatar');
       if (peer.avatar_url) {
-        avatarBox.innerHTML = `<img src="${escapeHtml(peer.avatar_url)}" alt="" class="w-8 h-8 rounded-full object-cover" />`;
+        avatarBox.innerHTML = \`<img src="\${escapeHtml(peer.avatar_url)}" alt="" class="w-8 h-8 rounded-full object-cover" />\`;
       } else {
         avatarBox.textContent = peer.full_name.charAt(0).toUpperCase();
       }
@@ -1504,7 +1855,7 @@
         const { data, error } = await sb
           .from('direct_messages')
           .select('*')
-          .or(`and(sender_id.eq.${state.user.id},receiver_id.eq.${peerId}),and(sender_id.eq.${peerId},receiver_id.eq.${state.user.id})`)
+          .or(\`and(sender_id.eq.\${state.user.id},receiver_id.eq.\${peerId}),and(sender_id.eq.\${peerId},receiver_id.eq.\${state.user.id})\`)
           .order('created_at', { ascending: true });
         if (error) throw error;
 
@@ -1527,23 +1878,23 @@
       if (!box) return;
 
       if (state.messages.length === 0) {
-        box.innerHTML = `<p class="text-center text-xs text-zinc-500 py-10">Say hello to start your conversation.</p>`;
+        box.innerHTML = \`<p class="text-center text-xs text-zinc-500 py-10">Say hello to start your conversation.</p>\`;
         return;
       }
 
       box.innerHTML = state.messages.map(m => {
         const mine = m.sender_id === state.user.id;
-        return `
-          <div class="flex ${mine ? 'justify-end' : 'justify-start'}">
-            <div class="max-w-[78%] px-3.5 py-2 rounded-2xl text-xs sm:text-sm leading-relaxed break-words ${
+        return \`
+          <div class="flex \${mine ? 'justify-end' : 'justify-start'}">
+            <div class="max-w-[78%] px-3.5 py-2 rounded-2xl text-xs sm:text-sm leading-relaxed break-words \${
               mine
-                ? 'bg-blue-600 text-white rounded-br-xs'
-                : 'bg-zinc-200 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-bl-xs'
+                ? 'bg-blue-600 text-white rounded-br-sm'
+                : 'bg-zinc-200 dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-bl-sm'
             }">
-              ${escapeHtml(m.body)}
+              \${escapeHtml(m.body)}
             </div>
           </div>
-        `;
+        \`;
       }).join('');
       box.scrollTop = box.scrollHeight;
     }
@@ -1597,7 +1948,7 @@
         const active = key === mode;
         panels[key].classList.toggle('hidden', !active);
         tabs[key].className = active
-          ? 'px-3 py-1 rounded-full bg-white dark:bg-zinc-800 shadow-xs text-zinc-900 dark:text-white'
+          ? 'px-3 py-1 rounded-full bg-white dark:bg-zinc-800 shadow-sm text-zinc-900 dark:text-white'
           : 'px-3 py-1 rounded-full text-zinc-500';
       });
       setFormStatus('privacy-status', '');
@@ -1610,10 +1961,9 @@
       const username = getUsername(state.user);
 
       document.getElementById('view-full-name').textContent = displayName;
-      document.getElementById('view-username').textContent = `@${username}`;
+      document.getElementById('view-username').textContent = \`@\${username}\`;
       document.getElementById('view-email').textContent = state.user.email;
-      document.getElementById('view-followers-count').textContent = getFollowerCount(state.user.id);
-      document.getElementById('view-following-count').textContent = getFollowingCount(state.user.id);
+      document.getElementById('view-connections-count').textContent = getConnectionCount(state.user.id);
       document.getElementById('view-phone').textContent = meta.phone || 'Not added';
       document.getElementById('view-genre').textContent = meta.favorite_genre || 'Fantasy';
       document.getElementById('view-bio-box').textContent = meta.bio || 'No bio added yet.';
@@ -1634,20 +1984,20 @@
       const linksContainer = document.getElementById('view-social-links');
       const badges = [];
       if (meta.x_handle) {
-        badges.push(`<a href="${escapeHtml(normalizeLink('x', meta.x_handle))}" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-full border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-xs font-medium transition">X: ${escapeHtml(meta.x_handle)}</a>`);
+        badges.push(\`<a href="\${escapeHtml(normalizeLink('x', meta.x_handle))}" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-full border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-xs font-medium transition">X: \${escapeHtml(meta.x_handle)}</a>\`);
       }
       if (meta.telegram) {
-        badges.push(`<a href="${escapeHtml(normalizeLink('telegram', meta.telegram))}" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-full border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-xs font-medium transition">Telegram: ${escapeHtml(meta.telegram)}</a>`);
+        badges.push(\`<a href="\${escapeHtml(normalizeLink('telegram', meta.telegram))}" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-full border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-xs font-medium transition">Telegram: \${escapeHtml(meta.telegram)}</a>\`);
       }
       if (meta.reddit) {
-        badges.push(`<a href="${escapeHtml(normalizeLink('reddit', meta.reddit))}" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-full border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-xs font-medium transition">Reddit: ${escapeHtml(meta.reddit)}</a>`);
+        badges.push(\`<a href="\${escapeHtml(normalizeLink('reddit', meta.reddit))}" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-full border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-xs font-medium transition">Reddit: \${escapeHtml(meta.reddit)}</a>\`);
       }
       if (meta.website) {
-        badges.push(`<a href="${escapeHtml(normalizeLink('website', meta.website))}" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-full border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-xs font-medium transition">Website</a>`);
+        badges.push(\`<a href="\${escapeHtml(normalizeLink('website', meta.website))}" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-full border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-xs font-medium transition">Website</a>\`);
       }
       linksContainer.innerHTML = badges.length
         ? badges.join('')
-        : `<p class="text-[11px] text-zinc-500">No social links added yet.</p>`;
+        : \`<p class="text-[11px] text-zinc-500">No social links added yet.</p>\`;
 
       document.getElementById('profile-full-name').value = displayName;
       document.getElementById('profile-username').value = username;
@@ -1680,9 +2030,11 @@
     function previewProfileAvatar(e) {
       const file = e.target.files?.[0];
       if (!file) return;
+      if (prevAvatarBlobUrl) URL.revokeObjectURL(prevAvatarBlobUrl);
+      prevAvatarBlobUrl = URL.createObjectURL(file);
       const preview = document.getElementById('profile-avatar-preview');
       const fallback = document.getElementById('profile-avatar-fallback');
-      preview.src = URL.createObjectURL(file);
+      preview.src = prevAvatarBlobUrl;
       preview.classList.remove('hidden');
       fallback.classList.add('hidden');
     }
@@ -1707,9 +2059,11 @@
 
       try {
         let avatarUrl = state.user.user_metadata?.avatar_url || null;
-        const avatarFile = document.getElementById('profile-avatar-file').files?.[0];
+        const avatarInput = document.getElementById('profile-avatar-file');
+        const avatarFile = avatarInput.files?.[0];
         if (avatarFile) {
           avatarUrl = await uploadImageFile(avatarFile, 'avatars');
+          avatarInput.value = '';
         }
 
         const { data, error } = await sb.auth.updateUser({
@@ -1775,7 +2129,7 @@
           redirectTo: window.location.origin
         });
         if (error) throw error;
-        setFormStatus('privacy-status', `Password reset link sent to ${state.user.email}.`);
+        setFormStatus('privacy-status', \`Password reset link sent to \${state.user.email}.\`);
       } catch (err) {
         setFormStatus('privacy-status', formatAuthError(err.message), true);
       }
@@ -1800,7 +2154,7 @@
         );
         if (error) throw error;
         e.target.reset();
-        setFormStatus('privacy-status', `Confirmation link sent to ${newEmail}. Open your inbox and tap the link to complete the change.`);
+        setFormStatus('privacy-status', \`Confirmation link sent to \${newEmail}. Open your inbox and tap the link to complete the change.\`);
         showToast('Check your new email inbox!');
       } catch (err) {
         setFormStatus('privacy-status', formatAuthError(err.message), true);
@@ -1954,12 +2308,17 @@
       const file = e.target.files?.[0];
       const thumb = document.getElementById('cover-preview-thumb');
       const label = document.getElementById('cover-file-label');
+      if (prevCoverBlobUrl) {
+        URL.revokeObjectURL(prevCoverBlobUrl);
+        prevCoverBlobUrl = null;
+      }
       if (!file) {
         thumb.classList.add('hidden');
         label.textContent = 'Choose Cover Photo';
         return;
       }
-      thumb.src = URL.createObjectURL(file);
+      prevCoverBlobUrl = URL.createObjectURL(file);
+      thumb.src = prevCoverBlobUrl;
       thumb.classList.remove('hidden');
       label.textContent = file.name;
     }
@@ -2014,7 +2373,7 @@
         return matchesGenre && matchesQuery;
       });
 
-      document.getElementById('catalog-count').textContent = `${filtered.length} novel${filtered.length === 1 ? '' : 's'}`;
+      document.getElementById('catalog-count').textContent = \`\${filtered.length} novel\${filtered.length === 1 ? '' : 's'}\`;
       const grid = document.getElementById('novels-grid');
       const empty = document.getElementById('empty-catalog');
       const emptyTitle = document.getElementById('empty-catalog-title');
@@ -2042,21 +2401,21 @@
 
     function novelCardHTML(novel) {
       const cover = novel.cover_url
-        ? `<img src="${escapeHtml(novel.cover_url)}" alt="${escapeHtml(novel.title)}" class="w-full h-full object-cover" />`
-        : `<div class="w-full h-full flex items-center justify-center p-3 text-center bg-zinc-200 dark:bg-zinc-900 text-xs font-semibold text-zinc-600 dark:text-zinc-300">${escapeHtml(novel.title)}</div>`;
+        ? \`<img src="\${escapeHtml(novel.cover_url)}" alt="\${escapeHtml(novel.title)}" class="w-full h-full object-cover" />\`
+        : \`<div class="w-full h-full flex items-center justify-center p-3 text-center bg-zinc-200 dark:bg-zinc-900 text-xs font-semibold text-zinc-600 dark:text-zinc-300">\${escapeHtml(novel.title)}</div>\`;
 
-      return `
-        <div onclick="openNovel('${novel.id}')" class="cursor-pointer group space-y-2">
+      return \`
+        <div onclick="openNovel('\${novel.id}')" class="cursor-pointer group space-y-2">
           <div class="relative aspect-[2/3] rounded-lg overflow-hidden bg-zinc-200 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800">
-            ${cover}
-            ${novel.is_mature ? '<span class="absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-bold rounded bg-red-600 text-white">18+</span>' : ''}
+            \${cover}
+            \${novel.is_mature ? '<span class="absolute top-2 right-2 px-1.5 py-0.5 text-[10px] font-bold rounded bg-red-600 text-white">18+</span>' : ''}
           </div>
           <div>
-            <h3 class="text-sm font-medium leading-snug line-clamp-1 group-hover:text-blue-500 transition">${escapeHtml(novel.title)}</h3>
-            <p class="text-xs text-zinc-500 line-clamp-1">${escapeHtml(novel.author_name)} · ${escapeHtml(novel.genre)}</p>
+            <h3 class="text-sm font-medium leading-snug line-clamp-1 group-hover:text-blue-500 transition">\${escapeHtml(novel.title)}</h3>
+            <p class="text-xs text-zinc-500 line-clamp-1">\${escapeHtml(novel.author_name)} · \${escapeHtml(novel.genre)}</p>
           </div>
         </div>
-      `;
+      \`;
     }
 
     async function openNovel(novelId) {
@@ -2080,47 +2439,47 @@
       state.currentNovelId = novelId;
       navigate('novel');
 
-      const isBookmarked = state.bookmarks.includes(novelId);
+      const isBookmarked = state.bookmarks.some(id => String(id) === String(novelId));
       const isOwnNovel = state.user && novel.author_id === state.user.id;
       const conn = novel.author_id ? getConnectionBetween(novel.author_id) : null;
 
       let authorActionHTML = '';
       if (novel.author_id && !isOwnNovel) {
         if (conn?.status === 'accepted') {
-          authorActionHTML = `<button type="button" onclick="navigate('messages'); switchMsgTab('chats'); openChatThread('${novel.author_id}');" class="px-4 py-2 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-semibold">Message Author</button>`;
+          authorActionHTML = \`<button type="button" onclick="navigate('messages'); switchMsgTab('chats'); openChatThread('\${novel.author_id}');" class="px-4 py-2 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-semibold">Message Author</button>\`;
         } else if (conn?.status === 'pending') {
-          authorActionHTML = `<span class="px-3.5 py-2 rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-500 text-xs font-semibold">Request Pending</span>`;
+          authorActionHTML = \`<span class="px-3.5 py-2 rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-500 text-xs font-semibold">Request Pending</span>\`;
         } else {
-          authorActionHTML = `<button type="button" onclick="sendReaderRequest('${novel.author_id}')" class="px-4 py-2 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-semibold">+ Connect with Author</button>`;
+          authorActionHTML = \`<button type="button" onclick="sendReaderRequest('\${novel.author_id}')" class="px-4 py-2 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-semibold">+ Connect with Author</button>\`;
         }
       }
 
       const cover = novel.cover_url
-        ? `<img src="${escapeHtml(novel.cover_url)}" alt="" class="w-28 sm:w-36 aspect-[2/3] object-cover rounded-lg border border-zinc-200 dark:border-zinc-800 shrink-0" />`
-        : `<div class="w-28 sm:w-36 aspect-[2/3] rounded-lg bg-zinc-200 dark:bg-zinc-900 flex items-center justify-center p-3 text-center text-xs font-semibold shrink-0">${escapeHtml(novel.title)}</div>`;
+        ? \`<img src="\${escapeHtml(novel.cover_url)}" alt="" class="w-28 sm:w-36 aspect-[2/3] object-cover rounded-lg border border-zinc-200 dark:border-zinc-800 shrink-0" />\`
+        : \`<div class="w-28 sm:w-36 aspect-[2/3] rounded-lg bg-zinc-200 dark:bg-zinc-900 flex items-center justify-center p-3 text-center text-xs font-semibold shrink-0">\${escapeHtml(novel.title)}</div>\`;
 
-      document.getElementById('novel-detail-container').innerHTML = `
+      document.getElementById('novel-detail-container').innerHTML = \`
         <div class="flex flex-col sm:flex-row gap-5">
-          ${cover}
+          \${cover}
           <div class="space-y-3 flex-1 min-w-0">
             <div class="flex flex-wrap items-center gap-2">
-              <span class="px-2.5 py-0.5 text-xs rounded-full bg-blue-600/10 text-blue-500 font-medium">${escapeHtml(novel.genre)}</span>
-              <span class="px-2.5 py-0.5 text-xs rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300">${escapeHtml(novel.status || 'Ongoing')}</span>
-              ${novel.is_mature ? '<span class="px-2.5 py-0.5 text-xs rounded-full bg-red-500/15 text-red-500 font-medium">18+</span>' : ''}
+              <span class="px-2.5 py-0.5 text-xs rounded-full bg-blue-600/10 text-blue-500 font-medium">\${escapeHtml(novel.genre)}</span>
+              <span class="px-2.5 py-0.5 text-xs rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-300">\${escapeHtml(novel.status || 'Ongoing')}</span>
+              \${novel.is_mature ? '<span class="px-2.5 py-0.5 text-xs rounded-full bg-red-500/15 text-red-500 font-medium">18+</span>' : ''}
             </div>
-            <h1 class="text-xl font-bold break-words">${escapeHtml(novel.title)}</h1>
-            <p class="text-xs text-zinc-500">By <span class="text-zinc-800 dark:text-zinc-200 font-medium">${escapeHtml(novel.author_name)}</span></p>
-            <p class="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed whitespace-pre-line break-words">${escapeHtml(novel.synopsis)}</p>
+            <h1 class="text-xl font-bold break-words">\${escapeHtml(novel.title)}</h1>
+            <p class="text-xs text-zinc-500">By <span class="text-zinc-800 dark:text-zinc-200 font-medium">\${escapeHtml(novel.author_name)}</span></p>
+            <p class="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed whitespace-pre-line break-words">\${escapeHtml(novel.synopsis)}</p>
             <div class="pt-2 flex flex-wrap gap-2">
               <button id="read-first-btn" type="button" class="px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold">Start Reading</button>
-              <button type="button" onclick="toggleBookmark('${novel.id}')" class="px-4 py-2 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-semibold">
-                ${isBookmarked ? 'In Library' : '+ Add to Library'}
+              <button id="novel-bookmark-btn" type="button" onclick="toggleBookmark('\${novel.id}')" class="px-4 py-2 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-semibold">
+                \${isBookmarked ? 'In Library' : '+ Add to Library'}
               </button>
-              ${authorActionHTML}
+              \${authorActionHTML}
             </div>
           </div>
         </div>
-      `;
+      \`;
 
       try {
         const { data: chapters, error } = await sb
@@ -2136,24 +2495,24 @@
         showToast('Could not load chapters.', true);
       }
 
-      document.getElementById('chapter-count-label').textContent = `${state.chapters.length} chapter${state.chapters.length === 1 ? '' : 's'}`;
+      document.getElementById('chapter-count-label').textContent = \`\${state.chapters.length} chapter\${state.chapters.length === 1 ? '' : 's'}\`;
 
       const list = document.getElementById('novel-chapters-list');
       const readFirstBtn = document.getElementById('read-first-btn');
       if (state.chapters.length === 0) {
-        list.innerHTML = `<p class="py-4 text-xs text-zinc-500">No chapters uploaded yet.</p>`;
+        list.innerHTML = \`<p class="py-4 text-xs text-zinc-500">No chapters uploaded yet.</p>\`;
         readFirstBtn.disabled = true;
         readFirstBtn.classList.add('opacity-40');
       } else {
         readFirstBtn.disabled = false;
         readFirstBtn.classList.remove('opacity-40');
         readFirstBtn.onclick = () => openChapter(state.chapters[0].id);
-        list.innerHTML = state.chapters.map(ch => `
-          <button type="button" onclick="openChapter('${ch.id}')" class="w-full py-3 flex items-center justify-between gap-3 text-left hover:text-blue-500 transition">
-            <span class="text-sm break-words">Chapter ${ch.chapter_number}: ${escapeHtml(ch.chapter_title)}</span>
-            <span class="text-xs text-zinc-400 shrink-0">Read -&gt;</span>
+        list.innerHTML = state.chapters.map(ch => \`
+          <button type="button" onclick="openChapter('\${ch.id}')" class="w-full py-3 flex items-center justify-between gap-3 text-left hover:text-blue-500 transition">
+            <span class="text-sm break-words">Chapter \${ch.chapter_number}: \${escapeHtml(ch.chapter_title)}</span>
+            <span class="text-xs text-zinc-400 shrink-0">Read -></span>
           </button>
-        `).join('');
+        \`).join('');
       }
     }
 
@@ -2178,7 +2537,7 @@
 
       document.getElementById('reader-back-btn').onclick = () => openNovel(chapter.novel_id);
       document.getElementById('reader-novel-title').textContent = novel ? novel.title : '';
-      document.getElementById('reader-chapter-title').textContent = `Chapter ${chapter.chapter_number}: ${chapter.chapter_title}`;
+      document.getElementById('reader-chapter-title').textContent = \`Chapter \${chapter.chapter_number}: \${chapter.chapter_title}\`;
 
       const prevBtn = document.getElementById('prev-chapter-btn');
       const nextBtn = document.getElementById('next-chapter-btn');
@@ -2196,22 +2555,28 @@
 
     async function toggleBookmark(novelId) {
       if (!state.user) return openAuthModal('signin');
-      const exists = state.bookmarks.includes(novelId);
+      const exists = state.bookmarks.some(id => String(id) === String(novelId));
+      const bmBtn = document.getElementById('novel-bookmark-btn');
+      if (bmBtn) bmBtn.disabled = true;
+
       try {
         if (exists) {
           const { error } = await sb.from('bookmarks').delete().eq('user_id', state.user.id).eq('novel_id', novelId);
           if (error) throw error;
-          state.bookmarks = state.bookmarks.filter(id => id !== novelId);
+          state.bookmarks = state.bookmarks.filter(id => String(id) !== String(novelId));
+          if (bmBtn) bmBtn.textContent = '+ Add to Library';
           showToast('Removed from Library');
         } else {
           const { error } = await sb.from('bookmarks').insert({ user_id: state.user.id, novel_id: novelId });
           if (error) throw error;
           state.bookmarks.push(novelId);
+          if (bmBtn) bmBtn.textContent = 'In Library';
           showToast('Added to Library');
         }
-        await openNovel(novelId);
       } catch (err) {
         showToast(err.message || 'Could not update library.', true);
+      } finally {
+        if (bmBtn) bmBtn.disabled = false;
       }
     }
 
@@ -2224,10 +2589,10 @@
         return;
       }
       guestBox.classList.add('hidden');
-      const saved = state.novels.filter(n => state.bookmarks.includes(n.id));
+      const saved = state.novels.filter(n => state.bookmarks.some(id => String(id) === String(n.id)));
       grid.innerHTML = saved.length
         ? saved.map(n => novelCardHTML(n)).join('')
-        : `<p class="col-span-full text-xs text-zinc-500">Your library is empty. Open any novel and tap "+ Add to Library".</p>`;
+        : \`<p class="col-span-full text-xs text-zinc-500">Your library is empty. Open any novel and tap "+ Add to Library".</p>\`;
     }
 
     async function deleteNovel(novelId) {
@@ -2235,7 +2600,7 @@
       const novel = state.novels.find(n => String(n.id) === String(novelId));
       if (!novel) return;
 
-      const ok = window.confirm(`Delete "${novel.title}" and all its chapters? This cannot be undone.`);
+      const ok = window.confirm(\`Delete "\${novel.title}" and all its chapters? This cannot be undone.\`);
       if (!ok) return;
 
       try {
@@ -2289,8 +2654,8 @@
       const myNovels = state.novels.filter(n => n.author_id === state.user.id);
       const select = document.getElementById('publish-novel-select');
       const currentSelection = select.value;
-      select.innerHTML = `<option value="">-- Choose your novel --</option>` +
-        myNovels.map(n => `<option value="${n.id}">${escapeHtml(n.title)}</option>`).join('');
+      select.innerHTML = \`<option value="">-- Choose your novel --</option>\` +
+        myNovels.map(n => \`<option value="\${n.id}">\${escapeHtml(n.title)}</option>\`).join('');
       if (currentSelection && myNovels.some(n => String(n.id) === String(currentSelection))) {
         select.value = currentSelection;
       }
@@ -2298,16 +2663,16 @@
       const myListEl = document.getElementById('my-novels-list');
       if (myListEl) {
         myListEl.innerHTML = myNovels.length
-          ? myNovels.map(n => `
+          ? myNovels.map(n => \`
               <div class="py-3 flex items-center justify-between gap-3">
                 <div class="min-w-0">
-                  <p class="text-sm font-semibold truncate">${escapeHtml(n.title)}</p>
-                  <p class="text-xs text-zinc-500">${escapeHtml(n.genre)} · ${escapeHtml(n.status || 'Ongoing')}</p>
+                  <p class="text-sm font-semibold truncate">\${escapeHtml(n.title)}</p>
+                  <p class="text-xs text-zinc-500">\${escapeHtml(n.genre)} · \${escapeHtml(n.status || 'Ongoing')}</p>
                 </div>
-                <button type="button" onclick="deleteNovel('${n.id}')" class="px-3.5 py-1.5 rounded-full border border-red-500/40 text-red-500 hover:bg-red-500/10 text-xs font-semibold shrink-0 transition">Delete</button>
+                <button type="button" onclick="deleteNovel('\${n.id}')" class="px-3.5 py-1.5 rounded-full border border-red-500/40 text-red-500 hover:bg-red-500/10 text-xs font-semibold shrink-0 transition">Delete</button>
               </div>
-            `).join('')
-          : `<p class="py-3 text-xs text-zinc-500">You have not published any novels yet.</p>`;
+            \`).join('')
+          : \`<p class="py-3 text-xs text-zinc-500">You have not published any novels yet.</p>\`;
       }
     }
 
@@ -2351,6 +2716,10 @@
         if (error) throw error;
 
         e.target.reset();
+        if (prevCoverBlobUrl) {
+          URL.revokeObjectURL(prevCoverBlobUrl);
+          prevCoverBlobUrl = null;
+        }
         document.getElementById('cover-preview-thumb').classList.add('hidden');
         document.getElementById('cover-file-label').textContent = 'Choose Cover Photo';
         await loadCatalog();
@@ -2424,6 +2793,49 @@
 
     initAuth();
     loadCatalog();
+  <\/script>
+</body>
+</html>`;
+
+    // Populate the code blocks safely as textContent so nothing is clipped or interpreted
+    const sqlPre = document.getElementById('sql-code');
+    const htmlPre = document.getElementById('html-code');
+    sqlPre.textContent = FULL_SQL;
+    htmlPre.textContent = FULL_HTML;
+
+    document.getElementById('sql-line-count').textContent = `${FULL_SQL.split('\n').length} lines`;
+    document.getElementById('html-line-count').textContent = `${FULL_HTML.split('\n').length} lines`;
+
+    // Copy helper
+    async function copyCode(elementId, btn) {
+      const text = document.getElementById(elementId).textContent;
+      try {
+        await navigator.clipboard.writeText(text);
+        const orig = btn.textContent;
+        btn.textContent = 'Copied!';
+        setTimeout(() => (btn.textContent = orig), 2000);
+      } catch (err) {
+        const range = document.createRange();
+        range.selectNodeContents(document.getElementById(elementId));
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+    }
+
+    // Direct file download helper
+    function downloadFile(filename, elementId) {
+      const text = document.getElementById(elementId).textContent;
+      const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
   </script>
 </body>
 </html>
