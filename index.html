@@ -85,13 +85,15 @@
         </a>
       </div>
 
+      <!-- Desktop Navigation with Separate People & Messages Headers -->
       <nav aria-label="Primary Navigation" class="hidden md:flex items-center gap-6 text-sm font-medium text-zinc-600 dark:text-zinc-400">
         <button type="button" onclick="navigate('home')" data-nav="home" class="nav-link py-1 border-b-2 border-blue-600 text-zinc-900 dark:text-white font-semibold transition">Browse</button>
-        <button type="button" onclick="navigate('library')" data-nav="library" class="nav-link py-1 border-b-2 border-transparent hover:text-zinc-900 dark:hover:text-white transition">Library</button>
-        <button type="button" onclick="navigate('messages')" data-nav="messages" class="nav-link py-1 border-b-2 border-transparent inline-flex items-center gap-1.5 hover:text-zinc-900 dark:hover:text-white transition">
-          <span>Messages</span>
+        <button type="button" onclick="navigate('people')" data-nav="people" class="nav-link py-1 border-b-2 border-transparent inline-flex items-center gap-1.5 hover:text-zinc-900 dark:hover:text-white transition">
+          <span>People</span>
           <span id="desktop-req-badge" class="hidden px-1.5 py-0.2 text-[10px] font-bold rounded-full bg-blue-600 text-white">0</span>
         </button>
+        <button type="button" onclick="navigate('messages')" data-nav="messages" class="nav-link py-1 border-b-2 border-transparent hover:text-zinc-900 dark:hover:text-white transition">Messages</button>
+        <button type="button" onclick="navigate('library')" data-nav="library" class="nav-link py-1 border-b-2 border-transparent hover:text-zinc-900 dark:hover:text-white transition">Library</button>
         <button type="button" onclick="navigate('publish')" data-nav="publish" class="nav-link py-1 border-b-2 border-transparent hover:text-zinc-900 dark:hover:text-white transition">Author Studio</button>
         <button type="button" onclick="openContactModal()" class="py-1 border-b-2 border-transparent hover:text-zinc-900 dark:hover:text-white transition">Contact us</button>
       </nav>
@@ -110,7 +112,7 @@
           Sign In
         </button>
 
-        <button id="profile-header-btn" type="button" onclick="openProfileModal('view')" class="hidden items-center gap-1.5 pl-1 pr-2.5 py-1 rounded-full border border-zinc-200 dark:border-zinc-800 bg-zinc-100/80 dark:bg-zinc-900 hover:bg-zinc-200/70 dark:hover:bg-zinc-800 text-xs font-medium whitespace-nowrap transition">
+        <button id="profile-header-btn" type="button" onclick="openUserProfile()" class="hidden items-center gap-1.5 pl-1 pr-2.5 py-1 rounded-full border border-zinc-200 dark:border-zinc-800 bg-zinc-100/80 dark:bg-zinc-900 hover:bg-zinc-200/70 dark:hover:bg-zinc-800 text-xs font-medium whitespace-nowrap transition">
           <img id="header-avatar-img" src="" alt="" class="w-6 h-6 rounded-full object-cover hidden" />
           <span id="header-avatar-initial" class="w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-[11px] font-bold">U</span>
           <span id="header-display-name" class="max-w-[90px] truncate">User</span>
@@ -137,12 +139,15 @@
           <button type="button" onclick="navigate('home'); closeMobileDrawer();" class="flex items-center gap-4 py-3 text-left text-[17px] font-bold hover:opacity-75 transition">
             <span>Browse</span>
           </button>
-          <button id="drawer-profile-nav" type="button" onclick="closeMobileDrawer(); openProfileModal('view');" class="hidden items-center gap-4 py-3 text-left text-[17px] font-bold hover:opacity-75 transition">
+          <button id="drawer-profile-nav" type="button" onclick="closeMobileDrawer(); openUserProfile();" class="hidden items-center gap-4 py-3 text-left text-[17px] font-bold hover:opacity-75 transition">
             <span>Profile</span>
           </button>
-          <button type="button" onclick="navigate('messages'); closeMobileDrawer();" class="flex items-center justify-between py-3 text-left text-[17px] font-bold hover:opacity-75 transition">
-            <span>Messages</span>
+          <button type="button" onclick="navigate('people'); closeMobileDrawer();" class="flex items-center justify-between py-3 text-left text-[17px] font-bold hover:opacity-75 transition">
+            <span>People &amp; Requests</span>
             <span id="drawer-req-badge" class="hidden px-2 py-0.5 text-xs font-bold rounded-full bg-blue-600 text-white">0</span>
+          </button>
+          <button type="button" onclick="navigate('messages'); closeMobileDrawer();" class="flex items-center gap-4 py-3 text-left text-[17px] font-bold hover:opacity-75 transition">
+            <span>Messages</span>
           </button>
           <button type="button" onclick="navigate('library'); closeMobileDrawer();" class="flex items-center gap-4 py-3 text-left text-[17px] font-bold hover:opacity-75 transition">
             <span>Library</span>
@@ -150,7 +155,7 @@
           <button type="button" onclick="navigate('publish'); closeMobileDrawer();" class="flex items-center gap-4 py-3 text-left text-[17px] font-bold hover:opacity-75 transition">
             <span>Author Studio</span>
           </button>
-          <button id="drawer-settings-nav" type="button" onclick="closeMobileDrawer(); openProfileModal('privacy');" class="hidden items-center gap-4 py-3 text-left text-[17px] font-bold hover:opacity-75 transition">
+          <button id="drawer-settings-nav" type="button" onclick="closeMobileDrawer(); openProfileEditModal('privacy');" class="hidden items-center gap-4 py-3 text-left text-[17px] font-bold hover:opacity-75 transition">
             <span>Settings and privacy</span>
           </button>
           <button type="button" onclick="closeMobileDrawer(); openContactModal();" class="flex items-center gap-4 py-3 text-left text-[17px] font-bold hover:opacity-75 transition">
@@ -256,7 +261,63 @@
       </div>
     </section>
 
-    <!-- Messages (X-style DM thread + Facebook-style Friend Requests & People) -->
+    <!-- SEPARATE SECTION: People & Friend Requests -->
+    <section id="view-people" class="hidden max-w-3xl mx-auto space-y-4">
+      <div class="flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <button type="button" onclick="goBackSmart('home')" aria-label="Back" class="p-1.5 -ml-1.5 rounded-full hover:bg-zinc-200/70 dark:hover:bg-zinc-900 text-zinc-600 dark:text-zinc-300 transition">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+            </svg>
+          </button>
+          <h2 class="text-base font-bold">People &amp; Requests</h2>
+        </div>
+        <button type="button" onclick="navigate('messages')" class="px-3.5 py-1.5 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-900 transition">Open Messages</button>
+      </div>
+
+      <div id="people-guest-notice" class="hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 rounded-xl p-6 text-center">
+        <p class="text-sm font-bold">Sign in to find readers &amp; authors</p>
+        <p class="text-xs text-zinc-500 mt-1">Send friend requests, accept connections, and view reader profiles.</p>
+        <button type="button" onclick="openAuthModal('signin')" class="mt-4 px-4 py-2 rounded-full bg-blue-600 text-white text-xs font-semibold">Sign In</button>
+      </div>
+
+      <div id="people-main-hub" class="hidden space-y-4">
+        <div class="flex border-b border-zinc-200 dark:border-zinc-800 text-xs font-bold">
+          <button type="button" onclick="switchPeopleTab('discover')" id="people-tab-discover" class="flex-1 py-3 text-center border-b-2 border-blue-500 text-zinc-900 dark:text-white">Find People</button>
+          <button type="button" onclick="switchPeopleTab('requests')" id="people-tab-requests" class="flex-1 py-3 text-center border-b-2 border-transparent text-zinc-500 inline-flex items-center justify-center gap-1.5">
+            <span>Friend Requests</span>
+            <span id="tab-req-count" class="hidden px-1.5 py-0.2 text-[10px] rounded-full bg-blue-600 text-white">0</span>
+          </button>
+          <button type="button" onclick="switchPeopleTab('friends')" id="people-tab-friends" class="flex-1 py-3 text-center border-b-2 border-transparent text-zinc-500">Friends</button>
+        </div>
+
+        <div id="people-panel-discover" class="space-y-3">
+          <div class="relative">
+            <input id="reader-search-input" type="text" autocomplete="off" oninput="handleLiveReaderSearch(this.value)" placeholder="Search people by name or @username..." class="w-full px-4 pr-9 py-2.5 text-sm rounded-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-500" />
+            <button id="clear-reader-search" type="button" onclick="clearReaderSearch()" aria-label="Clear reader search" class="hidden absolute right-3 top-2.5 w-5 h-5 rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 text-xs items-center justify-center">X</button>
+          </div>
+          <p id="discover-section-label" class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 px-1">People you may know</p>
+          <div id="discover-readers-list" class="divide-y divide-zinc-200 dark:divide-zinc-800/80 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 overflow-hidden"></div>
+        </div>
+
+        <div id="people-panel-requests" class="hidden space-y-5">
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-500 mb-2">Incoming Friend Requests</h3>
+            <div id="incoming-requests-list" class="divide-y divide-zinc-200 dark:divide-zinc-800/80 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 overflow-hidden"></div>
+          </div>
+          <div>
+            <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-500 mb-2">Sent Requests</h3>
+            <div id="outgoing-requests-list" class="divide-y divide-zinc-200 dark:divide-zinc-800/80 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 overflow-hidden"></div>
+          </div>
+        </div>
+
+        <div id="people-panel-friends" class="hidden space-y-3">
+          <div id="all-friends-list" class="divide-y divide-zinc-200 dark:divide-zinc-800/80 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 overflow-hidden"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DEDICATED SECTION: Messages Only -->
     <section id="view-messages" class="hidden max-w-3xl mx-auto space-y-4">
       <!-- Active X-style DM Conversation Screen -->
       <div id="active-chat-box" class="hidden border border-zinc-200 dark:border-zinc-800 rounded-2xl bg-white dark:bg-zinc-950 overflow-hidden flex flex-col min-h-[70vh]">
@@ -267,10 +328,12 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
               </svg>
             </button>
-            <div id="chat-peer-avatar" class="w-9 h-9 rounded-full bg-zinc-800 text-white flex items-center justify-center text-xs font-bold shrink-0">U</div>
-            <div class="min-w-0">
-              <p id="chat-peer-name" class="text-sm font-bold leading-tight truncate">Reader</p>
-              <p id="chat-peer-username" class="text-[11px] text-zinc-500 truncate">@reader</p>
+            <div onclick="openPeerProfileFromChat()" class="flex items-center gap-2.5 min-w-0 cursor-pointer">
+              <div id="chat-peer-avatar" class="w-9 h-9 rounded-full bg-zinc-800 text-white flex items-center justify-center text-xs font-bold shrink-0">U</div>
+              <div class="min-w-0">
+                <p id="chat-peer-name" class="text-sm font-bold leading-tight truncate">Reader</p>
+                <p id="chat-peer-username" class="text-[11px] text-zinc-500 truncate">@reader</p>
+              </div>
             </div>
           </div>
           <button type="button" onclick="closeChatThread()" class="text-xs font-semibold text-zinc-500 hover:text-zinc-900 dark:hover:text-white px-2.5 py-1 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-900 transition">Inbox</button>
@@ -284,7 +347,7 @@
         </form>
       </div>
 
-      <!-- Inbox, Requests & People Hub -->
+      <!-- Inbox List -->
       <div id="messages-inbox-shell" class="space-y-4">
         <div class="flex items-center justify-between gap-2">
           <div class="flex items-center gap-2">
@@ -295,48 +358,90 @@
             </button>
             <h2 class="text-base font-bold">Messages</h2>
           </div>
-          <button type="button" onclick="switchMsgTab('discover')" class="px-3.5 py-1.5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black text-xs font-semibold hover:opacity-90">+ Find People</button>
+          <button type="button" onclick="navigate('people')" class="px-3.5 py-1.5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black text-xs font-semibold hover:opacity-90">+ New Chat</button>
         </div>
 
         <div id="messages-guest-notice" class="hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 rounded-xl p-6 text-center">
-          <p class="text-sm font-bold">Sign in to connect with readers</p>
-          <p class="text-xs text-zinc-500 mt-1">Send friend requests, accept connections, and send direct messages.</p>
+          <p class="text-sm font-bold">Sign in to message friends</p>
+          <p class="text-xs text-zinc-500 mt-1">Chat privately with connected readers and authors.</p>
           <button type="button" onclick="openAuthModal('signin')" class="mt-4 px-4 py-2 rounded-full bg-blue-600 text-white text-xs font-semibold">Sign In</button>
         </div>
 
-        <div id="messages-main-hub" class="hidden space-y-4">
-          <div class="flex border-b border-zinc-200 dark:border-zinc-800 text-xs font-bold">
-            <button type="button" onclick="switchMsgTab('chats')" id="msg-tab-chats" class="flex-1 py-3 text-center border-b-2 border-blue-500 text-zinc-900 dark:text-white">Chats</button>
-            <button type="button" onclick="switchMsgTab('requests')" id="msg-tab-requests" class="flex-1 py-3 text-center border-b-2 border-transparent text-zinc-500 inline-flex items-center justify-center gap-1.5">
-              <span>Requests</span>
-              <span id="tab-req-count" class="hidden px-1.5 py-0.2 text-[10px] rounded-full bg-blue-600 text-white">0</span>
+        <div id="messages-main-hub" class="hidden space-y-3">
+          <div id="chat-friends-list" class="divide-y divide-zinc-200 dark:divide-zinc-800/80 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 overflow-hidden"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MATURE FULL-PAGE PROFILE VIEW (Own Profile or Other Reader Profile) -->
+    <section id="view-profile" class="hidden max-w-3xl mx-auto">
+      <div class="bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-2xl overflow-hidden">
+        <!-- Sticky Profile Top Bar -->
+        <div class="px-4 py-2.5 border-b border-zinc-200 dark:border-zinc-800/80 flex items-center justify-between gap-3 bg-white/95 dark:bg-zinc-950/95">
+          <div class="flex items-center gap-3 min-w-0">
+            <button type="button" onclick="goBackSmart('home')" aria-label="Back" class="p-1.5 -ml-1.5 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-900 text-zinc-700 dark:text-zinc-200 transition">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+              </svg>
             </button>
-            <button type="button" onclick="switchMsgTab('discover')" id="msg-tab-discover" class="flex-1 py-3 text-center border-b-2 border-transparent text-zinc-500">People</button>
-          </div>
-
-          <div id="msg-panel-chats" class="space-y-3">
-            <div id="chat-friends-list" class="divide-y divide-zinc-200 dark:divide-zinc-800/80 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 overflow-hidden"></div>
-          </div>
-
-          <div id="msg-panel-requests" class="hidden space-y-5">
-            <div>
-              <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-500 mb-2">Friend Requests</h3>
-              <div id="incoming-requests-list" class="divide-y divide-zinc-200 dark:divide-zinc-800/80 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 overflow-hidden"></div>
-            </div>
-            <div>
-              <h3 class="text-xs font-bold uppercase tracking-wider text-zinc-500 mb-2">Sent Requests</h3>
-              <div id="outgoing-requests-list" class="divide-y divide-zinc-200 dark:divide-zinc-800/80 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 overflow-hidden"></div>
+            <div class="min-w-0">
+              <h2 id="profile-top-name" class="text-base font-extrabold leading-tight truncate">Profile</h2>
+              <p id="profile-top-sub" class="text-[11px] text-zinc-500 truncate">0 novels</p>
             </div>
           </div>
+          <button id="profile-top-logout" type="button" onclick="signOutUser()" class="hidden px-3 py-1 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-semibold text-zinc-500 hover:text-red-500 transition">Log out</button>
+        </div>
 
-          <div id="msg-panel-discover" class="hidden space-y-3">
+        <!-- Cover Banner -->
+        <div class="relative h-36 sm:h-48 bg-gradient-to-r from-slate-800 via-blue-950 to-zinc-900 overflow-hidden">
+          <img id="profile-page-banner" src="" alt="" class="w-full h-full object-cover hidden" />
+        </div>
+
+        <!-- Avatar + Action Row -->
+        <div class="px-4 sm:px-6 pb-5">
+          <div class="flex items-end justify-between gap-3 -mt-12 sm:-mt-14 mb-3">
             <div class="relative">
-              <input id="reader-search-input" type="text" autocomplete="off" oninput="handleLiveReaderSearch(this.value)" placeholder="Search people by name or @username..." class="w-full px-4 pr-9 py-2.5 text-sm rounded-full bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-500" />
-              <button id="clear-reader-search" type="button" onclick="clearReaderSearch()" aria-label="Clear reader search" class="hidden absolute right-3 top-2.5 w-5 h-5 rounded-full bg-zinc-200 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 text-xs items-center justify-center">X</button>
+              <img id="profile-page-avatar" src="" alt="" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-white dark:border-zinc-950 bg-zinc-900 hidden" />
+              <div id="profile-page-avatar-fallback" class="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-white dark:border-zinc-950 bg-zinc-800 text-white flex items-center justify-center text-3xl font-extrabold">U</div>
             </div>
-            <p id="discover-section-label" class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 px-1">People you may know</p>
-            <div id="discover-readers-list" class="divide-y divide-zinc-200 dark:divide-zinc-800/80 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 overflow-hidden"></div>
+            <div id="profile-page-actions" class="flex items-center gap-2 pt-14"></div>
           </div>
+
+          <!-- Name, Handle & Bio -->
+          <div>
+            <h1 id="profile-page-fullname" class="text-xl font-extrabold tracking-tight text-zinc-900 dark:text-white">Reader</h1>
+            <p id="profile-page-username" class="text-xs sm:text-sm text-zinc-500">@reader</p>
+          </div>
+
+          <p id="profile-page-bio" class="mt-3 text-xs sm:text-sm text-zinc-800 dark:text-zinc-200 leading-relaxed whitespace-pre-line break-words"></p>
+
+          <!-- Metadata Row (Location, Link, Joined, Favorite Genre) -->
+          <div id="profile-page-meta" class="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-zinc-500"></div>
+
+          <!-- Counts Row -->
+          <div class="mt-3.5 flex items-center gap-5 text-xs sm:text-sm">
+            <button type="button" onclick="navigate('people'); switchPeopleTab('friends');" class="hover:underline">
+              <strong id="profile-page-friends-count" class="font-extrabold text-zinc-900 dark:text-white">0</strong>
+              <span class="text-zinc-500 ml-1">Friends</span>
+            </button>
+            <div>
+              <strong id="profile-page-novels-count" class="font-extrabold text-zinc-900 dark:text-white">0</strong>
+              <span class="text-zinc-500 ml-1">Novels</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile Section Tabs -->
+        <div class="flex border-t border-b border-zinc-200 dark:border-zinc-800 text-xs font-bold">
+          <button type="button" onclick="switchProfilePageTab('novels')" id="prof-tab-novels" class="flex-1 py-3 text-center border-b-2 border-blue-500 text-zinc-900 dark:text-white">Novels</button>
+          <button type="button" onclick="switchProfilePageTab('library')" id="prof-tab-library" class="flex-1 py-3 text-center border-b-2 border-transparent text-zinc-500">Library</button>
+          <button type="button" onclick="switchProfilePageTab('about')" id="prof-tab-about" class="flex-1 py-3 text-center border-b-2 border-transparent text-zinc-500">About &amp; Links</button>
+        </div>
+
+        <div class="p-4 sm:p-5">
+          <div id="prof-panel-novels" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
+          <div id="prof-panel-library" class="hidden grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
+          <div id="prof-panel-about" class="hidden space-y-4"></div>
         </div>
       </div>
     </section>
@@ -372,7 +477,7 @@
             <p class="text-xs text-zinc-500 mt-0.5">Publish, manage, or delete novels directly in your catalog.</p>
           </div>
         </div>
-        <button type="button" onclick="openProfileModal('edit')" class="px-3.5 py-1.5 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-900 whitespace-nowrap">Edit Profile</button>
+        <button type="button" onclick="openProfileEditModal('edit')" class="px-3.5 py-1.5 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-900 whitespace-nowrap">Edit Profile</button>
       </div>
 
       <div id="publish-auth-gate" class="hidden border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 rounded-xl p-6 text-center">
@@ -473,7 +578,7 @@
     </div>
   </footer>
 
-  <!-- Mobile Bottom Bar with Symbol Icons -->
+  <!-- Mobile Bottom Bar with Symbol Icons (Browse | People | Library | Messages | Studio) -->
   <nav id="mobile-bottom-bar" aria-label="Mobile Navigation" class="fixed bottom-3 left-1/2 -translate-x-1/2 z-40 md:hidden w-[94vw] max-w-md rounded-full bg-white/95 dark:bg-zinc-950/95 backdrop-blur-md border border-zinc-200/90 dark:border-zinc-800 shadow-2xl px-2 py-1.5 flex items-center justify-between gap-1">
     <button type="button" onclick="navigate('home')" data-bottom-nav="home" aria-label="Browse" class="bottom-nav-btn mobile-pill-active flex-1 py-2.5 rounded-full flex items-center justify-center transition">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -481,7 +586,7 @@
       </svg>
     </button>
 
-    <button type="button" onclick="navigate('messages'); switchMsgTab('discover');" data-bottom-nav="discover" aria-label="People and Friend Requests" class="relative bottom-nav-btn flex-1 py-2.5 rounded-full flex items-center justify-center text-zinc-500 dark:text-zinc-400 transition">
+    <button type="button" onclick="navigate('people')" data-bottom-nav="people" aria-label="People and Friend Requests" class="relative bottom-nav-btn flex-1 py-2.5 rounded-full flex items-center justify-center text-zinc-500 dark:text-zinc-400 transition">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
       </svg>
@@ -494,7 +599,7 @@
       </svg>
     </button>
 
-    <button type="button" onclick="navigate('messages'); switchMsgTab('chats');" data-bottom-nav="messages" aria-label="Messages" class="bottom-nav-btn flex-1 py-2.5 rounded-full flex items-center justify-center text-zinc-500 dark:text-zinc-400 transition">
+    <button type="button" onclick="navigate('messages')" data-bottom-nav="messages" aria-label="Messages" class="bottom-nav-btn flex-1 py-2.5 rounded-full flex items-center justify-center text-zinc-500 dark:text-zinc-400 transition">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M8 10h8m-8 4h5m7-2c0 4.418-3.582 8-8 8a8.96 8.96 0 01-4.128-1L3 20l1.14-3.42A7.963 7.963 0 013 12c0-4.418 3.582-8 8-8s8 3.582 8 8z"/>
       </svg>
@@ -549,43 +654,34 @@
     </div>
   </div>
 
-  <!-- Profile Modal -->
-  <div id="profile-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="view-full-name">
-    <div onclick="closeProfileModal()" class="fixed inset-0 bg-zinc-900/70 backdrop-blur-sm"></div>
+  <!-- Edit Profile & Privacy Modal -->
+  <div id="profile-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 overflow-y-auto" role="dialog" aria-modal="true" aria-labelledby="profile-modal-heading">
+    <div onclick="closeProfileEditModal()" class="fixed inset-0 bg-zinc-900/70 backdrop-blur-sm"></div>
     <div class="relative w-full max-w-md bg-white dark:bg-black border border-zinc-200 dark:border-zinc-800 rounded-2xl p-5 shadow-2xl space-y-4 my-auto max-h-[90vh] overflow-y-auto">
       <div class="flex items-center justify-between gap-2">
         <div class="inline-flex rounded-full bg-zinc-100 dark:bg-zinc-900 p-1 text-xs font-semibold">
-          <button type="button" id="profile-tab-view" onclick="switchProfileMode('view')" class="px-3 py-1 rounded-full bg-white dark:bg-zinc-800 shadow-sm">Profile</button>
-          <button type="button" id="profile-tab-edit" onclick="switchProfileMode('edit')" class="px-3 py-1 rounded-full text-zinc-500">Edit profile</button>
-          <button type="button" id="profile-tab-privacy" onclick="switchProfileMode('privacy')" class="px-3 py-1 rounded-full text-zinc-500">Privacy</button>
+          <button type="button" id="profile-tab-edit" onclick="switchProfileEditTab('edit')" class="px-3.5 py-1 rounded-full bg-white dark:bg-zinc-800 shadow-sm">Edit profile</button>
+          <button type="button" id="profile-tab-privacy" onclick="switchProfileEditTab('privacy')" class="px-3.5 py-1 rounded-full text-zinc-500">Privacy &amp; Security</button>
         </div>
-        <button type="button" onclick="closeProfileModal()" aria-label="Close profile dialog" class="p-1.5 rounded-full text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900">X</button>
+        <button type="button" onclick="closeProfileEditModal()" aria-label="Close profile editor" class="p-1.5 rounded-full text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-900">X</button>
       </div>
 
-      <div id="profile-view-panel" class="space-y-4">
-        <div class="flex items-center gap-3.5">
-          <img id="view-avatar-img" src="" alt="" class="w-16 h-16 rounded-full object-cover border border-zinc-300 dark:border-zinc-800 hidden shrink-0" />
-          <div id="view-avatar-fallback" class="w-16 h-16 rounded-full bg-zinc-800 text-white flex items-center justify-center text-xl font-bold shrink-0">U</div>
-          <div class="min-w-0 flex-1">
-            <p id="view-full-name" class="text-base font-bold truncate">User</p>
-            <p id="view-username" class="text-xs text-zinc-500 truncate">@user</p>
-            <p id="view-email" class="text-[11px] text-zinc-500 truncate mt-0.5"></p>
+      <h3 id="profile-modal-heading" class="sr-only">Profile Settings</h3>
+
+      <form id="profile-edit-form" novalidate onsubmit="handleSaveProfile(event)" class="space-y-3">
+        <!-- Cover Banner Upload -->
+        <div>
+          <label class="block text-xs text-zinc-500 mb-1">Header Banner</label>
+          <div class="relative h-24 rounded-xl overflow-hidden bg-gradient-to-r from-slate-800 via-blue-950 to-zinc-900 border border-zinc-200 dark:border-zinc-800">
+            <img id="profile-banner-preview" src="" alt="" class="w-full h-full object-cover hidden" />
+            <label class="absolute inset-0 flex items-center justify-center bg-black/35 hover:bg-black/50 cursor-pointer text-white text-xs font-semibold transition">
+              <span>Change Banner Photo</span>
+              <input id="profile-banner-file" type="file" accept="image/*" onchange="previewProfileBanner(event)" class="hidden" />
+            </label>
           </div>
         </div>
-        <p id="view-bio-box" class="text-xs text-zinc-700 dark:text-zinc-300 leading-relaxed"></p>
-        <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-zinc-500">
-          <span><strong id="view-connections-count" class="font-bold text-zinc-900 dark:text-white">0</strong> Friends</span>
-          <span>Phone: <strong id="view-phone" class="font-medium text-zinc-800 dark:text-zinc-200">Not added</strong></span>
-          <span>Genre: <strong id="view-genre" class="font-medium text-zinc-800 dark:text-zinc-200">Fantasy</strong></span>
-        </div>
-        <div id="view-social-links" class="flex flex-wrap gap-2"></div>
-        <div class="pt-3 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between gap-2">
-          <button type="button" onclick="closeProfileModal(); signOutUser();" class="px-3.5 py-2 rounded-full border border-zinc-300 dark:border-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-red-500 text-xs font-semibold">Log out</button>
-          <button type="button" onclick="switchProfileMode('edit')" class="px-4 py-2 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black text-xs font-semibold">Edit profile</button>
-        </div>
-      </div>
 
-      <form id="profile-edit-form" novalidate onsubmit="handleSaveProfile(event)" class="hidden space-y-3">
+        <!-- Avatar Upload -->
         <div class="flex items-center gap-3.5 p-3 rounded-xl bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800">
           <div class="relative shrink-0">
             <img id="profile-avatar-preview" src="" alt="" class="w-14 h-14 rounded-full object-cover border border-zinc-300 dark:border-zinc-700 hidden" />
@@ -599,6 +695,7 @@
             </label>
           </div>
         </div>
+
         <div class="grid grid-cols-2 gap-3">
           <div>
             <label class="block text-xs text-zinc-500 mb-1">Name *</label>
@@ -609,10 +706,16 @@
             <input id="profile-username" type="text" required placeholder="username" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
           </div>
         </div>
+
+        <div>
+          <label class="block text-xs text-zinc-500 mb-1">Bio</label>
+          <textarea id="profile-bio" rows="2" placeholder="Write a short bio about yourself..." class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600"></textarea>
+        </div>
+
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs text-zinc-500 mb-1">Phone number</label>
-            <input id="profile-phone" type="tel" placeholder="Phone number" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
+            <label class="block text-xs text-zinc-500 mb-1">Location</label>
+            <input id="profile-location" type="text" placeholder="e.g. Nigeria" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
           </div>
           <div>
             <label class="block text-xs text-zinc-500 mb-1">Favorite genre</label>
@@ -625,13 +728,21 @@
             </select>
           </div>
         </div>
-        <div>
-          <label class="block text-xs text-zinc-500 mb-1">Bio</label>
-          <textarea id="profile-bio" rows="2" placeholder="Add a bio to your profile..." class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600"></textarea>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs text-zinc-500 mb-1">Website</label>
+            <input id="profile-website" type="text" placeholder="https://..." class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
+          </div>
+          <div>
+            <label class="block text-xs text-zinc-500 mb-1">Phone number</label>
+            <input id="profile-phone" type="tel" placeholder="Phone number" class="w-full px-3 py-2 text-sm rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
+          </div>
         </div>
+
         <div class="pt-1 border-t border-zinc-200 dark:border-zinc-800 space-y-2.5">
-          <p class="text-xs font-semibold text-zinc-500">Links</p>
-          <div class="grid grid-cols-2 gap-2.5">
+          <p class="text-xs font-semibold text-zinc-500">Social Links</p>
+          <div class="grid grid-cols-3 gap-2">
             <div>
               <label class="block text-[11px] text-zinc-500 mb-1">X</label>
               <input id="profile-x" type="text" placeholder="@handle" class="w-full px-2.5 py-1.5 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
@@ -644,14 +755,11 @@
               <label class="block text-[11px] text-zinc-500 mb-1">Reddit</label>
               <input id="profile-reddit" type="text" placeholder="u/username" class="w-full px-2.5 py-1.5 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
             </div>
-            <div>
-              <label class="block text-[11px] text-zinc-500 mb-1">Website</label>
-              <input id="profile-website" type="text" placeholder="https://..." class="w-full px-2.5 py-1.5 text-xs rounded-lg bg-zinc-50 dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 focus:outline-none focus:border-blue-600" />
-            </div>
           </div>
         </div>
+
         <div class="pt-2 flex items-center justify-end gap-2">
-          <button type="button" onclick="switchProfileMode('view')" class="px-3.5 py-2 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-semibold">Cancel</button>
+          <button type="button" onclick="closeProfileEditModal()" class="px-3.5 py-2 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-semibold">Cancel</button>
           <button id="save-profile-btn" type="submit" class="px-4 py-2 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black text-xs font-semibold">Save</button>
         </div>
       </form>
@@ -745,7 +853,9 @@
       requests: [],
       messages: [],
       activeChatPeerId: null,
-      msgTab: 'chats',
+      peopleTab: 'discover',
+      viewedProfileId: null,
+      profilePageTab: 'novels',
       realtimeChannel: null,
       activeView: 'home',
       navStack: [],
@@ -760,6 +870,7 @@
 
     let toastTimer = null;
     let prevAvatarBlobUrl = null;
+    let prevBannerBlobUrl = null;
     let prevCoverBlobUrl = null;
 
     function showToast(msg, isError = false) {
@@ -796,6 +907,13 @@
       return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
 
+    function formatJoinedDate(isoString) {
+      if (!isoString) return '';
+      const d = new Date(isoString);
+      if (Number.isNaN(d.getTime())) return '';
+      return d.toLocaleDateString([], { month: 'long', year: 'numeric' });
+    }
+
     async function compressImage(file, maxWidth = 800, quality = 0.82) {
       return new Promise((resolve, reject) => {
         if (!file || !file.type.startsWith('image/')) {
@@ -830,7 +948,7 @@
     }
 
     function updateNavigationHighlights(view) {
-      const desktopTarget = (view === 'novel' || view === 'reader') ? 'home' : view;
+      const desktopTarget = (view === 'novel' || view === 'reader' || view === 'profile') ? 'home' : view;
       document.querySelectorAll('.nav-link').forEach((btn) => {
         const isCurrent = btn.dataset.nav === desktopTarget;
         btn.classList.toggle('text-zinc-900', isCurrent);
@@ -840,12 +958,8 @@
         btn.classList.toggle('border-transparent', !isCurrent);
       });
 
-      const bottomTarget = desktopTarget === 'messages'
-        ? (state.msgTab === 'discover' ? 'discover' : 'messages')
-        : desktopTarget;
-
       document.querySelectorAll('.bottom-nav-btn').forEach((btn) => {
-        const isActive = btn.dataset.bottomNav === bottomTarget;
+        const isActive = btn.dataset.bottomNav === desktopTarget;
         btn.classList.toggle('mobile-pill-active', isActive);
         btn.classList.toggle('text-zinc-500', !isActive);
         btn.classList.toggle('dark:text-zinc-400', !isActive);
@@ -854,7 +968,8 @@
 
     async function uploadImageFile(file, folder) {
       if (!state.user) throw new Error('Please sign in before uploading images.');
-      const { blob, dataUrl } = await compressImage(file, folder === 'avatars' ? 400 : 720, 0.82);
+      const maxW = folder === 'avatars' ? 400 : folder === 'banners' ? 1200 : 720;
+      const { blob, dataUrl } = await compressImage(file, maxW, 0.82);
       const filePath = `${folder}/${state.user.id}-${Date.now()}.jpg`;
 
       try {
@@ -918,7 +1033,7 @@
       closeMobileDrawer();
       closeContactModal();
       closeAuthModal();
-      closeProfileModal();
+      closeProfileEditModal();
       cancelMatureGate();
     });
 
@@ -936,7 +1051,7 @@
     }
 
     function navigate(view, opts = {}) {
-      const validViews = ['home', 'novel', 'reader', 'messages', 'library', 'publish'];
+      const validViews = ['home', 'novel', 'reader', 'people', 'messages', 'profile', 'library', 'publish'];
       const target = validViews.includes(view) ? view : 'home';
       const shouldPush = opts.push !== false && !state.isPoppingHistory;
 
@@ -963,9 +1078,16 @@
       if (target === 'home') renderNovels();
       if (target === 'library') renderLibrary();
       if (target === 'publish') renderPublishView();
+      if (target === 'people') {
+        loadSocialData();
+        renderPeopleView();
+      }
       if (target === 'messages') {
         loadSocialData();
         renderMessagesView();
+      }
+      if (target === 'profile') {
+        renderProfilePage();
       }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -1042,7 +1164,7 @@
           window.history.replaceState({}, document.title, window.location.pathname);
           closeAuthModal();
           if (isRecovery) {
-            openProfileModal('privacy');
+            openProfileEditModal('privacy');
             showToast('Set your new password below.');
           } else {
             showToast('Signed in!');
@@ -1053,7 +1175,7 @@
           await setCurrentUser(nextSession?.user || null);
           if (event === 'PASSWORD_RECOVERY' && nextSession?.user) {
             closeAuthModal();
-            openProfileModal('privacy');
+            openProfileEditModal('privacy');
             showToast('Enter your new password below.');
           } else if (event === 'SIGNED_IN' && nextSession?.user) {
             closeAuthModal();
@@ -1102,7 +1224,7 @@
         }
 
         drawerBox.innerHTML = `
-          <div onclick="closeMobileDrawer(); openProfileModal('view');" class="cursor-pointer">
+          <div onclick="closeMobileDrawer(); openUserProfile();" class="cursor-pointer">
             ${avatarUrl
               ? `<img src="${escapeHtml(avatarUrl)}" alt="" class="w-11 h-11 rounded-full object-cover" />`
               : `<div class="w-11 h-11 rounded-full bg-zinc-800 text-white flex items-center justify-center font-bold text-base">${escapeHtml(displayName.charAt(0).toUpperCase())}</div>`
@@ -1159,8 +1281,10 @@
 
       renderNovels();
       renderPublishView();
+      renderPeopleView();
       renderMessagesView();
       if (state.activeView === 'library') renderLibrary();
+      if (state.activeView === 'profile') renderProfilePage();
     }
 
     async function signOutUser() {
@@ -1174,6 +1298,214 @@
       }
     }
 
+    /* ==================== FULL-PAGE MATURE PROFILE VIEW ==================== */
+    function openUserProfile(profileId = null) {
+      if (!profileId && !state.user) return openAuthModal('signin');
+      state.viewedProfileId = profileId || state.user.id;
+      state.profilePageTab = 'novels';
+      navigate('profile');
+    }
+
+    function openPeerProfileFromChat() {
+      if (!state.activeChatPeerId) return;
+      openUserProfile(state.activeChatPeerId);
+    }
+
+    function switchProfilePageTab(tab) {
+      state.profilePageTab = tab;
+      ['novels', 'library', 'about'].forEach((t) => {
+        const active = t === tab;
+        document.getElementById('prof-panel-' + t).classList.toggle('hidden', !active);
+        const btn = document.getElementById('prof-tab-' + t);
+        btn.classList.toggle('border-blue-500', active);
+        btn.classList.toggle('text-zinc-900', active);
+        btn.classList.toggle('dark:text-white', active);
+        btn.classList.toggle('border-transparent', !active);
+        btn.classList.toggle('text-zinc-500', !active);
+      });
+    }
+
+    function renderProfilePage() {
+      const targetId = state.viewedProfileId || state.user?.id;
+      if (!targetId) return;
+
+      const isSelf = state.user && targetId === state.user.id;
+      const meta = isSelf ? (state.user.user_metadata || {}) : {};
+      const readerRecord = state.readers.find(r => r.id === targetId);
+
+      const displayName = isSelf
+        ? getDisplayName(state.user)
+        : (readerRecord?.full_name || state.novels.find(n => n.author_id === targetId)?.author_name || 'Reader');
+      const username = isSelf
+        ? getUsername(state.user)
+        : (readerRecord?.username || 'reader');
+      const avatarUrl = isSelf ? meta.avatar_url : readerRecord?.avatar_url;
+      const bannerUrl = isSelf ? meta.banner_url : null;
+      const bio = isSelf ? (meta.bio || '') : (readerRecord?.bio || '');
+      const locationStr = isSelf ? (meta.location || '') : '';
+      const websiteStr = isSelf ? (meta.website || '') : '';
+      const favGenre = isSelf ? (meta.favorite_genre || '') : '';
+      const joinedStr = isSelf
+        ? formatJoinedDate(state.user.created_at)
+        : formatJoinedDate(readerRecord?.updated_at);
+
+      const userNovels = state.novels.filter(n => n.author_id === targetId);
+      const friendsCount = getConnectionCount(targetId);
+
+      document.getElementById('profile-top-name').textContent = displayName;
+      document.getElementById('profile-top-sub').textContent = `${userNovels.length} novel${userNovels.length === 1 ? '' : 's'}`;
+      document.getElementById('profile-top-logout').classList.toggle('hidden', !isSelf);
+
+      const bannerImg = document.getElementById('profile-page-banner');
+      if (bannerUrl) {
+        bannerImg.src = bannerUrl;
+        bannerImg.classList.remove('hidden');
+      } else {
+        bannerImg.classList.add('hidden');
+      }
+
+      const avImg = document.getElementById('profile-page-avatar');
+      const avFallback = document.getElementById('profile-page-avatar-fallback');
+      if (avatarUrl) {
+        avImg.src = avatarUrl;
+        avImg.classList.remove('hidden');
+        avFallback.classList.add('hidden');
+      } else {
+        avImg.classList.add('hidden');
+        avFallback.classList.remove('hidden');
+        avFallback.textContent = displayName.charAt(0).toUpperCase();
+      }
+
+      document.getElementById('profile-page-fullname').textContent = displayName;
+      document.getElementById('profile-page-username').textContent = `@${username}`;
+
+      const bioEl = document.getElementById('profile-page-bio');
+      if (bio) {
+        bioEl.textContent = bio;
+        bioEl.classList.remove('hidden');
+      } else {
+        bioEl.textContent = isSelf ? 'Add a bio in Edit profile to tell readers about yourself.' : '';
+        bioEl.classList.toggle('hidden', !isSelf);
+      }
+
+      // Metadata items (Location, Website, Joined Date, Favorite Genre)
+      const metaItems = [];
+      if (locationStr) {
+        metaItems.push(`
+          <span class="inline-flex items-center gap-1">
+            <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"/><circle cx="12" cy="11" r="3"/></svg>
+            <span>${escapeHtml(locationStr)}</span>
+          </span>
+        `);
+      }
+      if (websiteStr) {
+        const cleanSite = websiteStr.replace(/^https?:\/\//, '').replace(/\/$/, '');
+        metaItems.push(`
+          <a href="${escapeHtml(normalizeLink('website', websiteStr))}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 text-blue-500 hover:underline">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+            <span>${escapeHtml(cleanSite)}</span>
+          </a>
+        `);
+      }
+      if (joinedStr) {
+        metaItems.push(`
+          <span class="inline-flex items-center gap-1">
+            <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            <span>Joined ${escapeHtml(joinedStr)}</span>
+          </span>
+        `);
+      }
+      if (favGenre) {
+        metaItems.push(`
+          <span class="inline-flex items-center gap-1">
+            <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            <span>${escapeHtml(favGenre)}</span>
+          </span>
+        `);
+      }
+      document.getElementById('profile-page-meta').innerHTML = metaItems.join('');
+
+      document.getElementById('profile-page-friends-count').textContent = friendsCount;
+      document.getElementById('profile-page-novels-count').textContent = userNovels.length;
+
+      // Action buttons (Edit profile if own profile, or Friend/Message actions if viewing another reader)
+      const actionsBox = document.getElementById('profile-page-actions');
+      if (isSelf) {
+        actionsBox.innerHTML = `
+          <button type="button" onclick="openProfileEditModal('edit')" class="px-4 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-xs sm:text-sm font-bold transition">Edit profile</button>
+        `;
+      } else {
+        const conn = getConnectionBetween(targetId);
+        if (conn?.status === 'accepted') {
+          actionsBox.innerHTML = `
+            <button type="button" onclick="navigate('messages'); openChatThread('${targetId}');" class="px-4 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-bold transition">Message</button>
+            <button type="button" onclick="cancelOrDeclineRequest('${conn.id}'); renderProfilePage();" class="px-3.5 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-xs font-semibold text-zinc-500 hover:text-red-500 transition">Unfriend</button>
+          `;
+        } else if (conn && conn.sender_id === state.user?.id) {
+          actionsBox.innerHTML = `
+            <button type="button" onclick="cancelOrDeclineRequest('${conn.id}'); renderProfilePage();" class="px-4 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-xs sm:text-sm font-semibold text-zinc-500 transition">Cancel Request</button>
+          `;
+        } else if (conn) {
+          actionsBox.innerHTML = `
+            <button type="button" onclick="acceptReaderRequest('${conn.id}'); renderProfilePage();" class="px-4 py-1.5 rounded-full bg-blue-600 text-white text-xs sm:text-sm font-bold transition">Confirm Request</button>
+          `;
+        } else {
+          actionsBox.innerHTML = `
+            <button type="button" onclick="sendReaderRequest('${targetId}'); renderProfilePage();" class="px-4 py-1.5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black text-xs sm:text-sm font-bold transition">+ Add Friend</button>
+          `;
+        }
+      }
+
+      // Populate Profile Tabs
+      const novelsPanel = document.getElementById('prof-panel-novels');
+      novelsPanel.innerHTML = userNovels.length
+        ? userNovels.map(n => novelCardHTML(n)).join('')
+        : `<p class="col-span-full py-6 text-center text-xs text-zinc-500">${isSelf ? 'You have not published any novels yet.' : 'No novels published yet.'}</p>`;
+
+      const libraryPanel = document.getElementById('prof-panel-library');
+      if (isSelf) {
+        const saved = state.novels.filter(n => state.bookmarks.some(id => String(id) === String(n.id)));
+        libraryPanel.innerHTML = saved.length
+          ? saved.map(n => novelCardHTML(n)).join('')
+          : `<p class="col-span-full py-6 text-center text-xs text-zinc-500">Your bookmarked library is empty.</p>`;
+      } else {
+        libraryPanel.innerHTML = `<p class="col-span-full py-6 text-center text-xs text-zinc-500">Reader library is private.</p>`;
+      }
+
+      const aboutPanel = document.getElementById('prof-panel-about');
+      const linkCards = [];
+      if (isSelf && meta.x_handle) {
+        linkCards.push(`<a href="${escapeHtml(normalizeLink('x', meta.x_handle))}" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-xs font-semibold">X: ${escapeHtml(meta.x_handle)}</a>`);
+      }
+      if (isSelf && meta.telegram) {
+        linkCards.push(`<a href="${escapeHtml(normalizeLink('telegram', meta.telegram))}" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-xs font-semibold">Telegram: ${escapeHtml(meta.telegram)}</a>`);
+      }
+      if (isSelf && meta.reddit) {
+        linkCards.push(`<a href="${escapeHtml(normalizeLink('reddit', meta.reddit))}" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-xs font-semibold">Reddit: ${escapeHtml(meta.reddit)}</a>`);
+      }
+      if (websiteStr) {
+        linkCards.push(`<a href="${escapeHtml(normalizeLink('website', websiteStr))}" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-xl border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-xs font-semibold">Website</a>`);
+      }
+
+      aboutPanel.innerHTML = `
+        <div class="space-y-3 text-xs">
+          ${isSelf ? `<p class="text-zinc-500">Email: <span class="text-zinc-900 dark:text-zinc-200 font-medium">${escapeHtml(state.user.email)}</span></p>` : ''}
+          ${isSelf && meta.phone ? `<p class="text-zinc-500">Phone: <span class="text-zinc-900 dark:text-zinc-200 font-medium">${escapeHtml(meta.phone)}</span></p>` : ''}
+          <div class="flex flex-wrap gap-2 pt-1">
+            ${linkCards.length ? linkCards.join('') : '<p class="text-zinc-500">No external links added.</p>'}
+          </div>
+          ${isSelf ? `
+            <div class="pt-4 border-t border-zinc-200 dark:border-zinc-800 flex items-center gap-2">
+              <button type="button" onclick="openProfileEditModal('privacy')" class="px-3.5 py-2 rounded-full border border-zinc-200 dark:border-zinc-800 font-semibold hover:bg-zinc-100 dark:hover:bg-zinc-900">Account &amp; Password Settings</button>
+            </div>
+          ` : ''}
+        </div>
+      `;
+
+      switchProfilePageTab(state.profilePageTab);
+    }
+
+    /* ==================== PEOPLE & FRIEND REQUESTS SECTION ==================== */
     let readerSearchTimer = null;
 
     function clearReaderSearch() {
@@ -1249,7 +1581,9 @@
       state.readers = readers || [];
       state.requests = reqs || [];
       updateRequestBadges();
+      renderPeopleView();
       renderMessagesView();
+      if (state.activeView === 'profile') renderProfilePage();
     }
 
     function setupSocialRealtime() {
@@ -1315,25 +1649,22 @@
       }
     }
 
-    function switchMsgTab(tab) {
-      state.msgTab = tab;
-      ['chats', 'requests', 'discover'].forEach(t => {
+    function switchPeopleTab(tab) {
+      state.peopleTab = tab;
+      ['discover', 'requests', 'friends'].forEach(t => {
         const active = t === tab;
-        document.getElementById('msg-panel-' + t).classList.toggle('hidden', !active);
-        const btn = document.getElementById('msg-tab-' + t);
+        document.getElementById('people-panel-' + t).classList.toggle('hidden', !active);
+        const btn = document.getElementById('people-tab-' + t);
         btn.classList.toggle('border-blue-500', active);
         btn.classList.toggle('text-zinc-900', active);
         btn.classList.toggle('dark:text-white', active);
         btn.classList.toggle('border-transparent', !active);
         btn.classList.toggle('text-zinc-500', !active);
       });
-      updateNavigationHighlights('messages');
       if (tab === 'discover') {
-        loadSocialData();
         setTimeout(() => document.getElementById('reader-search-input')?.focus(), 50);
-      } else {
-        renderMessagesView();
       }
+      renderPeopleView();
     }
 
     function getConnectionBetween(otherId) {
@@ -1384,7 +1715,7 @@
           .update({ status: 'accepted' })
           .eq('id', requestId);
         if (error) throw error;
-        showToast('Friend request confirmed! You can now message each other.');
+        showToast('Friend request confirmed!');
         await loadSocialData();
       } catch (err) {
         showToast(err.message || 'Could not confirm request.', true);
@@ -1395,7 +1726,7 @@
       try {
         const { error } = await sb.from('friend_requests').delete().eq('id', requestId);
         if (error) throw error;
-        showToast('Request updated.');
+        showToast('Updated.');
         await loadSocialData();
       } catch (err) {
         showToast(err.message || 'Could not update request.', true);
@@ -1410,9 +1741,9 @@
       return `<div class="${sizeClass} rounded-full bg-zinc-800 text-white flex items-center justify-center font-bold shrink-0">${escapeHtml(name.charAt(0).toUpperCase())}</div>`;
     }
 
-    function renderMessagesView() {
-      const guestNotice = document.getElementById('messages-guest-notice');
-      const mainHub = document.getElementById('messages-main-hub');
+    function renderPeopleView() {
+      const guestNotice = document.getElementById('people-guest-notice');
+      const mainHub = document.getElementById('people-main-hub');
 
       if (!state.user) {
         guestNotice.classList.remove('hidden');
@@ -1423,73 +1754,28 @@
       guestNotice.classList.add('hidden');
       mainHub.classList.remove('hidden');
 
-      if (state.activeChatPeerId) {
-        document.getElementById('messages-inbox-shell').classList.add('hidden');
-        document.getElementById('active-chat-box').classList.remove('hidden');
-      } else {
-        document.getElementById('active-chat-box').classList.add('hidden');
-        document.getElementById('messages-inbox-shell').classList.remove('hidden');
-      }
-
-      renderAcceptedChats();
-      renderRequestsTab();
       renderDiscoverReaders();
-    }
-
-    function renderAcceptedChats() {
-      const listEl = document.getElementById('chat-friends-list');
-      if (!state.user) return;
-      const accepted = state.requests.filter(
-        r => r.status === 'accepted' && (r.sender_id === state.user.id || r.receiver_id === state.user.id)
-      );
-
-      if (accepted.length === 0) {
-        listEl.innerHTML = `
-          <div class="p-6 text-center space-y-2">
-            <p class="text-sm font-bold">No messages yet</p>
-            <p class="text-xs text-zinc-500">Add friends and confirm requests to start chatting.</p>
-            <button type="button" onclick="switchMsgTab('discover')" class="mt-2 px-4 py-1.5 rounded-full bg-blue-600 text-white text-xs font-semibold">Find People</button>
-          </div>
-        `;
-        return;
-      }
-
-      listEl.innerHTML = accepted.map(conn => {
-        const peerId = conn.sender_id === state.user.id ? conn.receiver_id : conn.sender_id;
-        const peer = state.readers.find(r => r.id === peerId) || { id: peerId, full_name: 'Reader', username: 'reader' };
-        const friendsCount = getConnectionCount(peerId);
-
-        return `
-          <button type="button" onclick="openChatThread('${peerId}')" class="w-full px-4 py-3.5 flex items-center justify-between gap-3 text-left hover:bg-zinc-50 dark:hover:bg-zinc-900/70 transition">
-            <div class="flex items-center gap-3 min-w-0">
-              ${avatarMarkup(peer)}
-              <div class="min-w-0">
-                <p class="text-sm font-bold truncate">${escapeHtml(peer.full_name)}</p>
-                <p class="text-xs text-zinc-500 truncate">@${escapeHtml(peer.username)} · ${friendsCount} friend${friendsCount === 1 ? '' : 's'}</p>
-              </div>
-            </div>
-            <span class="text-xs font-semibold text-blue-500 shrink-0">Chat</span>
-          </button>
-        `;
-      }).join('');
+      renderRequestsTab();
+      renderFriendsListTab();
     }
 
     function renderRequestsTab() {
       const incomingEl = document.getElementById('incoming-requests-list');
       const outgoingEl = document.getElementById('outgoing-requests-list');
+      if (!incomingEl || !outgoingEl || !state.user) return;
 
       const incoming = state.requests.filter(r => r.receiver_id === state.user.id && r.status === 'pending');
       const outgoing = state.requests.filter(r => r.sender_id === state.user.id && r.status === 'pending');
 
       incomingEl.innerHTML = incoming.length
         ? incoming.map(req => {
-            const sender = state.readers.find(r => r.id === req.sender_id) || { full_name: 'Reader', username: 'reader' };
+            const sender = state.readers.find(r => r.id === req.sender_id) || { id: req.sender_id, full_name: 'Reader', username: 'reader' };
             return `
               <div class="px-4 py-3 flex items-center justify-between gap-3">
-                <div class="flex items-center gap-3 min-w-0">
+                <div onclick="openUserProfile('${sender.id}')" class="flex items-center gap-3 min-w-0 cursor-pointer">
                   ${avatarMarkup(sender)}
                   <div class="min-w-0">
-                    <p class="text-sm font-bold truncate">${escapeHtml(sender.full_name)}</p>
+                    <p class="text-sm font-bold truncate hover:underline">${escapeHtml(sender.full_name)}</p>
                     <p class="text-xs text-zinc-500 truncate">@${escapeHtml(sender.username)}</p>
                   </div>
                 </div>
@@ -1500,17 +1786,17 @@
               </div>
             `;
           }).join('')
-        : `<p class="p-4 text-xs text-zinc-500">No friend requests.</p>`;
+        : `<p class="p-4 text-xs text-zinc-500">No incoming friend requests.</p>`;
 
       outgoingEl.innerHTML = outgoing.length
         ? outgoing.map(req => {
-            const receiver = state.readers.find(r => r.id === req.receiver_id) || { full_name: 'Reader', username: 'reader' };
+            const receiver = state.readers.find(r => r.id === req.receiver_id) || { id: req.receiver_id, full_name: 'Reader', username: 'reader' };
             return `
               <div class="px-4 py-3 flex items-center justify-between gap-3">
-                <div class="flex items-center gap-3 min-w-0">
+                <div onclick="openUserProfile('${receiver.id}')" class="flex items-center gap-3 min-w-0 cursor-pointer">
                   ${avatarMarkup(receiver)}
                   <div class="min-w-0">
-                    <p class="text-sm font-bold truncate">${escapeHtml(receiver.full_name)}</p>
+                    <p class="text-sm font-bold truncate hover:underline">${escapeHtml(receiver.full_name)}</p>
                     <p class="text-xs text-zinc-500 truncate">@${escapeHtml(receiver.username)}</p>
                   </div>
                 </div>
@@ -1519,6 +1805,39 @@
             `;
           }).join('')
         : `<p class="p-4 text-xs text-zinc-500">No sent requests.</p>`;
+    }
+
+    function renderFriendsListTab() {
+      const listEl = document.getElementById('all-friends-list');
+      if (!listEl || !state.user) return;
+      const accepted = state.requests.filter(
+        r => r.status === 'accepted' && (r.sender_id === state.user.id || r.receiver_id === state.user.id)
+      );
+
+      if (accepted.length === 0) {
+        listEl.innerHTML = `<p class="p-5 text-center text-xs text-zinc-500">You have not added any friends yet.</p>`;
+        return;
+      }
+
+      listEl.innerHTML = accepted.map(conn => {
+        const peerId = conn.sender_id === state.user.id ? conn.receiver_id : conn.sender_id;
+        const peer = state.readers.find(r => r.id === peerId) || { id: peerId, full_name: 'Reader', username: 'reader' };
+        return `
+          <div class="px-4 py-3 flex items-center justify-between gap-3">
+            <div onclick="openUserProfile('${peerId}')" class="flex items-center gap-3 min-w-0 cursor-pointer">
+              ${avatarMarkup(peer)}
+              <div class="min-w-0">
+                <p class="text-sm font-bold truncate hover:underline">${escapeHtml(peer.full_name)}</p>
+                <p class="text-xs text-zinc-500 truncate">@${escapeHtml(peer.username)}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <button type="button" onclick="navigate('messages'); openChatThread('${peerId}');" class="px-3.5 py-1.5 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition">Message</button>
+              <button type="button" onclick="cancelOrDeclineRequest('${conn.id}')" class="px-3 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-xs font-semibold text-zinc-500 hover:text-red-500 transition">Unfriend</button>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     function renderDiscoverReaders() {
@@ -1569,10 +1888,7 @@
         if (conn) {
           if (conn.status === 'accepted') {
             actionBtn = `
-              <div class="flex items-center gap-1.5 shrink-0">
-                <button type="button" onclick="switchMsgTab('chats'); openChatThread('${reader.id}');" class="px-3 py-1.5 rounded-full bg-blue-600 text-white text-xs font-bold hover:bg-blue-700">Message</button>
-                <button type="button" onclick="cancelOrDeclineRequest('${conn.id}')" class="px-2.5 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-[11px] font-semibold text-zinc-500 hover:text-red-500">Unfriend</button>
-              </div>
+              <button type="button" onclick="navigate('messages'); openChatThread('${reader.id}');" class="px-3.5 py-1.5 rounded-full bg-zinc-900 dark:bg-white text-white dark:text-black text-xs font-bold shrink-0">Message</button>
             `;
           } else if (conn.sender_id === state.user.id) {
             actionBtn = `<button type="button" onclick="cancelOrDeclineRequest('${conn.id}')" class="px-3.5 py-1.5 rounded-full border border-zinc-300 dark:border-zinc-700 text-zinc-500 text-xs font-semibold shrink-0">Cancel Request</button>`;
@@ -1583,16 +1899,78 @@
 
         return `
           <div class="px-4 py-3 flex items-center justify-between gap-3 hover:bg-zinc-50 dark:hover:bg-zinc-900/60 transition">
-            <div class="flex items-center gap-3 min-w-0">
+            <div onclick="openUserProfile('${reader.id}')" class="flex items-center gap-3 min-w-0 cursor-pointer">
               ${avatarMarkup(reader, 'w-11 h-11 text-sm')}
               <div class="min-w-0">
-                <p class="text-sm font-bold text-zinc-900 dark:text-white truncate">${escapeHtml(reader.full_name)}</p>
+                <p class="text-sm font-bold text-zinc-900 dark:text-white truncate hover:underline">${escapeHtml(reader.full_name)}</p>
                 <p class="text-xs text-zinc-500 truncate">@${escapeHtml(reader.username)} · ${friendsCount} friend${friendsCount === 1 ? '' : 's'}</p>
                 ${reader.bio ? `<p class="text-xs text-zinc-600 dark:text-zinc-300 line-clamp-1 mt-0.5">${escapeHtml(reader.bio)}</p>` : ''}
               </div>
             </div>
             ${actionBtn}
           </div>
+        `;
+      }).join('');
+    }
+
+    /* ==================== DEDICATED MESSAGES SECTION ==================== */
+    function renderMessagesView() {
+      const guestNotice = document.getElementById('messages-guest-notice');
+      const mainHub = document.getElementById('messages-main-hub');
+
+      if (!state.user) {
+        guestNotice.classList.remove('hidden');
+        mainHub.classList.add('hidden');
+        return;
+      }
+
+      guestNotice.classList.add('hidden');
+      mainHub.classList.remove('hidden');
+
+      if (state.activeChatPeerId) {
+        document.getElementById('messages-inbox-shell').classList.add('hidden');
+        document.getElementById('active-chat-box').classList.remove('hidden');
+      } else {
+        document.getElementById('active-chat-box').classList.add('hidden');
+        document.getElementById('messages-inbox-shell').classList.remove('hidden');
+      }
+
+      renderAcceptedChats();
+    }
+
+    function renderAcceptedChats() {
+      const listEl = document.getElementById('chat-friends-list');
+      if (!listEl || !state.user) return;
+      const accepted = state.requests.filter(
+        r => r.status === 'accepted' && (r.sender_id === state.user.id || r.receiver_id === state.user.id)
+      );
+
+      if (accepted.length === 0) {
+        listEl.innerHTML = `
+          <div class="p-6 text-center space-y-2">
+            <p class="text-sm font-bold">No messages yet</p>
+            <p class="text-xs text-zinc-500">Connect with friends in the People section to start chatting.</p>
+            <button type="button" onclick="navigate('people')" class="mt-2 px-4 py-1.5 rounded-full bg-blue-600 text-white text-xs font-semibold">Find People</button>
+          </div>
+        `;
+        return;
+      }
+
+      listEl.innerHTML = accepted.map(conn => {
+        const peerId = conn.sender_id === state.user.id ? conn.receiver_id : conn.sender_id;
+        const peer = state.readers.find(r => r.id === peerId) || { id: peerId, full_name: 'Reader', username: 'reader' };
+
+        return `
+          <button type="button" onclick="openChatThread('${peerId}')" class="w-full px-4 py-3.5 flex items-center justify-between gap-3 text-left hover:bg-zinc-50 dark:hover:bg-zinc-900/70 transition">
+            <div class="flex items-center gap-3 min-w-0">
+              ${avatarMarkup(peer)}
+              <div class="min-w-0">
+                <p class="text-sm font-bold truncate">${escapeHtml(peer.full_name)}</p>
+                <p class="text-xs text-zinc-500 truncate">@${escapeHtml(peer.username)}</p>
+              </div>
+            </div>
+            <span class="text-xs font-semibold text-blue-500 shrink-0">Message</span>
+          </button>
         `;
       }).join('');
     }
@@ -1710,83 +2088,54 @@
       }
     }
 
-    function switchProfileMode(mode) {
-      const panels = {
-        view: document.getElementById('profile-view-panel'),
-        edit: document.getElementById('profile-edit-form'),
-        privacy: document.getElementById('profile-privacy-panel')
-      };
-      const tabs = {
-        view: document.getElementById('profile-tab-view'),
-        edit: document.getElementById('profile-tab-edit'),
-        privacy: document.getElementById('profile-tab-privacy')
-      };
+    /* ==================== EDIT PROFILE & PRIVACY MODAL ==================== */
+    function switchProfileEditTab(mode) {
+      const editForm = document.getElementById('profile-edit-form');
+      const privacyPanel = document.getElementById('profile-privacy-panel');
+      const tabEdit = document.getElementById('profile-tab-edit');
+      const tabPrivacy = document.getElementById('profile-tab-privacy');
 
-      ['view', 'edit', 'privacy'].forEach(key => {
-        const active = key === mode;
-        panels[key].classList.toggle('hidden', !active);
-        tabs[key].className = active
-          ? 'px-3 py-1 rounded-full bg-white dark:bg-zinc-800 shadow-sm text-zinc-900 dark:text-white'
-          : 'px-3 py-1 rounded-full text-zinc-500';
-      });
+      const isEdit = mode === 'edit';
+      editForm.classList.toggle('hidden', !isEdit);
+      privacyPanel.classList.toggle('hidden', isEdit);
+
+      tabEdit.className = isEdit
+        ? 'px-3.5 py-1 rounded-full bg-white dark:bg-zinc-800 shadow-sm text-zinc-900 dark:text-white'
+        : 'px-3.5 py-1 rounded-full text-zinc-500';
+      tabPrivacy.className = !isEdit
+        ? 'px-3.5 py-1 rounded-full bg-white dark:bg-zinc-800 shadow-sm text-zinc-900 dark:text-white'
+        : 'px-3.5 py-1 rounded-full text-zinc-500';
+
       setFormStatus('privacy-status', '');
     }
 
-    function openProfileModal(mode = 'view') {
+    function openProfileEditModal(mode = 'edit') {
       if (!state.user) return openAuthModal('signin');
       const meta = state.user.user_metadata || {};
       const displayName = getDisplayName(state.user);
       const username = getUsername(state.user);
 
-      document.getElementById('view-full-name').textContent = displayName;
-      document.getElementById('view-username').textContent = `@${username}`;
-      document.getElementById('view-email').textContent = state.user.email;
-      document.getElementById('view-connections-count').textContent = getConnectionCount(state.user.id);
-      document.getElementById('view-phone').textContent = meta.phone || 'Not added';
-      document.getElementById('view-genre').textContent = meta.favorite_genre || 'Fantasy';
-      document.getElementById('view-bio-box').textContent = meta.bio || 'No bio added yet.';
       document.getElementById('privacy-current-email').textContent = state.user.email;
-
-      const vImg = document.getElementById('view-avatar-img');
-      const vFallback = document.getElementById('view-avatar-fallback');
-      if (meta.avatar_url) {
-        vImg.src = meta.avatar_url;
-        vImg.classList.remove('hidden');
-        vFallback.classList.add('hidden');
-      } else {
-        vImg.classList.add('hidden');
-        vFallback.classList.remove('hidden');
-        vFallback.textContent = displayName.charAt(0).toUpperCase();
-      }
-
-      const linksContainer = document.getElementById('view-social-links');
-      const badges = [];
-      if (meta.x_handle) {
-        badges.push(`<a href="${escapeHtml(normalizeLink('x', meta.x_handle))}" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-full border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-xs font-medium transition">X: ${escapeHtml(meta.x_handle)}</a>`);
-      }
-      if (meta.telegram) {
-        badges.push(`<a href="${escapeHtml(normalizeLink('telegram', meta.telegram))}" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-full border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-xs font-medium transition">Telegram: ${escapeHtml(meta.telegram)}</a>`);
-      }
-      if (meta.reddit) {
-        badges.push(`<a href="${escapeHtml(normalizeLink('reddit', meta.reddit))}" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-full border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-xs font-medium transition">Reddit: ${escapeHtml(meta.reddit)}</a>`);
-      }
-      if (meta.website) {
-        badges.push(`<a href="${escapeHtml(normalizeLink('website', meta.website))}" target="_blank" rel="noopener noreferrer" class="px-3 py-1 rounded-full border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-900 text-xs font-medium transition">Website</a>`);
-      }
-      linksContainer.innerHTML = badges.length
-        ? badges.join('')
-        : `<p class="text-[11px] text-zinc-500">No social links added yet.</p>`;
-
       document.getElementById('profile-full-name').value = displayName;
       document.getElementById('profile-username').value = username;
-      document.getElementById('profile-phone').value = meta.phone || '';
-      document.getElementById('profile-fav-genre').value = meta.favorite_genre || 'Fantasy';
       document.getElementById('profile-bio').value = meta.bio || '';
+      document.getElementById('profile-location').value = meta.location || '';
+      document.getElementById('profile-fav-genre').value = meta.favorite_genre || 'Fantasy';
+      document.getElementById('profile-website').value = meta.website || '';
+      document.getElementById('profile-phone').value = meta.phone || '';
       document.getElementById('profile-x').value = meta.x_handle || '';
       document.getElementById('profile-telegram').value = meta.telegram || '';
       document.getElementById('profile-reddit').value = meta.reddit || '';
-      document.getElementById('profile-website').value = meta.website || '';
       document.getElementById('profile-avatar-file').value = '';
+      document.getElementById('profile-banner-file').value = '';
+
+      const bannerPrev = document.getElementById('profile-banner-preview');
+      if (meta.banner_url) {
+        bannerPrev.src = meta.banner_url;
+        bannerPrev.classList.remove('hidden');
+      } else {
+        bannerPrev.classList.add('hidden');
+      }
 
       const preview = document.getElementById('profile-avatar-preview');
       const fallback = document.getElementById('profile-avatar-fallback');
@@ -1800,7 +2149,7 @@
         fallback.textContent = displayName.charAt(0).toUpperCase();
       }
 
-      switchProfileMode(mode);
+      switchProfileEditTab(mode);
       document.getElementById('profile-modal').classList.remove('hidden');
       document.getElementById('profile-modal').classList.add('flex');
     }
@@ -1817,7 +2166,17 @@
       fallback.classList.add('hidden');
     }
 
-    function closeProfileModal() {
+    function previewProfileBanner(e) {
+      const file = e.target.files?.[0];
+      if (!file) return;
+      if (prevBannerBlobUrl) URL.revokeObjectURL(prevBannerBlobUrl);
+      prevBannerBlobUrl = URL.createObjectURL(file);
+      const preview = document.getElementById('profile-banner-preview');
+      preview.src = prevBannerBlobUrl;
+      preview.classList.remove('hidden');
+    }
+
+    function closeProfileEditModal() {
       const modal = document.getElementById('profile-modal');
       modal.classList.add('hidden');
       modal.classList.remove('flex');
@@ -1837,6 +2196,8 @@
 
       try {
         let avatarUrl = state.user.user_metadata?.avatar_url || null;
+        let bannerUrl = state.user.user_metadata?.banner_url || null;
+
         const avatarInput = document.getElementById('profile-avatar-file');
         const avatarFile = avatarInput.files?.[0];
         if (avatarFile) {
@@ -1844,25 +2205,35 @@
           avatarInput.value = '';
         }
 
+        const bannerInput = document.getElementById('profile-banner-file');
+        const bannerFile = bannerInput.files?.[0];
+        if (bannerFile) {
+          bannerUrl = await uploadImageFile(bannerFile, 'banners');
+          bannerInput.value = '';
+        }
+
         const { data, error } = await sb.auth.updateUser({
           data: {
             full_name: fullName,
             pen_name: fullName,
             username,
-            phone: document.getElementById('profile-phone').value.trim(),
-            favorite_genre: document.getElementById('profile-fav-genre').value,
             bio: document.getElementById('profile-bio').value.trim(),
+            location: document.getElementById('profile-location').value.trim(),
+            favorite_genre: document.getElementById('profile-fav-genre').value,
+            website: document.getElementById('profile-website').value.trim(),
+            phone: document.getElementById('profile-phone').value.trim(),
             x_handle: document.getElementById('profile-x').value.trim(),
             telegram: document.getElementById('profile-telegram').value.trim(),
             reddit: document.getElementById('profile-reddit').value.trim(),
-            website: document.getElementById('profile-website').value.trim(),
-            avatar_url: avatarUrl
+            avatar_url: avatarUrl,
+            banner_url: bannerUrl
           }
         });
 
         if (error) throw error;
         await setCurrentUser(data.user);
-        openProfileModal('view');
+        closeProfileEditModal();
+        if (state.activeView === 'profile') renderProfilePage();
         showToast('Profile saved!');
       } catch (err) {
         showToast(err.message || 'Could not update profile.', true);
@@ -2116,6 +2487,7 @@
       }
       renderNovels();
       if (state.activeView === 'publish') renderPublishView();
+      if (state.activeView === 'profile') renderProfilePage();
     }
 
     async function loadUserBookmarks() {
@@ -2224,13 +2596,17 @@
       let authorActionHTML = '';
       if (novel.author_id && !isOwnNovel) {
         if (conn?.status === 'accepted') {
-          authorActionHTML = `<button type="button" onclick="navigate('messages'); switchMsgTab('chats'); openChatThread('${novel.author_id}');" class="px-4 py-2 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-semibold">Message Author</button>`;
+          authorActionHTML = `<button type="button" onclick="navigate('messages'); openChatThread('${novel.author_id}');" class="px-4 py-2 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-semibold">Message Author</button>`;
         } else if (conn?.status === 'pending') {
           authorActionHTML = `<span class="px-3.5 py-2 rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-500 text-xs font-semibold">Request Pending</span>`;
         } else {
           authorActionHTML = `<button type="button" onclick="sendReaderRequest('${novel.author_id}')" class="px-4 py-2 rounded-full border border-zinc-200 dark:border-zinc-800 text-xs font-semibold">+ Add Friend</button>`;
         }
       }
+
+      const authorLinkHTML = novel.author_id
+        ? `<button type="button" onclick="openUserProfile('${novel.author_id}')" class="text-zinc-800 dark:text-zinc-200 font-semibold hover:underline">${escapeHtml(novel.author_name)}</button>`
+        : `<span class="text-zinc-800 dark:text-zinc-200 font-medium">${escapeHtml(novel.author_name)}</span>`;
 
       const cover = novel.cover_url
         ? `<img src="${escapeHtml(novel.cover_url)}" alt="" class="w-28 sm:w-36 aspect-[2/3] object-cover rounded-lg border border-zinc-200 dark:border-zinc-800 shrink-0" />`
@@ -2246,7 +2622,7 @@
               ${novel.is_mature ? '<span class="px-2.5 py-0.5 text-xs rounded-full bg-red-500/15 text-red-500 font-medium">18+</span>' : ''}
             </div>
             <h1 class="text-xl font-bold break-words">${escapeHtml(novel.title)}</h1>
-            <p class="text-xs text-zinc-500">By <span class="text-zinc-800 dark:text-zinc-200 font-medium">${escapeHtml(novel.author_name)}</span></p>
+            <p class="text-xs text-zinc-500">By ${authorLinkHTML}</p>
             <p class="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed whitespace-pre-line break-words">${escapeHtml(novel.synopsis)}</p>
             <div class="pt-2 flex flex-wrap gap-2">
               <button id="read-first-btn" type="button" class="px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold">Start Reading</button>
